@@ -1,0 +1,41 @@
+# Arquivos que agentes de IA (Cline) nao devem ler nem indexar.
+# Sintaxe igual .gitignore. Bloqueia coleta automatica de contexto,
+# listagem de arquivos e busca. NAO bloqueia referencia explicita (@arquivo).
+
+# Segredos e ambiente
+.env
+.env.*
+!.env.example
+!.env.sample
+*.env.local
+secrets/
+**/secrets/
+**/credentials*
+**/*secret*
+**/*password*
+
+# Chaves e certificados
+*.pem
+*.key
+*.crt
+*.p12
+*.pfx
+*.p8
+*.keystore
+*.jks
+id_rsa*
+id_ed25519*
+
+# Credenciais de servico
+serviceAccount*.json
+gha-creds-*.json
+.aws/
+.ssh/
+.gnupg/
+.netrc
+
+# Tokens de ferramentas
+.npmrc
+.pypirc
+.docker/config.json
+.cargo/credentials*
