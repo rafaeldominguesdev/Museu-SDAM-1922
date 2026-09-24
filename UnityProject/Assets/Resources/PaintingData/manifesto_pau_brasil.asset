@@ -30,7 +30,7 @@ MonoBehaviour:
   description: "O manifesto prop\xF5e uma reflex\xE3o sobre a produ\xE7\xE3o po\xE9tica
     brasileira. Sua circula\xE7\xE3o mostra como os debates modernistas seguiram
     por publica\xE7\xF5es e novos programas art\xEDsticos."
-  funFact:
+  funFact: 
   paintingTexture: {fileID: 0}
   thumbnailSprite: {fileID: 0}
   audioGuide: {fileID: 0}

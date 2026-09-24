@@ -17,23 +17,30 @@ MonoBehaviour:
   year: 1915
   movement: Modernismo brasileiro
   periodo: c. 1915
-  tecnica: "\xD3leo sobre tela (obra de refer\xEAncia)"
+  tecnica: "\xD3leo sobre tela"
   categoria: Pintura
-  relacao_com_a_semana_de_1922: "A artista exp\xF4s na Semana; o painel situa sua
-    pesquisa de retrato anterior a 1922."
-  obra_historica_ou_reinterpretacao: "Painel did\xE1tico criado para este museu virtual.
-    A composi\xE7\xE3o visual \xE9 cenogr\xE1fica; n\xE3o reproduz uma obra original.
-    Autor e per\xEDodo informados referem-se ao assunto hist\xF3rico."
-  resumo: "O retrato de uma mulher sentada combina constru\xE7\xE3o expressiva e
-    \xE1reas de cor."
-  fontes: 'https://www.meer.com/mam/pt/artworks/92663
+  relacao_com_a_semana_de_1922: "Anita Malfatti participou da Semana. Este retrato
+    pertence \xE0 pesquisa expressiva da artista anterior a 1922."
+  obra_historica_ou_reinterpretacao: "Reprodu\xE7\xE3o digital da obra hist\xF3rica
+    identificada nesta ficha. A imagem preserva a composi\xE7\xE3o e as propor\xE7\xF5es
+    da fonte. Cr\xE9dito da reprodu\xE7\xE3o: Anita Malfatti. Cole\xE7\xE3o de Artes
+    Visuais, Instituto de Estudos Brasileiros da USP. Fotografia: P. H. O. V. Campos
+    e E. Kajiya. Fonte: tese de Pedro Herzilio Ottoni Viviani de Campos, USP, 2015."
+  resumo: "Retrato de uma mulher sentada em cadeira vermelha, com uma m\xE3o apoiada
+    sobre o colo."
+  fontes: 'https://teses.usp.br/teses/disponiveis/43/43134/tde-06112015-143351/pt-br.php
 
-    https://anitamalfatti.ieb.usp.br/1921-1922/'
-  description: "O retrato de uma mulher sentada combina constru\xE7\xE3o expressiva
-    e \xE1reas de cor. A figura permite discutir as rela\xE7\xF5es entre postura,
-    enquadramento e express\xE3o na pintura moderna."
-  funFact:
-  paintingTexture: {fileID: 0}
+    https://anitamalfatti.ieb.usp.br/1931-xxxviii-egba/
+
+    https://jornal.usp.br/universidade/como-a-ciencia-pode-desvendar-os-bastidores-das-obras-de-arte/
+
+    Imagem:
+    https://teses.usp.br/teses/disponiveis/43/43134/tde-06112015-143351/publico/TesePCampos.pdf#page=80'
+  description: "Retrato de uma mulher sentada em cadeira vermelha, com uma m\xE3o
+    apoiada sobre o colo. Os contornos e as \xE1reas de cor aproximam a pintura das
+    experi\xEAncias modernistas de Anita Malfatti."
+  funFact: 
+  paintingTexture: {fileID: 2800000, guid: 0b8c02a0fe76b4402b63e5f63284b0ab, type: 3}
   thumbnailSprite: {fileID: 0}
   audioGuide: {fileID: 0}
   audioDuration: 0

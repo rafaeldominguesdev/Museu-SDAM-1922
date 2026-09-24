@@ -11,25 +11,32 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 14256d4cfae25415f84295e8fa960519, type: 3}
   m_Name: ferrignac
-  m_EditorClassIdentifier:
-  title: "Ferrignac (Ign\xE1cio da Costa Ferreira)"
-  artist: "Ferrignac (Ign\xE1cio da Costa Ferreira)"
-  year: 1922
+  m_EditorClassIdentifier: 
+  title: Colombina
+  artist: "Ign\xE1cio da Costa Ferreira (Ferrignac)"
+  year: 0
   movement: Modernismo brasileiro
-  periodo: 1922
-  tecnica: "Composi\xE7\xE3o gr\xE1fica digital de media\xE7\xE3o"
-  categoria: Painel de artista
-  relacao_com_a_semana_de_1922: "Participante da exposi\xE7\xE3o da Semana; este
-    painel n\xE3o atribui uma pintura inventada ao artista."
-  obra_historica_ou_reinterpretacao: "Painel did\xE1tico criado para este museu virtual.
-    A composi\xE7\xE3o visual \xE9 cenogr\xE1fica; n\xE3o reproduz uma obra original.
-    Autor e per\xEDodo informados referem-se ao assunto hist\xF3rico."
-  resumo: Ferrignac esteve entre os expositores de 1922.
-  fontes: https://anitamalfatti.ieb.usp.br/1921-1922/
-  description: "Ferrignac esteve entre os expositores de 1922. O painel chama aten\xE7\xE3o
-    para os nomes que recebem menor destaque nas s\xEDnteses do modernismo."
-  funFact:
-  paintingTexture: {fileID: 0}
+  periodo: Sem data
+  tecnica: Nanquim, aquarela e colagem sobre papel
+  categoria: Obra sobre papel
+  relacao_com_a_semana_de_1922: "Ferrignac foi expositor da Semana. A fonte registra
+    Colombina como sem data; esta reprodu\xE7\xE3o apresenta a produ\xE7\xE3o do
+    artista sem atribuir sua execu\xE7\xE3o ou exposi\xE7\xE3o a 1922."
+  obra_historica_ou_reinterpretacao: "Reprodu\xE7\xE3o digital da obra hist\xF3rica
+    identificada nesta ficha. A imagem preserva a composi\xE7\xE3o e as propor\xE7\xF5es
+    da fonte. Cr\xE9dito da reprodu\xE7\xE3o: Cole\xE7\xE3o M\xE1rio de Andrade \xB7
+    IEB-USP."
+  resumo: Uma figura sentada, de contornos escuros e roupa estampada, ocupa um fundo
+    de tons terrosos.
+  fontes: 'https://mam.org.br/wp-content/uploads/2022/04/mam-modernoondemodernoquando-catalogo-com-ad.pdf
+
+    Imagem:
+    https://mam.org.br/wp-content/uploads/2022/04/mam-modernoondemodernoquando-catalogo-com-ad.pdf'
+  description: "Uma figura sentada, de contornos escuros e roupa estampada, ocupa
+    um fundo de tons terrosos. A combina\xE7\xE3o de desenho, aquarela e colagem
+    cria uma superf\xEDcie marcada por contrastes de cor e textura."
+  funFact: 
+  paintingTexture: {fileID: 2800000, guid: ff962d3793590458ca886e75e5c73179, type: 3}
   thumbnailSprite: {fileID: 0}
   audioGuide: {fileID: 0}
   audioDuration: 0

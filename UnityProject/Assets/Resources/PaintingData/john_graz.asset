@@ -12,26 +12,30 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 14256d4cfae25415f84295e8fa960519, type: 3}
   m_Name: john_graz
   m_EditorClassIdentifier: 
-  title: 'John Graz: pintura e artes decorativas'
+  title: "Retrato do desembargador Gabriel Gon\xE7alves Gomide"
   artist: John Graz
-  year: 1922
+  year: 1917
   movement: Modernismo brasileiro
-  periodo: 1922
-  tecnica: "Painel de media\xE7\xE3o digital"
-  categoria: Painel de artista
-  relacao_com_a_semana_de_1922: "John Graz participou da exposi\xE7\xE3o da Semana
-    de Arte Moderna."
-  obra_historica_ou_reinterpretacao: "Painel did\xE1tico criado para este museu virtual.
-    A composi\xE7\xE3o visual \xE9 cenogr\xE1fica; n\xE3o reproduz uma obra original.
-    Autor e per\xEDodo informados referem-se ao assunto hist\xF3rico."
-  resumo: "A presen\xE7a de John Graz amplia o conjunto de artistas lembrados pela
-    exposi\xE7\xE3o."
-  fontes: https://www.cultura.pr.gov.br/Noticia/Semana-de-Arte-Moderna-de-1922-e-tema-de-serie-de-posts-do-MON
-  description: "A presen\xE7a de John Graz amplia o conjunto de artistas lembrados
-    pela exposi\xE7\xE3o. Este painel convida a pensar a rela\xE7\xE3o entre pintura
-    e espa\xE7os de conviv\xEAncia."
-  funFact:
-  paintingTexture: {fileID: 0}
+  periodo: 1917
+  tecnica: "\xD3leo sobre tela"
+  categoria: Pintura
+  relacao_com_a_semana_de_1922: Segundo o MASP, este retrato de 1917 foi exposto
+    na Semana de Arte Moderna de 1922.
+  obra_historica_ou_reinterpretacao: "Reprodu\xE7\xE3o digital da obra hist\xF3rica
+    identificada nesta ficha. A imagem preserva a composi\xE7\xE3o e as propor\xE7\xF5es
+    da fonte. Cr\xE9dito da reprodu\xE7\xE3o: Acervo MASP \xB7 Foto: Jo\xE3o Musa."
+  resumo: O desembargador, pai dos artistas Antonio Gomide e Regina Gomide Graz,
+    aparece sentado ao lado de uma cortina estampada.
+  fontes: 'https://masp.org.br/acervo/obra/retrato-do-desembargador-gabriel-goncalves-gomide
+
+    Imagem:
+    https://assets.masp.org.br/uploads/temp/WEB_JM_MASP_01128_01.jpg'
+  description: "O desembargador, pai dos artistas Antonio Gomide e Regina Gomide
+    Graz, aparece sentado ao lado de uma cortina estampada. Contornos escuros e pinceladas
+    vis\xEDveis d\xE3o \xE0 figura uma constru\xE7\xE3o levemente geom\xE9trica.
+    A obra foi exposta na Semana de Arte Moderna de 1922."
+  funFact: 
+  paintingTexture: {fileID: 2800000, guid: 9051bcb66b2324b5ea4bd25865aab46f, type: 3}
   thumbnailSprite: {fileID: 0}
   audioGuide: {fileID: 0}
   audioDuration: 0

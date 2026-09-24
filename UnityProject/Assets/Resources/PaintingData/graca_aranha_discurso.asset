@@ -29,7 +29,7 @@ MonoBehaviour:
   description: "A confer\xEAncia integrou a abertura da Semana. A palavra falada,
     junto \xE0 m\xFAsica e \xE0s artes visuais, ajudava a apresentar as novas propostas
     ao p\xFAblico."
-  funFact:
+  funFact: 
   paintingTexture: {fileID: 0}
   thumbnailSprite: {fileID: 0}
   audioGuide: {fileID: 0}

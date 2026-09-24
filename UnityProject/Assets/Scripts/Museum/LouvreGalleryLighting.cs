@@ -11,14 +11,19 @@ namespace MuseumModerna
 
         public static void ApplyDaylight()
         {
-            RenderSettings.ambientMode = AmbientMode.Flat;
-            RenderSettings.ambientLight = new Color(.82f, .80f, .74f);
-            RenderSettings.ambientIntensity = 1;
+            SetAmbient(new Color(.72f, .72f, .68f));
             RenderSettings.fog = false;
-            var diffuse = new SphericalHarmonicsL2();
-            diffuse.AddAmbientLight(new Color(.72f, .72f, .68f));
-            RenderSettings.ambientProbe = diffuse;
             QualitySettings.antiAliasing = 2;
+        }
+
+        public static void SetAmbient(Color color)
+        {
+            RenderSettings.ambientMode = AmbientMode.Flat;
+            RenderSettings.ambientLight = color;
+            RenderSettings.ambientIntensity = 1;
+            var diffuse = new SphericalHarmonicsL2();
+            diffuse.AddAmbientLight(color);
+            RenderSettings.ambientProbe = diffuse;
         }
     }
 }

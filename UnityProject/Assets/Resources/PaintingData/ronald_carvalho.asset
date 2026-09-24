@@ -29,7 +29,7 @@ MonoBehaviour:
   description: "Ronald de Carvalho participou da programa\xE7\xE3o liter\xE1ria do
     evento. O painel destaca a escuta como parte da visita, ao lado da observa\xE7\xE3o
     de imagens."
-  funFact:
+  funFact: 
   paintingTexture: {fileID: 0}
   thumbnailSprite: {fileID: 0}
   audioGuide: {fileID: 0}

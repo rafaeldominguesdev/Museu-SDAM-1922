@@ -31,7 +31,7 @@ namespace MuseumModerna
         [SerializeField] private float autoSaveInterval = 30f;
 
         [Tooltip("Posição inicial padrão usada quando não há save (spawn)")]
-        [SerializeField] private Vector3 defaultSpawnPosition = new Vector3(0f, 1f, 0f);
+        [SerializeField] private Vector3 defaultSpawnPosition = new Vector3(0f, .02f, 0f);
 
         [Header("Referência (preenchida automaticamente)")]
         [SerializeField] private Transform playerTransform;
@@ -151,11 +151,16 @@ namespace MuseumModerna
         {
             // Desabilita o CC temporariamente para evitar colisão ao teleportar
             var cc = playerTransform.GetComponent<CharacterController>();
+            bool wasEnabled = cc != null && cc.enabled;
             if (cc != null) cc.enabled = false;
 
             playerTransform.position = position;
 
-            if (cc != null) cc.enabled = true;
+            if (cc != null) cc.enabled = wasEnabled;
+            Physics.SyncTransforms();
+
+            // Descarta a velocidade antiga; a gravidade volta a apoiar os pés no piso.
+            playerTransform.GetComponent<HeadGazeMovement>()?.SyncLockedY();
         }
     }
 }

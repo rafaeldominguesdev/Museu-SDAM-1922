@@ -39,7 +39,12 @@ namespace MuseumModerna
         {
             // Primeiro sólido atingido: paredes, vitrines e pedestais também bloqueiam o olhar.
             if (Physics.Raycast(ray, out var hit, maxRayDistance, rayMask, QueryTriggerInteraction.Ignore))
-                return hit.collider.GetComponentInParent<PaintingExhibit>();
+            {
+                var original = hit.collider.GetComponentInParent<PaintingExhibit>();
+                if (original != null) return original;
+                var reference = hit.collider.GetComponentInParent<ExhibitGuideReference>();
+                return reference != null ? reference.Source : null;
+            }
             return null;
         }
 

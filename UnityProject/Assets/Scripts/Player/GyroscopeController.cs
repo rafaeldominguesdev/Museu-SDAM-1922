@@ -13,6 +13,7 @@ namespace MuseumModerna
     ///   2. Chame Calibrate() via botão de UI para zerar a rotação atual.
     ///   3. Leia IsLookingDown para saber quando o player olha para baixo.
     /// </summary>
+    [DefaultExecutionOrder(-100)] // Depois da pose XR, antes do movimento e dos menus pelo olhar.
     [RequireComponent(typeof(Camera))]
     public class GyroscopeController : MonoBehaviour
     {
@@ -25,6 +26,9 @@ namespace MuseumModerna
         [Header("Limite de Olhar")]
         [Tooltip("Ângulo de pitch (em graus) abaixo do qual IsLookingDown = true. Ex: -30 = olhando 30° abaixo do horizonte")]
         [SerializeField] private float lookDownThreshold = -30f;
+
+        [Tooltip("Margem em graus para PARAR de andar. Evita liga/desliga quando o pitch oscila em cima do limiar.")]
+        [SerializeField] private float lookDownHysteresis = 8f;
 
         [Tooltip("Pitch máximo para cima (graus positivos = olhar para cima)")]
         [SerializeField] private float pitchMax = 80f;
@@ -60,6 +64,9 @@ namespace MuseumModerna
         /// </summary>
         public bool IsUsingGyroscope { get; private set; }
 
+        /// <summary>O olhar voltou ao horizonte após a última pausa/troca de modo.</summary>
+        public bool IsWalkingGestureArmed { get; private set; }
+
         // ─── Variáveis Privadas ────────────────────────────────────────────────
 
         // Rotação suavizada atual
@@ -79,6 +86,12 @@ namespace MuseumModerna
         private Vector2 _lastTouchPos;
         private bool _isDragging = false;
         private bool _touchStartedOnUI;
+        private bool _wasHeadTracking;
+        private bool _applicationPaused, _applicationUnfocused;
+        private float _neutralLookTime;
+        private float _lookDownTime;
+        private const float NeutralHoldSeconds = 0.35f;
+        private const float LookDownHoldSeconds = 0.18f;
 
         // ─── Ciclo de Vida Unity ──────────────────────────────────────────────
 
@@ -88,16 +101,30 @@ namespace MuseumModerna
 
             // Carrega calibração salva anteriormente
             _calibrationOffset = GyroCalibration.GetCalibrationOffset();
+            _currentRotation = _targetRotation = transform.localRotation;
+            CurrentLookDirection = transform.forward;
+            ResetWalkingGesture();
         }
 
         private void Update()
         {
-            if (MobileVrMode.Instance != null && MobileVrMode.Instance.HasHeadTracking)
+            if (_applicationPaused || _applicationUnfocused)
+            {
+                ResetWalkingGesture();
+                return;
+            }
+            bool headTracking = MobileVrMode.Instance != null && MobileVrMode.Instance.HasHeadTracking;
+            if (headTracking != _wasHeadTracking)
+            {
+                _wasHeadTracking = headTracking;
+                if (headTracking) ResetWalkingGesture();
+                else ResumeFromCurrentPose();
+            }
+            if (headTracking)
             {
                 // O TrackedPoseDriver do SDK controla a câmera; não somar Input.gyro à pose XR.
                 CurrentLookDirection = transform.forward;
-                CurrentPitchDegrees = Mathf.Asin(Mathf.Clamp(transform.forward.y, -1f, 1f)) * Mathf.Rad2Deg;
-                IsLookingDown = CurrentPitchDegrees < lookDownThreshold;
+                UpdateLookDownState(PitchFromDirection(transform.forward), Time.unscaledDeltaTime);
                 return;
             }
             if (IsUsingGyroscope)
@@ -112,18 +139,15 @@ namespace MuseumModerna
             // Aplica suavização
             _currentRotation = Quaternion.Slerp(_currentRotation, _targetRotation, smoothFactor);
 
-            // Extrai o pitch atual para verificar "olhar para baixo"
-            CurrentPitchDegrees = GetPitchFromQuaternion(_currentRotation);
-
             // Removido: ClampPitch causava gimbal lock e impedia o giro 360 livre no celular
             // _currentRotation = ClampPitch(_currentRotation, pitchMin, pitchMax);
 
             // Atualiza propriedades públicas
-            IsLookingDown = CurrentPitchDegrees < lookDownThreshold;
-            CurrentLookDirection = _currentRotation * Vector3.forward;
-
             // Aplica rotação ao transform da câmera
             transform.localRotation = _currentRotation;
+            // Movimento e XR usam a mesma direção no mundo, incluindo a rotação do Player.
+            CurrentLookDirection = transform.forward;
+            UpdateLookDownState(PitchFromDirection(CurrentLookDirection), Time.unscaledDeltaTime);
         }
 
         // ─── Inicialização ─────────────────────────────────────────────────────
@@ -254,10 +278,14 @@ namespace MuseumModerna
             _touchPitch = transform.localEulerAngles.x;
             if (_touchPitch > 180) _touchPitch -= 360;
             _isDragging = false;
+            _touchStartedOnUI = false;
+            CurrentLookDirection = transform.forward;
+            ResetWalkingGesture();
         }
 
         public void Calibrate()
         {
+            ResetWalkingGesture();
             if (MobileVrMode.Instance != null && MobileVrMode.Instance.IsActive)
             {
                 MobileVrMode.Instance.Recenter();
@@ -286,15 +314,51 @@ namespace MuseumModerna
         // ─── Utilitários ──────────────────────────────────────────────────────
 
         /// <summary>
-        /// Extrai o ângulo de pitch (rotação no eixo X) de um Quaternion.
-        /// Retorna valor em graus: negativo = olhando para baixo.
+        /// Ângulo de pitch em graus a partir da direção de olhar: negativo = olhando para baixo.
+        /// Usa asin(y) em vez de eulerAngles.x porque a decomposição em Euler satura em ±90°
+        /// e salta 180° quando o celular tem roll (inclinado de lado) — o que fazia o
+        /// IsLookingDown piscar e o player andar/parar sozinho.
         /// </summary>
-        private static float GetPitchFromQuaternion(Quaternion q)
+        private static float PitchFromDirection(Vector3 forward)
         {
-            // Converte para ângulos de Euler e normaliza entre -180 e +180
-            float pitch = q.eulerAngles.x;
-            if (pitch > 180f) pitch -= 360f;
-            return -pitch; // Inverte: Unity considera X+ = olhar para baixo
+            if (forward.sqrMagnitude < 1e-6f) return 0f;
+            return Mathf.Asin(Mathf.Clamp(forward.normalized.y, -1f, 1f)) * Mathf.Rad2Deg;
+        }
+
+        /// <summary>
+        /// Atualiza pitch e IsLookingDown aplicando histerese: começa a andar em
+        /// lookDownThreshold e só para lookDownHysteresis graus acima dele.
+        /// </summary>
+        private void UpdateLookDownState(float pitch, float deltaTime)
+        {
+            CurrentPitchDegrees = pitch;
+            float stopAt = lookDownThreshold + Mathf.Max(0f, lookDownHysteresis);
+            // Encaixar o celular ou fechar um menu olhando para baixo não inicia uma caminhada.
+            // Um frame longo na volta do Android também não deve completar o gesto sozinho.
+            float elapsed = Mathf.Clamp(deltaTime, 0f, 0.1f);
+            if (!IsWalkingGestureArmed)
+            {
+                IsLookingDown = false;
+                _neutralLookTime = pitch >= stopAt ? _neutralLookTime + elapsed : 0f;
+                if (_neutralLookTime >= NeutralHoldSeconds) IsWalkingGestureArmed = true;
+                return;
+            }
+            if (IsLookingDown)
+            {
+                IsLookingDown = pitch < stopAt;
+                if (!IsLookingDown) _lookDownTime = 0f;
+                return;
+            }
+            _lookDownTime = pitch < lookDownThreshold ? _lookDownTime + elapsed : 0f;
+            IsLookingDown = _lookDownTime >= LookDownHoldSeconds;
+        }
+
+        /// <summary>Exige olhar à frente antes de aceitar um novo gesto de caminhada.</summary>
+        public void ResetWalkingGesture()
+        {
+            IsLookingDown = false;
+            IsWalkingGestureArmed = false;
+            _neutralLookTime = _lookDownTime = 0f;
         }
 
         /// <summary>
@@ -315,10 +379,22 @@ namespace MuseumModerna
 
         private void OnApplicationPause(bool paused)
         {
+            _applicationPaused = paused;
+            ResetWalkingGesture();
+            _isDragging = false;
+            _touchStartedOnUI = false;
             if (IsUsingGyroscope && SystemInfo.supportsGyroscope)
             {
                 Input.gyro.enabled = !paused;
             }
+        }
+
+        private void OnApplicationFocus(bool focused)
+        {
+            _applicationUnfocused = !focused;
+            ResetWalkingGesture();
+            _isDragging = false;
+            _touchStartedOnUI = false;
         }
 
         private void OnDestroy()

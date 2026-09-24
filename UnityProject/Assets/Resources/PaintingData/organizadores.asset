@@ -29,7 +29,7 @@ MonoBehaviour:
   description: "Pintura, escultura, m\xFAsica e literatura se encontraram no mesmo
     evento. A reuni\xE3o de linguagens n\xE3o significa que todos os participantes
     defendessem uma \xFAnica forma de arte."
-  funFact:
+  funFact: 
   paintingTexture: {fileID: 0}
   thumbnailSprite: {fileID: 0}
   audioGuide: {fileID: 0}

@@ -55,7 +55,11 @@ namespace MuseumModerna
         private AudioSource _musicSource;
         private AudioSource _footstepSource;
         private AudioReverbZone _reverbZone;
-        private float _footstepTimer;
+        private Vector3 _lastFootstepPosition;
+        private float _distanceSinceFootstep;
+        private PlayerBodyVisual _bodyVisual;
+        private int _lastClip = -1;
+        public int PlayedFootsteps { get; private set; }
 
         // ─── Ciclo de Vida ────────────────────────────────────────────────────
 
@@ -70,10 +74,13 @@ namespace MuseumModerna
 
             if (playerMovement == null)
                 playerMovement = FindAnyObjectByType<HeadGazeMovement>();
+            if (playerMovement != null) _lastFootstepPosition = playerMovement.transform.position;
         }
 
         private void Start()
         {
+            _bodyVisual = playerMovement != null ? playerMovement.GetComponent<PlayerBodyVisual>() : FindAnyObjectByType<PlayerBodyVisual>();
+            if (_bodyVisual != null) _bodyVisual.FootPlanted += PlayFootstep;
             if (backgroundMusic != null)
             {
                 _musicSource.clip = backgroundMusic;
@@ -84,7 +91,13 @@ namespace MuseumModerna
 
         private void Update()
         {
-            HandleFootsteps();
+            if (_bodyVisual == null) HandleFootsteps();
+        }
+
+        private void OnDestroy()
+        {
+            if (_bodyVisual != null) _bodyVisual.FootPlanted -= PlayFootstep;
+            if (Instance == this) Instance = null;
         }
 
         private void OnApplicationPause(bool paused)
@@ -110,8 +123,10 @@ namespace MuseumModerna
             _footstepSource = gameObject.AddComponent<AudioSource>();
             _footstepSource.loop = false;
             _footstepSource.playOnAwake = false;
-            _footstepSource.spatialBlend = 0.2f; // levemente 3D para eco natural
-            _footstepSource.volume = footstepVolume;
+            _footstepSource.spatialBlend = 0f;
+            _footstepSource.volume = 1f; // Ganho aplicado uma única vez no contato.
+            _footstepSource.dopplerLevel = 0f;
+            _footstepSource.reverbZoneMix = .18f;
             _footstepSource.priority = 64;
         }
 
@@ -128,18 +143,40 @@ namespace MuseumModerna
         private void HandleFootsteps()
         {
             if (footstepClips == null || footstepClips.Length == 0) return;
-            if (playerMovement == null || !playerMovement.IsMoving) return;
+            if (playerMovement == null) return;
 
-            _footstepTimer += Time.deltaTime;
-            if (_footstepTimer < footstepInterval) return;
+            Vector3 current = playerMovement.transform.position;
+            Vector3 delta = current - _lastFootstepPosition;
+            delta.y = 0f;
+            _lastFootstepPosition = current;
+            if (!playerMovement.IsMoving)
+            {
+                _distanceSinceFootstep = 0f;
+                return;
+            }
 
-            _footstepTimer = 0f;
-            int index = Random.Range(0, footstepClips.Length);
-            // Varia levemente volume e pitch para soar natural
-            float vol   = footstepVolume * Random.Range(0.85f, 1f);
-            float pitch = Random.Range(0.92f, 1.08f);
-            _footstepSource.pitch = pitch;
-            _footstepSource.PlayOneShot(footstepClips[index], vol);
+            _distanceSinceFootstep += delta.magnitude;
+            // Passos acompanham metros percorridos, e não frames: continuam no
+            // ritmo certo quando o celular alterna entre 30 e 60 FPS.
+            float stride = Mathf.Max(.35f, playerMovement.CurrentSpeed * footstepInterval);
+            if (_distanceSinceFootstep < stride) return;
+
+            _distanceSinceFootstep %= stride;
+            PlayFootstep(PlayedFootsteps % 2 == 0 ? -1f : 1f, current, playerMovement.CurrentSpeed);
+        }
+
+        private void PlayFootstep(float side, Vector3 position, float speed)
+        {
+            if (!isActiveAndEnabled || Time.timeScale <= 0f || _footstepSource == null ||
+                footstepClips == null || footstepClips.Length == 0 || speed < .05f) return;
+            int index = footstepClips.Length > 1 ? (Random.Range(1,footstepClips.Length)+Mathf.Max(0,_lastClip)) % footstepClips.Length : 0;
+            if (footstepClips[index] == null) return;
+            _lastClip=index;
+            _footstepSource.panStereo=side*.10f;
+            _footstepSource.pitch=Random.Range(.97f,1.03f);
+            float intensity=Mathf.Lerp(.55f,1f,Mathf.Clamp01(speed/1.5f));
+            _footstepSource.PlayOneShot(footstepClips[index],footstepVolume*intensity*Random.Range(.90f,1f));
+            PlayedFootsteps++;
         }
 
         // ─── Utilitários ──────────────────────────────────────────────────────

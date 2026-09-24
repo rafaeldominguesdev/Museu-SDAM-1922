@@ -1,0 +1,9 @@
+PASS
+21834 triângulos adicionais
+16 limites físicos
+3 testes de locomoção contra cordões
+25 fichas não escultóricas acessíveis
+6 percursos livres (raio 0,30 m)
+8 vasos instalados
+Zero novas luzes; banho de luz modelado com malha de gradiente.
+Capturas mono do Editor; aparelho VR não testado.

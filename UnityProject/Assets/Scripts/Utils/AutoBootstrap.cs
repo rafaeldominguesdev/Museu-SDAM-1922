@@ -75,8 +75,10 @@ namespace MuseumModerna
                 if (cam == null) return;
             }
 
-            cam.nearClipPlane  = 0.01f;          // evita clipping perto
-            cam.farClipPlane   = 200f;            // enxerga sala toda
+            // near tão curto arruinava a precisão do depth buffer (razão far/near de 20.000:1)
+            // e fazia superfícies coplanares piscarem. 0.1 é o padrão para VR mobile.
+            cam.nearClipPlane  = 0.1f;
+            cam.farClipPlane   = 80f;             // o museu inteiro cabe em ~50m
             cam.clearFlags     = CameraClearFlags.SolidColor;
             cam.backgroundColor = new Color(0.05f, 0.04f, 0.04f); // fundo escuro quando não há geometria
             cam.fieldOfView    = 80f;             // FOV bom para VR no celular
@@ -175,6 +177,19 @@ namespace MuseumModerna
             {
                 new GameObject("SaveSystem_Auto")
                     .AddComponent<SaveSystem>();
+            }
+
+            var player = Object.FindAnyObjectByType<PlayerController>();
+            if (player != null && player.GetComponent<PlayerBodyVisual>() == null)
+                player.gameObject.AddComponent<PlayerBodyVisual>();
+
+            var architecture = GameObject.Find("Museum_LouvreStyle");
+            if (architecture != null)
+            {
+                if (architecture.GetComponent<PillarPhysicsRepair>() == null)
+                    architecture.AddComponent<PillarPhysicsRepair>();
+                if (architecture.GetComponent<MuseumDayNightCycle>() == null)
+                    architecture.AddComponent<MuseumDayNightCycle>();
             }
         }
     }

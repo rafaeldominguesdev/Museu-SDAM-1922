@@ -11,25 +11,32 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 14256d4cfae25415f84295e8fa960519, type: 3}
   m_Name: zina_aita
-  m_EditorClassIdentifier:
-  title: Zina Aita
+  m_EditorClassIdentifier: 
+  title: Homens trabalhando
   artist: Zina Aita
   year: 1922
   movement: Modernismo brasileiro
   periodo: 1922
-  tecnica: "Composi\xE7\xE3o gr\xE1fica digital de media\xE7\xE3o"
-  categoria: Painel de artista
-  relacao_com_a_semana_de_1922: "Participante da exposi\xE7\xE3o da Semana; este
-    painel n\xE3o atribui uma pintura inventada ao artista."
-  obra_historica_ou_reinterpretacao: "Painel did\xE1tico criado para este museu virtual.
-    A composi\xE7\xE3o visual \xE9 cenogr\xE1fica; n\xE3o reproduz uma obra original.
-    Autor e per\xEDodo informados referem-se ao assunto hist\xF3rico."
-  resumo: "Zina Aita participou da exposi\xE7\xE3o de artes visuais."
-  fontes: https://anitamalfatti.ieb.usp.br/1921-1922/
-  description: "Zina Aita participou da exposi\xE7\xE3o de artes visuais. Sua presen\xE7a
-    ajuda a rever narrativas que restringem o evento a poucos protagonistas."
-  funFact:
-  paintingTexture: {fileID: 0}
+  tecnica: "\xD3leo sobre tela"
+  categoria: Pintura
+  relacao_com_a_semana_de_1922: "Zina Aita participou da exposi\xE7\xE3o de 1922.
+    A pintura pertence ao mesmo ano; esta ficha n\xE3o afirma que o exemplar foi
+    apresentado durante a Semana."
+  obra_historica_ou_reinterpretacao: "Reprodu\xE7\xE3o digital da obra hist\xF3rica
+    identificada nesta ficha. A imagem preserva a composi\xE7\xE3o e as propor\xE7\xF5es
+    da fonte. Cr\xE9dito da reprodu\xE7\xE3o: Cole\xE7\xE3o particular \xB7 Foto:
+    Jaime Acioli."
+  resumo: "Trabalhadores se distribuem por uma cena constru\xEDda com pinceladas
+    curtas e cores intensas."
+  fontes: 'https://artsandculture.google.com/asset/homens-trabalhando-zina-aita/mwEUChwOAnkXEA
+
+    Imagem:
+    https://lh3.googleusercontent.com/ci/AL18g_Qs_fVW3Fnm3qQtzWv_R38DZ4ajEcZ2xuLiFKbxOJtR95wbRxo8-sL3RmG9IliZHuXWX-TSCSE=s2400'
+  description: "Trabalhadores se distribuem por uma cena constru\xEDda com pinceladas
+    curtas e cores intensas. Tons de azul nas sombras contrastam com as roupas e
+    a luz do ch\xE3o, dando ritmo aos gestos das figuras."
+  funFact: 
+  paintingTexture: {fileID: 2800000, guid: 261274b4bf65946b6aaaceb2b8ca0ab3, type: 3}
   thumbnailSprite: {fileID: 0}
   audioGuide: {fileID: 0}
   audioDuration: 0

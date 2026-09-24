@@ -34,6 +34,88 @@ namespace MuseumModerna
 
         private float _ambientDuration = 30f;
 
+        [MenuItem("Museum/Audio/Aplicar passos enviados pelo usuario")]
+        public static void ApplySuppliedFootsteps()
+        {
+            if (!Application.isBatchMode && !EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo()) return;
+            var scene=EditorSceneManager.OpenScene("Assets/Scenes/MuseumScene.unity");
+            var manager=UnityEngine.Object.FindAnyObjectByType<AmbientAudioManager>();
+            if(manager==null) throw new InvalidOperationException("Gerenciador de áudio ausente.");
+            var serialized=new SerializedObject(manager);
+            var list=serialized.FindProperty("footstepClips"); list.arraySize=6;
+            for(int i=0;i<6;i++)
+            {
+                string path=$"{AudioFolder}/UserStep_{i+1:00}.wav";
+                AssetDatabase.ImportAsset(path);
+                var importer=AssetImporter.GetAtPath(path) as AudioImporter;
+                if(importer==null) throw new InvalidOperationException("Clipe ausente: "+path);
+                var settings=importer.defaultSampleSettings;
+                settings.loadType=AudioClipLoadType.DecompressOnLoad;
+                settings.compressionFormat=AudioCompressionFormat.PCM;
+                importer.defaultSampleSettings=settings;
+                importer.forceToMono=true; importer.SaveAndReimport();
+                list.GetArrayElementAtIndex(i).objectReferenceValue=AssetDatabase.LoadAssetAtPath<AudioClip>(path);
+            }
+            serialized.FindProperty("footstepVolume").floatValue=.27f;
+            serialized.ApplyModifiedPropertiesWithoutUndo();
+            AssetDatabase.SaveAssets();
+            EditorSceneManager.MarkSceneDirty(scene);
+            if(!EditorSceneManager.SaveScene(scene)) throw new InvalidOperationException("Falha ao salvar áudio enviado.");
+            Debug.Log("[SuppliedFootsteps] Seis recortes do áudio enviado aplicados aos contatos dos pés.");
+        }
+
+        [MenuItem("Museum/Audio/Aplicar passos em parquet")]
+        public static void ApplyParquetFootsteps()
+        {
+            if (!Application.isBatchMode && !EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo()) return;
+            var scene=EditorSceneManager.OpenScene("Assets/Scenes/MuseumScene.unity");
+            EnsureAudioFolder();
+            var clips=new AudioClip[6];
+            for(int variant=0;variant<clips.Length;variant++)
+            {
+                var samples=new float[Mathf.RoundToInt(.24f*SampleRate)];
+                var rng=new System.Random(7201+variant);
+                float low=0,mid=0;
+                float soleDelay=.035f+variant*.002f;
+                for(int i=0;i<samples.Length;i++)
+                {
+                    float t=i/(float)SampleRate;
+                    float noise=(float)rng.NextDouble()*2f-1f;
+                    low+=.075f*(noise-low); mid+=.3f*(noise-mid);
+                    float heel=(1f-Mathf.Exp(-t*1400f))*Mathf.Exp(-t*70f);
+                    float s=Mathf.Max(0,t-soleDelay);
+                    float sole=t>soleDelay ? (1f-Mathf.Exp(-s*600f))*Mathf.Exp(-s*45f) : 0;
+                    float wood=Mathf.Sin(2*Mathf.PI*(165+variant*7)*t)*Mathf.Exp(-t*48f)*.12f
+                        +Mathf.Sin(2*Mathf.PI*(370+variant*13)*t)*Mathf.Exp(-t*65f)*.045f;
+                    float contact=mid*heel*.7f+low*sole*1.1f+(noise-mid)*heel*.055f;
+                    float fade=Mathf.Clamp01((.24f-t)/.025f);
+                    samples[i]=(contact+wood*(1f-Mathf.Exp(-t*1000f)))*fade;
+                }
+                NormalizeInPlace(samples,.72f);
+                string path=$"{AudioFolder}/ParquetStep_{variant+1:00}.wav";
+                SaveWav(Path.GetFullPath(path),samples,SampleRate);
+                AssetDatabase.ImportAsset(path);
+                var importer=(AudioImporter)AssetImporter.GetAtPath(path);
+                var settings=importer.defaultSampleSettings;
+                settings.loadType=AudioClipLoadType.DecompressOnLoad;
+                settings.compressionFormat=AudioCompressionFormat.PCM;
+                importer.defaultSampleSettings=settings;
+                importer.forceToMono=true; importer.SaveAndReimport();
+                clips[variant]=AssetDatabase.LoadAssetAtPath<AudioClip>(path);
+            }
+            var manager=UnityEngine.Object.FindAnyObjectByType<AmbientAudioManager>();
+            if(manager==null) throw new InvalidOperationException("Gerenciador de áudio ausente.");
+            var serialized=new SerializedObject(manager);
+            var list=serialized.FindProperty("footstepClips"); list.arraySize=clips.Length;
+            for(int i=0;i<clips.Length;i++) list.GetArrayElementAtIndex(i).objectReferenceValue=clips[i];
+            serialized.FindProperty("footstepVolume").floatValue=.27f;
+            serialized.ApplyModifiedPropertiesWithoutUndo();
+            AssetDatabase.SaveAssets();
+            EditorSceneManager.MarkSceneDirty(scene);
+            if(!EditorSceneManager.SaveScene(scene)) throw new InvalidOperationException("Falha ao salvar passos.");
+            Debug.Log("[ParquetFootsteps] Seis variações sintéticas de calcanhar/sola atribuídas; música preservada.");
+        }
+
         // ─── Menu ─────────────────────────────────────────────────────────────
 
         [MenuItem("MuseumModerna/Áudio Ambiente (Gerar Clipes)")]

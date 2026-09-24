@@ -68,6 +68,7 @@ namespace MuseumModerna
 
         private float _detectionTimer = 0f;
         private GameObject _lastNearPaintingObject = null;
+        private PlayerState _stateBeforePause = PlayerState.Walking;
 
         // Reutiliza array para evitar garbage collection por frame
         private readonly Collider[] _overlapResults = new Collider[5];
@@ -208,6 +209,7 @@ namespace MuseumModerna
         /// </summary>
         public void Calibrate()
         {
+            headGazeMovement?.ResetMovement();
             gyroController?.Calibrate();
             Debug.Log("[MuseumModerna] Calibração realizada via PlayerController.");
         }
@@ -215,7 +217,16 @@ namespace MuseumModerna
         /// <summary>Pausa ou despausa o player.</summary>
         public void SetPaused(bool paused)
         {
-            SetState(paused ? PlayerState.Paused : PlayerState.Walking);
+            if (paused)
+            {
+                if (State != PlayerState.Paused) _stateBeforePause = State;
+                headGazeMovement?.ResetMovement();
+                SetState(PlayerState.Paused);
+            }
+            else if (State == PlayerState.Paused)
+            {
+                SetState(_stateBeforePause);
+            }
         }
 
         /// <summary>Chamado pelo GazeDwellInteraction ao confirmar que o olhar ficou sobre um quadro.</summary>

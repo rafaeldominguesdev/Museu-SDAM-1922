@@ -12,25 +12,31 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 14256d4cfae25415f84295e8fa960519, type: 3}
   m_Name: di_cavalcanti_pierrot
   m_EditorClassIdentifier: 
-  title: 'Di Cavalcanti: desenho e vida urbana'
-  artist: Di Cavalcanti
-  year: 1922
+  title: "Mulheres d\xE9cada de 20"
+  artist: Emiliano Di Cavalcanti
+  year: 0
   movement: Modernismo brasileiro
-  periodo: "D\xE9cada de 1920"
-  tecnica: "Painel gr\xE1fico digital; refer\xEAncia a desenho e ilustra\xE7\xE3o"
-  categoria: Painel de artista
-  relacao_com_a_semana_de_1922: "Participou da organiza\xE7\xE3o da Semana e criou
-    a capa de seu cat\xE1logo."
-  obra_historica_ou_reinterpretacao: "Painel did\xE1tico criado para este museu virtual.
-    A composi\xE7\xE3o visual \xE9 cenogr\xE1fica; n\xE3o reproduz uma obra original.
-    Autor e per\xEDodo informados referem-se ao assunto hist\xF3rico."
-  resumo: "Di Cavalcanti atuou entre o desenho, a ilustra\xE7\xE3o e a pintura."
-  fontes: https://masp.org.br/en/collections/works/1920s-women
-  description: "Di Cavalcanti atuou entre o desenho, a ilustra\xE7\xE3o e a pintura.
-    Este painel destaca o papel das artes gr\xE1ficas na circula\xE7\xE3o de ideias
-    modernas."
-  funFact:
-  paintingTexture: {fileID: 0}
+  periodo: Sem data
+  tecnica: Guache sobre papel
+  categoria: Obra sobre papel
+  relacao_com_a_semana_de_1922: "Di Cavalcanti participou da organiza\xE7\xE3o da
+    Semana e criou a capa de seu cat\xE1logo. O MASP registra esta obra como sem
+    data; sua presen\xE7a aqui contextualiza a produ\xE7\xE3o do artista, sem afirmar
+    que foi exposta em 1922."
+  obra_historica_ou_reinterpretacao: "Reprodu\xE7\xE3o digital da obra hist\xF3rica
+    identificada nesta ficha. A imagem preserva a composi\xE7\xE3o e as propor\xE7\xF5es
+    da fonte. Cr\xE9dito da reprodu\xE7\xE3o: Comodato MASP B3 \xB7 Foto: MASP."
+  resumo: "Duas mulheres com roupas e acess\xF3rios dos anos 1920 aparecem em uma
+    composi\xE7\xE3o de linhas estilizadas e cores contrastantes."
+  fontes: 'https://masp.org.br/acervo/obra/mulheres-decada-de-20
+
+    Imagem: https://assets.masp.org.br/uploads/temp/WEB_JB_C_01217_01.jpg'
+  description: "Duas mulheres com roupas e acess\xF3rios dos anos 1920 aparecem em
+    uma composi\xE7\xE3o de linhas estilizadas e cores contrastantes. O desenho dos
+    cabelos, len\xE7os e luvas aproxima a obra da ilustra\xE7\xE3o gr\xE1fica e do
+    art d\xE9co."
+  funFact: 
+  paintingTexture: {fileID: 2800000, guid: 89c62254136fd4831af4ef00c911c03b, type: 3}
   thumbnailSprite: {fileID: 0}
   audioGuide: {fileID: 0}
   audioDuration: 0

@@ -11,7 +11,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 14256d4cfae25415f84295e8fa960519, type: 3}
   m_Name: vitrine_documentos
-  m_EditorClassIdentifier:
+  m_EditorClassIdentifier: 
   title: Documentos de uma semana
   artist: "Cria\xE7\xE3o educativa do projeto"
   year: 2026
@@ -30,7 +30,7 @@ MonoBehaviour:
   description: "Programas, cat\xE1logos e livros permitem estudar a circula\xE7\xE3o
     das ideias. Os volumes nesta vitrine s\xE3o objetos did\xE1ticos, sem reproduzir
     documentos de arquivo."
-  funFact:
+  funFact: 
   paintingTexture: {fileID: 0}
   thumbnailSprite: {fileID: 0}
   audioGuide: {fileID: 0}

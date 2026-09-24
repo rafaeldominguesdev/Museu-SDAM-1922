@@ -4,14 +4,13 @@ using UnityEngine;
 namespace MuseumModerna
 {
     /// <summary>
-    /// Garante que o player nasça dentro da sala, mesmo que a sala esteja
-    /// posicionada em qualquer altura no mundo.
+    /// Garante que o player sempre nasça no centro seguro da sala, mesmo que a
+    /// sala esteja posicionada em qualquer altura no mundo.
     ///
     /// Estratégia:
-    ///   1. Tenta raycast de cima para baixo para achar o chão com collider.
-    ///   2. Se não achar collider, usa os bounds de todos os Renderers da cena.
-    ///   3. Teleporta o player para cima do chão encontrado.
-    ///   4. Invalida o save se a posição salva estava no vazio.
+    ///   1. Busca o piso físico próximo da origem arquitetônica da sala.
+    ///   2. Ignora o visitante, triggers e superfícies acima do piso.
+    ///   3. Posiciona os pés, preservando a altura local da câmera.
     ///
     /// Como usar:
     ///   Adicione ao mesmo GameObject do PlayerController (ou qualquer objeto ativo).
@@ -21,11 +20,11 @@ namespace MuseumModerna
     public class PlayerSpawnAnchor : MonoBehaviour
     {
         [Header("Ajustes de Spawn")]
-        [Tooltip("Altura acima do chão onde o player vai aparecer")]
-        [SerializeField] private float heightAboveFloor = 1.0f;
+        [Tooltip("Pequena folga dos pés acima do chão, resolvida pela gravidade no primeiro frame")]
+        [SerializeField, Range(0f, .05f)] private float floorClearance = .02f;
 
-        [Tooltip("Se o player estiver mais que este valor abaixo do chão da sala, é teleportado")]
-        [SerializeField] private float fallThreshold = 3f;
+        [Tooltip("Sempre reposiciona o visitante no centro seguro da sala ao abrir o aplicativo.")]
+        [SerializeField] private bool resetToRoomCenterOnLaunch = true;
 
         [Tooltip("Layers consideradas chão (deixe 'Everything' para pegar qualquer coisa)")]
         [SerializeField] private LayerMask floorLayers = ~0;
@@ -40,80 +39,66 @@ namespace MuseumModerna
             PlayerController player = FindAnyObjectByType<PlayerController>();
             if (player == null) yield break;
 
-            Vector3 floorPosition = FindRoomFloor(player.transform.position);
-
-            float playerY  = player.transform.position.y;
-            float floorY   = floorPosition.y;
-
-            bool isInVoid = playerY < floorY - fallThreshold;
-
-            if (isInVoid)
+            Physics.SyncTransforms();
+            Vector3 spawnBase = FindRoomCenter();
+            if (!TryFindRoomFloor(spawnBase, out Vector3 floorPosition))
             {
-                Debug.Log($"[MuseumModerna] Player no vazio (Y={playerY:F1}, chão em Y={floorY:F1}). Teleportando...");
-
-                // Limpa save inválido para não carregar posição ruim na próxima vez
-                SaveSystem save = FindAnyObjectByType<SaveSystem>();
-                save?.DeleteSave();
-
-                // Teleporta para cima do chão da sala
-                Vector3 spawnPos = new Vector3(floorPosition.x, floorY + heightAboveFloor, floorPosition.z);
-                TeleportPlayer(player, spawnPos);
-
-                Debug.Log($"[MuseumModerna] Player reposicionado para {spawnPos}.");
+                Debug.LogWarning("[MuseumModerna] Spawn mantido: não há piso físico abaixo da entrada.");
+                yield break;
             }
+            if (!resetToRoomCenterOnLaunch && player.transform.position.y >= floorPosition.y - 3f) yield break;
+
+            // Saves continuam existindo para outros dados, mas nunca definem a
+            // posição inicial: cada abertura começa no centro da sala.
+            var controller = player.GetComponent<CharacterController>();
+            // O pivot fica nos pés na cena atual. A câmera já tem os seus 1,6 m
+            // locais: acrescentar 1 m à raiz suspendia todo o corpo sobre móveis.
+            float footOffset = controller != null
+                ? player.transform.TransformVector(controller.center - Vector3.up * (controller.height * .5f)).y
+                : 0f;
+            Vector3 spawnPos = floorPosition + Vector3.up * (floorClearance - footOffset);
+            TeleportPlayer(player, spawnPos);
+            Debug.Log($"[MuseumModerna] Spawn reiniciado no centro seguro: {spawnPos}.");
         }
 
         // ─── Encontrar o Chão ─────────────────────────────────────────────────
 
-        private Vector3 FindRoomFloor(Vector3 playerPos)
+        private bool TryFindRoomFloor(Vector3 playerPos, out Vector3 floorPosition)
         {
-            // Método 1: raycast de Y muito alto para baixo — funciona se houver colliders
-            Vector3 rayOrigin = new Vector3(playerPos.x, 5000f, playerPos.z);
-            if (Physics.Raycast(rayOrigin, Vector3.down, out RaycastHit hit, 10000f, floorLayers))
+            // Começa dentro da sala: um raio vindo do céu pode selecionar o teto.
+            // Ignora também o próprio visitante e volumes de interação.
+            Vector3 rayOrigin = playerPos + Vector3.up * 2.5f;
+            var hits = Physics.RaycastAll(rayOrigin, Vector3.down, 8f, floorLayers,
+                QueryTriggerInteraction.Ignore);
+            float floorOffset = float.PositiveInfinity;
+            RaycastHit floor = default;
+            foreach (var hit in hits)
             {
-                Debug.Log($"[MuseumModerna] Chão encontrado via raycast em Y={hit.point.y:F2}");
-                return new Vector3(hit.point.x, hit.point.y, hit.point.z);
+                if (hit.normal.y < .7f || hit.collider is CharacterController ||
+                    hit.collider.GetComponentInParent<PlayerController>() != null) continue;
+                // A cota da origem arquitetônica é o piso da entrada. Um móvel
+                // entre a origem do raio e o chão não deve elevar o visitante.
+                float offset = Mathf.Abs(hit.point.y - playerPos.y);
+                if (offset >= floorOffset) continue;
+                floorOffset = offset;
+                floor = hit;
             }
-
-            // Método 2: bounds de todos os Renderers — funciona mesmo sem colliders
-            return FindFloorFromRenderers();
+            floorPosition = floor.point;
+            if (floor.collider != null)
+            {
+                Debug.Log($"[MuseumModerna] Chão encontrado via raycast em Y={floor.point.y:F2}");
+                return true;
+            }
+            return false;
         }
 
-        private Vector3 FindFloorFromRenderers()
+        private Vector3 FindRoomCenter()
         {
-            Renderer[] all = FindObjectsByType<Renderer>(FindObjectsSortMode.None);
-
-            if (all.Length == 0)
-            {
-                Debug.LogWarning("[MuseumModerna] Nenhum Renderer encontrado. Usando Y=0.");
-                return Vector3.zero;
-            }
-
-            // Ignora câmera e UI
-            Bounds combined = new Bounds();
-            bool first = true;
-
-            foreach (Renderer r in all)
-            {
-                if (r == null) continue;
-                if (r.GetComponent<Camera>()         != null) continue;
-                if (r.GetComponentInParent<Camera>() != null) continue;
-                if (r is CanvasRenderer)                      continue;
-
-                if (first) { combined = r.bounds; first = false; }
-                else         combined.Encapsulate(r.bounds);
-            }
-
-            if (first)
-            {
-                Debug.LogWarning("[MuseumModerna] Só encontrei Renderers de câmera/UI. Usando Y=0.");
-                return Vector3.zero;
-            }
-
-            Debug.Log($"[MuseumModerna] Chão encontrado via Renderer bounds: " +
-                      $"center={combined.center}, min.y={combined.min.y:F2}");
-
-            return new Vector3(combined.center.x, combined.min.y, combined.center.z);
+            var architecture = GameObject.Find("Museum_LouvreStyle");
+            // O gerador constrói o piso da galeria central na origem local.
+            // Bounds globais também incluem jardins e objetos sob o piso.
+            if (architecture != null) return architecture.transform.position;
+            return Vector3.zero;
         }
 
         // ─── Teleportar ───────────────────────────────────────────────────────
@@ -121,10 +106,14 @@ namespace MuseumModerna
         private static void TeleportPlayer(PlayerController player, Vector3 position)
         {
             CharacterController cc = player.GetComponent<CharacterController>();
-
+            bool wasEnabled = cc != null && cc.enabled;
             if (cc != null) cc.enabled = false;
             player.transform.position = position;
-            if (cc != null) cc.enabled = true;
+            if (cc != null) cc.enabled = wasEnabled;
+            Physics.SyncTransforms();
+
+            // O teleporte descarta a velocidade antiga; o chão resolve a altura.
+            player.GetComponent<HeadGazeMovement>()?.SyncLockedY();
         }
     }
 }

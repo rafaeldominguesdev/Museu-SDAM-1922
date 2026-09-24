@@ -29,7 +29,7 @@ MonoBehaviour:
   description: "Brecheret participou da renova\xE7\xE3o da escultura brasileira.
     O painel convida a observar rela\xE7\xF5es entre massa, vazio e silhueta, sem
     identificar o objeto cenogr\xE1fico como uma escultura hist\xF3rica."
-  funFact:
+  funFact: 
   paintingTexture: {fileID: 0}
   thumbnailSprite: {fileID: 0}
   audioGuide: {fileID: 0}

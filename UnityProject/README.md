@@ -1,8 +1,13 @@
 # Museu virtual — Semana de Arte Moderna de 1922
 
 Unity 2022.3.62f1. Abra `Assets/Scenes/MuseumScene.unity` e pressione Play.
-A cena contém 28 objetos com ficha própria: 24 painéis didáticos, três esculturas
-cenográficas e uma vitrine documental. O arquivo Blender original foi preservado.
+A cena contém 28 objetos com ficha própria: nove reproduções de obras históricas,
+15 painéis didáticos, três esculturas cenográficas e uma vitrine documental.
+O arquivo Blender original foi preservado.
+
+As 24 telas medem 2,38 × 1,87 m, com molduras douradas ornamentadas.
+Veja as [capturas e a validação da ampliação](../artifacts/PAINTING_UPGRADE.md).
+O ambiente também inclui [ilhas de exposição, vitrines e vegetação](../artifacts/ENVIRONMENT_UPGRADE.md).
 
 ## VR Box com celular
 
@@ -30,14 +35,17 @@ por teclado e estados de foco. Não foi implementada integração com leitor de 
 
 ## Conteúdo e autoria
 
-As composições gráficas e os volumes 3D são criações cenográficas identificadas na
-ficha e nas legendas. Não são reproduções das obras históricas nem são atribuídos
-como originais aos artistas mencionados. As fichas distinguem o assunto histórico
-do objeto criado para a visita. A arquitetura é própria, sem alegação de reconstrução do Theatro Municipal.
+Os nove quadros da galeria de pintura exibem reproduções verificadas de obras
+históricas. O manifesto `Assets/Resources/MuseumArtworkImages.json` registra
+origem, créditos, resolução e preparação de cada imagem. As quatro faces das ilhas
+reutilizam as imagens das fichas correspondentes, sem criar novas obras no catálogo.
+As demais composições e os volumes 3D continuam sendo criações cenográficas,
+identificadas nas fichas e legendas. A arquitetura é própria, sem alegação de
+reconstrução do Theatro Municipal. Consulte [fontes e validação das imagens](../artifacts/ARTWORK_IMAGES.md).
 
 `Assets/Resources/MuseumCatalog.json` é o catálogo editorial revisado, com fontes
 por ficha. `PaintingInfo` contém título, autor, período, técnica, categoria,
-descrição, resumo, relação com 1922 e aviso de cenografia. Cada `PaintingExhibit`
+descrição, resumo, relação com 1922 e identificação da reprodução ou cenografia. Cada `PaintingExhibit`
 associa um objeto a um `.asset` em `Assets/Resources/PaintingData`.
 
 As fichas contextualizam Anita Malfatti, Di Cavalcanti, Victor Brecheret, Vicente do
@@ -57,19 +65,20 @@ As fontes específicas e ressalvas constam do catálogo.
 
 1. Edite `MuseumCatalog.json`.
 2. Execute **MuseumModerna > Visita guiada > Atualizar fichas curatoriais**.
-3. Para sincronizar as legendas e a cenografia, execute **Aplicar à cena do museu**.
-   Esse comando abre e salva `MuseumScene`, substituindo apenas o grupo gerado
-   `Museum_GuidedExhibition`. Salve alterações abertas antes de usá-lo.
+3. Para reaplicar as imagens e atualizar suas legendas, execute
+   **Museum > Visual > Aplicar imagens das obras verificadas**. Esse comando abre
+   e salva `MuseumScene`, mantendo as molduras e os alvos de interação.
 
 Para uma nova peça, crie seu `PaintingInfo` e associe um `PaintingExhibit` ao objeto
 ou ao pai dos seus colliders. Um `Collider` sólido é necessário. Filhos são
 resolvidos pelo componente no ancestral; não é necessário colocar um Renderer
 no objeto pai. Objetos na layer `Ignore Raycast` não são selecionados.
 
-A referência de textura continua disponível em `PaintingInfo.paintingTexture`.
-Ao substituir uma composição por reprodução histórica autorizada, revise também
-o aviso e a proveniência da imagem. O instalador de cenografia gera composições
-próprias e deve ser adaptado para preservar uma substituição manual.
+A referência de textura está em `PaintingInfo.paintingTexture`. O renderer específico
+da reprodução fica em `PaintingExhibit.artworkRenderer`, preservando o passe-partout
+sem esticar a imagem. `ArtworkTextureSetup` aplica o manifesto às paredes e ilhas;
+o setup das molduras também reaplica as imagens. Revise a ficha e a proveniência
+ao trocar uma obra. Texturas usam mipmaps e ASTC 6x6 no Android, limitadas a 2048 px.
 
 ## Implementação e validação
 

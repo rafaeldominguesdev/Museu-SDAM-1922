@@ -97,7 +97,7 @@ namespace MuseumModerna
         public void SetVrEnabled(bool enabled)
         {
             IsEnabled = enabled; visible = false; MenuOpen = false; ConsumesGaze = false;
-            current = null; group.alpha = 0; activation.Reset();
+            current = null; group.alpha = 0; lookupArmed = true; ResetInteraction();
             reticle.gameObject.SetActive(enabled);
             gameObject.SetActive(enabled);
         }
@@ -119,17 +119,24 @@ namespace MuseumModerna
         {
             if (!IsEnabled) return;
             MenuOpen = true; visible = true; menuPage = 0;
+            mode.ResetWalkingGesture();
             PlaceBoard(true); RenderMenu();
         }
         public void CloseMenu()
         {
             MenuOpen = false; ConsumesGaze = false;
+            ResetInteraction();
             current = gaze.Focus.Current;
             if (current != null && preferences.PanelsEnabled)
             {
                 page = 0; RebuildPages(); PlaceBoard(false); RenderPage();
             }
             else visible = false;
+        }
+        public void ResetInteraction()
+        {
+            activation.Reset(); lookupTimer = 0; ConsumesGaze = false;
+            if (ring != null) ring.fillAmount = 0;
         }
         private void PlaceBoard(bool centered)
         {
@@ -196,26 +203,27 @@ namespace MuseumModerna
             title.text = "Opções do visor";
             body.fontSize = 28;
             body.text = "Mantenha a mira sobre um botão até completar o círculo.\n\n" +
-                "Olhe para baixo para caminhar; levante o olhar para parar. Olhe para cima por 1,2 segundo para abrir este menu.\n\n" +
+                "Olhe à frente; depois, abaixe a cabeça para caminhar e levante para parar. Olhe para cima por 1,2 segundo para abrir este menu.\n\n" +
                 "Durante a leitura da ficha, o movimento fica suspenso.";
             pageLabel.text = "Opções " + (menuPage + 1) + " de 3";
             previous.interactable = menuPage > 0; next.interactable = menuPage < 2;
             if (menuPage == 0)
             {
                 SetButton(actions[0], "Voltar à visita");
-                SetButton(actions[1], "Texto: " + new[] { "padrão", "grande", "maior" }[preferences.TextStep]);
-                SetButton(actions[2], "Resumo: " + (preferences.Summary ? "sim" : "não"));
+                SetButton(actions[1], "Centralizar");
+                SetButton(actions[2], "Sair do VR");
             }
             else if (menuPage == 1)
             {
-                SetButton(actions[0], "Fichas: " + (preferences.PanelsEnabled ? "sim" : "não"));
-                SetButton(actions[1], "Contraste: " + (preferences.HighContrast ? "alto" : "padrão"));
-                SetButton(actions[2], "Animação: " + (preferences.ReducedMotion ? "não" : "sim"));
+                SetButton(actions[0], "Texto: " + new[] { "padrão", "grande", "maior" }[preferences.TextStep]);
+                SetButton(actions[1], "Resumo: " + (preferences.Summary ? "sim" : "não"));
+                SetButton(actions[2], "Fichas: " + (preferences.PanelsEnabled ? "sim" : "não"));
             }
             else
             {
-                SetButton(actions[0], "Leitura: " + (preferences.LongerReading ? "longa" : "breve"));
-                SetButton(actions[1], "Centralizar"); SetButton(actions[2], "Sair do VR");
+                SetButton(actions[0], "Contraste: " + (preferences.HighContrast ? "alto" : "padrão"));
+                SetButton(actions[1], "Animação: " + (preferences.ReducedMotion ? "não" : "sim"));
+                SetButton(actions[2], "Leitura: " + (preferences.LongerReading ? "longa" : "breve"));
             }
             ApplyContrast();
         }
@@ -241,18 +249,18 @@ namespace MuseumModerna
             if (menuPage == 0)
             {
                 if (index == 0) { CloseMenu(); return; }
-                if (index == 1) preferences.CycleTextSize(); else preferences.ToggleSummary();
+                if (index == 1) mode.Recenter(); else mode.ExitVR();
+                return;
             }
             else if (menuPage == 1)
             {
-                if (index == 0) preferences.TogglePanels();
-                else if (index == 1) preferences.ToggleContrast(); else preferences.ToggleMotion();
+                if (index == 0) preferences.CycleTextSize();
+                else if (index == 1) preferences.ToggleSummary(); else preferences.TogglePanels();
             }
             else
             {
-                if (index == 0) preferences.ToggleLinger();
-                else if (index == 1) { mode.Recenter(); return; }
-                else { mode.ExitVR(); return; }
+                if (index == 0) preferences.ToggleContrast();
+                else if (index == 1) preferences.ToggleMotion(); else preferences.ToggleLinger();
             }
             RenderMenu();
         }
@@ -260,7 +268,9 @@ namespace MuseumModerna
         {
             if (!IsEnabled) return;
             bool paused = FindPlayerPaused();
-            if (paused) { activation.Reset(); ring.fillAmount = 0; return; }
+            if (paused) { ResetInteraction(); return; }
+            // Voltar do Android ou um frame travado não completa dwell/gestos sozinho.
+            float elapsed = Mathf.Clamp(Time.unscaledDeltaTime, 0f, .1f);
             group.alpha = preferences.ReducedMotion ? (visible ? 1 : 0) :
                 Mathf.MoveTowards(group.alpha, visible ? 1 : 0, Time.unscaledDeltaTime / MuseumGuideTheme.Fade);
             var ray = new Ray(eye.transform.position, eye.transform.forward);
@@ -273,14 +283,15 @@ namespace MuseumModerna
                 else foreach (var button in actions)
                     if (button.interactable && HitRect((RectTransform)button.transform, ray)) { selected = button; break; }
             }
-            bool fire = activation.Step(selected, Time.unscaledDeltaTime, DwellSeconds);
+            bool fire = activation.Step(selected, elapsed, DwellSeconds);
             ring.fillAmount = activation.Progress;
             if (fire && selected != null) selected.onClick.Invoke();
+            if (!IsEnabled) return; // Um botão pode ter encerrado o VR neste frame.
             float pitch = Mathf.Asin(Mathf.Clamp(eye.transform.forward.y, -1, 1)) * Mathf.Rad2Deg;
             if (pitch < 35) { lookupArmed = true; lookupTimer = 0; }
             else if (pitch > 48 && lookupArmed && !MenuOpen)
             {
-                lookupTimer += Time.unscaledDeltaTime;
+                lookupTimer += elapsed;
                 if (lookupTimer > 1.2f) { lookupArmed = false; lookupTimer = 0; OpenMenu(); }
             }
             else lookupTimer = 0;
@@ -337,7 +348,8 @@ namespace MuseumModerna
             ringTexture.Apply();
             return Sprite.Create(ringTexture, new Rect(0, 0, size, size), Vector2.one * .5f);
         }
-        private void OnApplicationPause(bool paused) { activation.Reset(); lookupTimer = 0; }
+        private void OnApplicationPause(bool paused) => ResetInteraction();
+        private void OnApplicationFocus(bool focused) => ResetInteraction();
         private void OnDestroy()
         {
             if (reticle != null) Destroy(reticle.gameObject);

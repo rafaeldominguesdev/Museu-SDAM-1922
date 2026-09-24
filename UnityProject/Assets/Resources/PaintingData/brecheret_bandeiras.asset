@@ -29,7 +29,7 @@ MonoBehaviour:
   description: "O monumento trabalha a ideia de deslocamento coletivo em escala urbana.
     Sua leitura atual tamb\xE9m exige refletir sobre as viol\xEAncias da coloniza\xE7\xE3o
     e a constru\xE7\xE3o da mem\xF3ria p\xFAblica."
-  funFact:
+  funFact: 
   paintingTexture: {fileID: 0}
   thumbnailSprite: {fileID: 0}
   audioGuide: {fileID: 0}

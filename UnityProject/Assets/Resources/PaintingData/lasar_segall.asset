@@ -12,26 +12,31 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 14256d4cfae25415f84295e8fa960519, type: 3}
   m_Name: lasar_segall
   m_EditorClassIdentifier: 
-  title: 'Lasar Segall: outros caminhos modernos'
+  title: Eternos caminhantes
   artist: Lasar Segall
-  year: 1913
+  year: 1919
   movement: Modernismo brasileiro
-  periodo: "1913 e d\xE9cada de 1920"
-  tecnica: "Painel de contexto art\xEDstico"
-  categoria: Contexto
-  relacao_com_a_semana_de_1922: "Segall n\xE3o participou da Semana de 1922. Sua
-    presen\xE7a aqui amplia o contexto do modernismo."
-  obra_historica_ou_reinterpretacao: "Painel did\xE1tico criado para este museu virtual.
-    A composi\xE7\xE3o visual \xE9 cenogr\xE1fica; n\xE3o reproduz uma obra original.
-    Autor e per\xEDodo informados referem-se ao assunto hist\xF3rico."
-  resumo: "O percurso de Segall ajuda a situar a renova\xE7\xE3o art\xEDstica al\xE9m
-    de um \xFAnico evento."
-  fontes: https://www.gov.br/museus/pt-br/museus-ibram/museu-lasar-segall/assuntos/exposicao
-  description: "O percurso de Segall ajuda a situar a renova\xE7\xE3o art\xEDstica
-    al\xE9m de um \xFAnico evento. Suas exposi\xE7\xF5es de 1913 no Brasil antecedem
-    a Semana."
-  funFact:
-  paintingTexture: {fileID: 0}
+  periodo: 1919
+  tecnica: "\xD3leo sobre tela"
+  categoria: Pintura
+  relacao_com_a_semana_de_1922: "Lasar Segall n\xE3o participou da Semana de 1922.
+    A obra de 1919 amplia o contexto expressionista e os caminhos do modernismo al\xE9m
+    do evento."
+  obra_historica_ou_reinterpretacao: "Reprodu\xE7\xE3o digital da obra hist\xF3rica
+    identificada nesta ficha. A imagem preserva a composi\xE7\xE3o e as propor\xE7\xF5es
+    da fonte. Cr\xE9dito da reprodu\xE7\xE3o: Acervo Museu Lasar Segall / Ibram."
+  resumo: "Figuras de rostos angulosos e grandes olhos se sobrep\xF5em em uma composi\xE7\xE3o
+    de cores escuras."
+  fontes: 'https://artsandculture.google.com/asset/eternos-caminhantes-lasar-segall/fAELR3B0k8NaOA
+
+    Imagem:
+    https://lh3.googleusercontent.com/ci/AL18g_TLYfUkBZ4j6ILa3q9Q-VINDx-FqjcjTGa-ZmxHbpTxlaDFOYpEG0qwm-xt4hVagp0qSOuGhg=s2400'
+  description: "Figuras de rostos angulosos e grandes olhos se sobrep\xF5em em uma
+    composi\xE7\xE3o de cores escuras. A obra pertence \xE0 fase expressionista de
+    Segall e aborda a condi\xE7\xE3o dos emigrantes. Foi confiscada pelo regime nazista
+    e apresentada na exposi\xE7\xE3o de Arte Degenerada de 1937."
+  funFact: 
+  paintingTexture: {fileID: 2800000, guid: 1174d292e409d4ba994afb1630b6f145, type: 3}
   thumbnailSprite: {fileID: 0}
   audioGuide: {fileID: 0}
   audioDuration: 0

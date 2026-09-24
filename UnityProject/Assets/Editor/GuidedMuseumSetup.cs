@@ -118,9 +118,9 @@ namespace MuseumModerna
             WorldText(art, exhibit.PaintingData.year.ToString(), new Vector3(-w * .28f, h * .31f, .04f), .065f, MuseumGuideTheme.Text);
             Cube(frame, "Placa", new Vector3(0, -h / 2 - .28f, .022f), new Vector3(w, .30f, .045f), charcoal);
             WorldText(frame, exhibit.PaintingData.title + "\n" + exhibit.PaintingData.artist + " | " + exhibit.PaintingData.Periodo,
-                new Vector3(0, -h / 2 - .22f, .05f), .026f, MuseumGuideTheme.Text);
+                new Vector3(0, -h / 2 - .22f, .05f), .036f, MuseumGuideTheme.Text);
             WorldText(frame, "PAINEL DIDÁTICO / COMPOSIÇÃO CENOGRÁFICA",
-                new Vector3(0, -h / 2 - .36f, .051f), .021f, MuseumGuideTheme.Accent);
+                new Vector3(0, -h / 2 - .36f, .051f), .028f, MuseumGuideTheme.Accent);
             Cube(frame, "Luminaria", new Vector3(0, h / 2 + .28f, .28f), new Vector3(.36f, .045f, .13f), charcoal);
             var existingSpot = GameObject.Find("Spotlight_" + exhibit.PaintingData.uniqueId);
             if (existingSpot != null)
@@ -149,7 +149,7 @@ namespace MuseumModerna
             var label = new GameObject("Identificacao").transform; label.SetParent(root, false);
             label.position = origin + new Vector3(-.3f, .8f, 0); label.rotation = Quaternion.Euler(0, -90, 0);
             Cube(label, "Placa", Vector3.zero, new Vector3(.65f, .24f, .025f), charcoal);
-            WorldText(label, "ESTUDO DE VOLUMES " + (i + 1) + "\nCriação do projeto / Cenografia", new Vector3(0, .025f, .02f), .025f, MuseumGuideTheme.Text);
+            WorldText(label, "ESTUDO DE VOLUMES " + (i + 1) + "\nCriação do projeto / Cenografia", new Vector3(0, .025f, .02f), .034f, MuseumGuideTheme.Text);
             Spot(go.transform, new Vector3(-1, 1.8f, 1), new Vector3(0, .45f, 0));
         }
         private static void Vitrine()
@@ -182,7 +182,7 @@ namespace MuseumModerna
             sign.SetParent(root, false); sign.SetPositionAndRotation(position, rotation);
             Cube(sign, "Fundo", Vector3.zero, new Vector3(2.5f, .64f, .06f), charcoal);
             Cube(sign, "Filete", new Vector3(0, -.28f, .04f), new Vector3(2.3f, .012f, .015f), bronze);
-            WorldText(sign, text, new Vector3(0, .065f, .042f), .070f, MuseumGuideTheme.Text);
+            WorldText(sign, text, new Vector3(0, .065f, .042f), .090f, MuseumGuideTheme.Text);
         }
         private static void Spot(Transform parent, Vector3 position, Vector3 target)
         {

@@ -30,7 +30,7 @@ MonoBehaviour:
   description: "O poema usa repeti\xE7\xE3o e ironia para confrontar valores burgueses.
     Seu tom provocador \xE9 um convite a observar a rela\xE7\xE3o entre forma po\xE9tica
     e cr\xEDtica social."
-  funFact:
+  funFact: 
   paintingTexture: {fileID: 0}
   thumbnailSprite: {fileID: 0}
   audioGuide: {fileID: 0}

@@ -31,7 +31,7 @@ MonoBehaviour:
     https://anitamalfatti.ieb.usp.br/1921-1922/'
   description: "A cidade aparece como mat\xE9ria po\xE9tica, com vozes e ritmos contrastantes.
     O livro permite discutir a experi\xEAncia urbana e a liberdade de composi\xE7\xE3o."
-  funFact:
+  funFact: 
   paintingTexture: {fileID: 0}
   thumbnailSprite: {fileID: 0}
   audioGuide: {fileID: 0}

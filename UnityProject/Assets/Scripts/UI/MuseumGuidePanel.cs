@@ -8,7 +8,7 @@ namespace MuseumModerna
     public sealed class MuseumGuidePanel : MonoBehaviour
     {
         private const string Pref = "MuseumGuide_";
-        private RectTransform safe, panel, settings;
+        private RectTransform safe, panel, settings, toggle, backdrop;
         private CanvasGroup group;
         private Image background;
         private Text title, author, technique, notice, description, relation, source;
@@ -101,12 +101,24 @@ namespace MuseumModerna
             pinLabel = Button(actions, "Fixar", () => gaze?.TogglePin());
             Button(actions, "Fechar", () => gaze?.Close());
 
-            var toggle = Rect("OpcoesDaVisita", safe);
+            toggle = Rect("OpcoesDaVisita", safe);
             toggle.anchorMin = toggle.anchorMax = toggle.pivot = new Vector2(0, 1);
             toggle.anchoredPosition = new Vector2(MuseumGuideTheme.Padding, -MuseumGuideTheme.Padding);
             toggle.sizeDelta = new Vector2(210, MuseumGuideTheme.ButtonHeight);
             var trigger = Button(toggle, "Opções da visita", ToggleSettings);
             Stretch((RectTransform)trigger.transform.parent);
+
+            // Camada que captura o toque fora do painel de opções para fechá-lo.
+            backdrop = Rect("VeuDeFundo", safe);
+            Stretch(backdrop);
+            var veil = backdrop.gameObject.AddComponent<Image>();
+            veil.color = MuseumGuideTheme.Scrim;
+            var backdropButton = backdrop.gameObject.AddComponent<Button>();
+            backdropButton.transition = Selectable.Transition.None;
+            backdropButton.targetGraphic = veil;
+            backdropButton.onClick.AddListener(ToggleSettings);
+            backdrop.gameObject.SetActive(false);
+
             settings = Rect("PreferenciasDeLeitura", safe);
             Surface(settings);
             // ScrollRect permite acessar todas as opções mesmo em telas baixas.
@@ -128,6 +140,7 @@ namespace MuseumModerna
             motionLabel = Button(options, "", () => { reducedMotion = !reducedMotion; ApplyPreferences(); });
             var visitor = FindAnyObjectByType<PlayerController>();
             Button(options, "Calibrar câmera", () => visitor?.Calibrate());
+            Button(options, "Voltar ao menu", () => MobileVrMode.Instance?.ShowMainMenu());
 #if UNITY_ANDROID && !UNITY_EDITOR
             Button(options, "Preparar visor VR", () => MobileVrMode.Instance?.ShowPreparation());
 #endif
@@ -139,9 +152,20 @@ namespace MuseumModerna
         }
         private void ToggleSettings()
         {
-            settings.gameObject.SetActive(!settings.gameObject.activeSelf);
-            if (settings.gameObject.activeSelf && EventSystem.current != null)
+            bool open = !settings.gameObject.activeSelf;
+            settings.gameObject.SetActive(open);
+            backdrop.gameObject.SetActive(open);
+            if (open && EventSystem.current != null)
                 EventSystem.current.SetSelectedGameObject(enabledLabel.transform.parent.gameObject);
+        }
+        /// <summary>Abre o painel de opções (ex.: chamado pela tela de abertura). Não faz nada se já estiver aberto.</summary>
+        public void OpenSettings()
+        {
+            if (!settings.gameObject.activeSelf) ToggleSettings();
+        }
+        public void CloseSettings()
+        {
+            if (settings != null && settings.gameObject.activeSelf) ToggleSettings();
         }
         public void Show(PaintingInfo info)
         {
@@ -188,6 +212,13 @@ namespace MuseumModerna
             contrastLabel.text = "Alto contraste: " + (contrast ? "sim" : "não");
             lingerLabel.text = "Tempo após olhar: " + (linger ? "5 segundos" : "breve");
             motionLabel.text = "Reduzir animação: " + (reducedMotion ? "sim" : "não");
+            // Estado ligado/desligado também aparece na cor de fundo do botão, não só no texto.
+            SetToggleVisual(enabledLabel, panelsEnabled);
+            SetToggleVisual(sizeLabel, textStep > 0);
+            SetToggleVisual(summaryLabel, summary);
+            SetToggleVisual(contrastLabel, contrast);
+            SetToggleVisual(lingerLabel, linger);
+            SetToggleVisual(motionLabel, reducedMotion);
             background.color = contrast ? Color.black : MuseumGuideTheme.Surface;
             foreach (var label in new[] { title, author, technique, notice, description, relation, source })
             {
@@ -242,9 +273,19 @@ namespace MuseumModerna
             panel.anchorMin = panel.anchorMax = panel.pivot = new Vector2(1, 0);
             panel.anchoredPosition = new Vector2(-MuseumGuideTheme.Padding, MuseumGuideTheme.Padding);
             panel.sizeDelta = new Vector2(Mathf.Min(MuseumGuideTheme.Width, width > height ? width * .42f : width - 40), height * (width > height ? .70f : .46f));
+
+            // Nunca deixa o botão de opções maior que a área segura (telas muito estreitas).
+            toggle.sizeDelta = new Vector2(Mathf.Min(210, width - MuseumGuideTheme.Padding * 2), MuseumGuideTheme.ButtonHeight);
+
+            // Painel de opções: nunca sobrepõe o botão que o abre, largura acompanha a tela
+            // (com mínimo/máximo legíveis) e altura é limitada pelo espaço restante abaixo do botão.
+            float belowToggle = MuseumGuideTheme.Padding + toggle.sizeDelta.y + MuseumGuideTheme.Gap;
             settings.anchorMin = settings.anchorMax = settings.pivot = new Vector2(0, 1);
-            settings.anchoredPosition = new Vector2(20, -76);
-            settings.sizeDelta = new Vector2(Mathf.Min(320, width - 40), Mathf.Min(420, height - 96));
+            settings.anchoredPosition = new Vector2(MuseumGuideTheme.Padding, -belowToggle);
+            float settingsWidth = Mathf.Clamp(width * .88f, MuseumGuideTheme.SettingsMinWidth,
+                Mathf.Min(MuseumGuideTheme.SettingsMaxWidth, width - MuseumGuideTheme.Padding * 2));
+            float settingsHeight = Mathf.Min(MuseumGuideTheme.SettingsMaxHeight, height - belowToggle - MuseumGuideTheme.Padding);
+            settings.sizeDelta = new Vector2(settingsWidth, Mathf.Max(160, settingsHeight));
         }
         public void ConfigureScale(float width, float height)
         {
@@ -263,6 +304,12 @@ namespace MuseumModerna
         {
             rt.anchorMin = Vector2.zero; rt.anchorMax = Vector2.one;
             rt.offsetMin = rt.offsetMax = Vector2.zero;
+        }
+        /// <summary>Realça o fundo do botão de opção quando ela está ativa (feedback visual além do texto).</summary>
+        private static void SetToggleVisual(Text label, bool active)
+        {
+            var image = label.transform.parent.GetComponent<Image>();
+            if (image != null) image.color = active ? MuseumGuideTheme.ActiveControl : MuseumGuideTheme.Control;
         }
         private Image Surface(RectTransform rt)
         {

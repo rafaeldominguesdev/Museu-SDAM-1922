@@ -55,10 +55,10 @@ ajuste às lentes, latência e conforto de leitura. Não há suporte iOS configu
 
 ## APK e testes
 
-APK com o redesign inspirado no Louvre, gerado em 9 de setembro e verificado em
-10 de setembro de 2026:
+APK com pinturas ampliadas, molduras de gala e ilhas de exposição, gerado e verificado em
+11 de setembro de 2026:
 [MuseudaSemanaArteModerna.apk](../artifacts/MuseumVR_Build/MuseudaSemanaArteModerna.apk)
-(33,6 MB). Transfira para o celular Android e abra o arquivo para instalar.
+(36,4 MB). Transfira para o celular Android e abra o arquivo para instalar.
 Se o Android solicitar, autorize a instalação pelo aplicativo usado para abrir o APK.
 Depois siga a preparação das lentes no início deste guia.
 

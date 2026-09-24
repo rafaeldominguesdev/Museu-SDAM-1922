@@ -1,6 +1,7 @@
 using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.EventSystems;
 
 namespace MuseumModerna
 {
@@ -129,6 +130,7 @@ namespace MuseumModerna
 
         private void Start()
         {
+            EnsureEventSystem();
             // Inicializa o painel invisível
             if (paintingPanelCanvasGroup != null)
             {
@@ -142,9 +144,10 @@ namespace MuseumModerna
 
             var scaler = GetComponent<CanvasScaler>();
             if (scaler != null) scaler.referenceResolution = new Vector2(1280, 800);
-            guide = gameObject.AddComponent<MuseumGuidePanel>();
+            guide = GetComponent<MuseumGuidePanel>() ?? gameObject.AddComponent<MuseumGuidePanel>();
             guide.Build(transform);
-            gameObject.AddComponent<MobileVrMode>().Initialize(this);
+            (GetComponent<MobileVrMode>() ?? gameObject.AddComponent<MobileVrMode>()).Initialize(this);
+            (GetComponent<WelcomeScreen>() ?? gameObject.AddComponent<WelcomeScreen>()).Build(this);
             crosshairActiveColor = MuseumGuideTheme.Accent;
             crosshairNormalColor = new Color(1, 1, 1, .6f);
             if (crosshairImage != null) crosshairImage.rectTransform.sizeDelta = new Vector2(6, 6);
@@ -165,6 +168,20 @@ namespace MuseumModerna
                 if (gameObject.activeInHierarchy)
                     StartCoroutine(HideGazeIndicatorAfterDelay(indicatorShowDuration));
             }
+        }
+
+        internal static void EnsureEventSystem()
+        {
+            var events = EventSystem.current;
+            if (events == null)
+                events = FindAnyObjectByType<EventSystem>(FindObjectsInactive.Include);
+            if (events == null)
+                events = new GameObject("EventSystem", typeof(EventSystem)).GetComponent<EventSystem>();
+            events.gameObject.SetActive(true);
+            events.enabled = true;
+            var module = events.GetComponent<BaseInputModule>();
+            if (module == null) module = events.gameObject.AddComponent<StandaloneInputModule>();
+            module.enabled = true;
         }
 
         private void Update()

@@ -11,25 +11,30 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 14256d4cfae25415f84295e8fa960519, type: 3}
   m_Name: vicente_rego_monteiro
-  m_EditorClassIdentifier:
-  title: Vicente do Rego Monteiro
+  m_EditorClassIdentifier: 
+  title: Menino nu e tartaruga
   artist: Vicente do Rego Monteiro
-  year: 1922
+  year: 1923
   movement: Modernismo brasileiro
-  periodo: 1922
-  tecnica: "Composi\xE7\xE3o gr\xE1fica digital de media\xE7\xE3o"
-  categoria: Painel de artista
-  relacao_com_a_semana_de_1922: "Participante da exposi\xE7\xE3o da Semana; este
-    painel n\xE3o atribui uma pintura inventada ao artista."
-  obra_historica_ou_reinterpretacao: "Painel did\xE1tico criado para este museu virtual.
-    A composi\xE7\xE3o visual \xE9 cenogr\xE1fica; n\xE3o reproduz uma obra original.
-    Autor e per\xEDodo informados referem-se ao assunto hist\xF3rico."
-  resumo: "Vicente do Rego Monteiro esteve representado na exposi\xE7\xE3o."
-  fontes: https://anitamalfatti.ieb.usp.br/1921-1922/
-  description: "Vicente do Rego Monteiro esteve representado na exposi\xE7\xE3o.
-    O painel amplia o percurso para diferentes pesquisas visuais reunidas em 1922."
-  funFact:
-  paintingTexture: {fileID: 0}
+  periodo: 1923
+  tecnica: "\xD3leo sobre tela"
+  categoria: Pintura
+  relacao_com_a_semana_de_1922: "Vicente do Rego Monteiro esteve representado na
+    Semana. Esta pintura \xE9 de 1923, posterior ao evento, e apresenta um desdobramento
+    de sua pesquisa."
+  obra_historica_ou_reinterpretacao: "Reprodu\xE7\xE3o digital da obra hist\xF3rica
+    identificada nesta ficha. A imagem preserva a composi\xE7\xE3o e as propor\xE7\xF5es
+    da fonte. Cr\xE9dito da reprodu\xE7\xE3o: Acervo MASP \xB7 Foto: Jo\xE3o Musa."
+  resumo: "A figura de um menino e uma tartaruga s\xE3o constru\xEDdas com volumes
+    arredondados e tons de argila."
+  fontes: 'https://masp.org.br/acervo/obra/menino-nu-e-tartaruga
+
+    Imagem: https://assets.masp.org.br/uploads/temp/WEB_JM_MASP_00646_01.jpg'
+  description: "A figura de um menino e uma tartaruga s\xE3o constru\xEDdas com volumes
+    arredondados e tons de argila. A estiliza\xE7\xE3o aproxima refer\xEAncias cubistas
+    das formas da cer\xE2mica marajoara estudada pelo artista."
+  funFact: 
+  paintingTexture: {fileID: 2800000, guid: 5f4797132e0c54868a426c3469ccc26e, type: 3}
   thumbnailSprite: {fileID: 0}
   audioGuide: {fileID: 0}
   audioDuration: 0

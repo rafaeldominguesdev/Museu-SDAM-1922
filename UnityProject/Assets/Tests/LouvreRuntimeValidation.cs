@@ -31,9 +31,59 @@ namespace MuseumModerna
             public int colliders;
             public int exhibitRaycastsPassed;
             public int doorwaysPassed;
+            public int enlargedPaintingsPassed;
+            public int paintingCornerRaycastsPassed;
+            public int paintingNeighbourPairsChecked;
+            public float smallestPaintingNeighbourGap;
+            public AtmosphereEvidence atmosphere;
+            public CirculationEvidence[] circulation;
             public string captureSettings = "Mono Editor camera renders at 1600 x 1000, 62-degree vertical FOV and 4x MSAA; these settings are for visual inspection, not a mobile performance measurement.";
             public SculptureHitEvidence[] sculptureTopHits;
+            public PaintingEvidence[] enlargedPaintings;
             public string scope = "Active saved scene geometry. Triangles count only each renderer's assigned submeshes, including its static-batch offset; vertices count once per shared mesh. These are not measured FPS, device draw calls or GPU time.";
+        }
+
+        [Serializable]
+        private sealed class AtmosphereEvidence
+        {
+            public int curvedPanels;
+            public int islandCases;
+            public int planters;
+            public int contactShadows;
+            public int solidColliders;
+            public int addedBenches;
+            public DisplayHitEvidence[] displayRaycasts;
+        }
+
+        [Serializable]
+        private sealed class DisplayHitEvidence
+        {
+            public string display;
+            public string exhibitId;
+            public string collider;
+            public Vector3 hitPoint;
+        }
+
+        [Serializable]
+        private sealed class CirculationEvidence
+        {
+            public string route;
+            public Vector3 from;
+            public Vector3 to;
+            public float clearanceRadius;
+        }
+
+        [Serializable]
+        private sealed class PaintingEvidence
+        {
+            public string exhibitId;
+            public float canvasWidth;
+            public float canvasHeight;
+            public float centerHeight;
+            public int cornerRaycastsPassed;
+            public int frameMaterials;
+            public Vector3 frameBoundsCenter;
+            public Vector3 frameBoundsSize;
         }
 
         [Serializable]
@@ -122,6 +172,7 @@ namespace MuseumModerna
                 Require(found == exhibit, "Unobstructed approach to " + exhibit.name + "; first exhibit: " + (found != null ? found.name : "solid/no hit"));
             }
             Debug.Log("[LouvreValidation] Raycasts to all 28 exhibits: PASS");
+            var paintingEvidence = CheckEnlargedPaintings(exhibits, out var neighbourPairs, out var smallestGap);
             var sculptureTopHits = exhibits.Where(exhibit => exhibit.PaintingData.categoria == "Escultura cenográfica")
                 .Select(CheckSculptureTop).ToArray();
             Require(sculptureTopHits.Length == 3, "Upper surfaces of all three sculptures were checked");
@@ -158,11 +209,24 @@ namespace MuseumModerna
             }
             Debug.Log("[LouvreValidation] Four doorway clearance tests and six floor positions: PASS");
 
+            var atmosphere = CheckAtmosphere(architecture.transform);
+            var circulation = CheckGalleryCirculation();
+
             var metrics = MeasureGeometry();
             metrics.activeCameras = cameras.Length;
             metrics.exhibitRaycastsPassed = exhibits.Length;
             metrics.doorwaysPassed = 4;
             metrics.sculptureTopHits = sculptureTopHits;
+            metrics.enlargedPaintingsPassed = paintingEvidence.Length;
+            metrics.paintingCornerRaycastsPassed = paintingEvidence.Sum(painting => painting.cornerRaycastsPassed);
+            metrics.paintingNeighbourPairsChecked = neighbourPairs;
+            metrics.smallestPaintingNeighbourGap = smallestGap;
+            metrics.enlargedPaintings = paintingEvidence;
+            metrics.atmosphere = atmosphere;
+            metrics.circulation = circulation;
+            Require(metrics.renderedTriangles <= 350000,
+                "The saved scene remains within its 350,000-triangle geometry budget; found " + metrics.renderedTriangles);
+            Require(metrics.shadowCastingLights == 0, "The enlarged paintings add no realtime shadow lights");
             Directory.CreateDirectory(OutputDirectory);
             File.WriteAllText(Path.Combine(OutputDirectory, "louvre-geometry-metrics.json"), JsonUtility.ToJson(metrics, true) + "\n");
             Debug.Log("[LouvreValidation] Geometry: " + metrics.activeRenderers + " renderers, " + metrics.renderedTriangles +
@@ -171,13 +235,237 @@ namespace MuseumModerna
             Capture("louvre-hall.png", new Vector3(0, 1.7f, -8), new Vector3(0, 3, 4));
             Capture("louvre-hall-corner.png", new Vector3(-7, 1.7f, -6), new Vector3(3, 3, 4));
             Capture("louvre-painting-gallery.png", new Vector3(-4.5f, 1.7f, 11.8f), new Vector3(3, 2.8f, 22));
+            Capture("louvre-real-paintings.png", new Vector3(0, 2, 16.8f), new Vector3(.2f, 2.55f, 23.8f));
             Capture("louvre-sculpture-gallery.png", new Vector3(11.5f, 1.7f, -5), new Vector3(19, 2.5f, 3));
+            Capture("louvre-gallery-islands.png", new Vector3(0, 1.7f, 11.5f), new Vector3(0, 1.8f, 19));
+            Capture("louvre-literature-gallery.png", new Vector3(-11.6f, 1.7f, -5), new Vector3(-19, 1.8f, 2));
+            var island = architecture.GetComponentsInChildren<Transform>()
+                .Where(item => item.name.StartsWith("Vitrine_ilha_", StringComparison.Ordinal))
+                .OrderBy(item => item.name, StringComparer.Ordinal).First();
+            var islandCenter = island.position + Vector3.up;
+            Capture("louvre-vitrine-detail.png", islandCenter + new Vector3(1.7f, 1.1f, -2.4f), islandCenter);
             Capture("louvre-ceiling.png", new Vector3(-2, 1.7f, -3), new Vector3(0, 7, 0));
             var frameCenter = first.transform.position - Vector3.up * .10f;
-            Capture("louvre-frame-detail.png", frameCenter + first.transform.forward * 1.8f + first.transform.right * .28f, frameCenter);
+            Capture("louvre-frame-detail.png", frameCenter + first.transform.forward * 2.8f + first.transform.right * .28f, frameCenter);
+            var frameCorner = first.transform.position + first.transform.right * 1.1f + Vector3.up * .9f;
+            Capture("louvre-frame-corner.png", frameCorner + first.transform.forward * .9f + first.transform.right * .15f, frameCorner);
             yield return null;
             Require(runtimeErrors.Count == 0, "No runtime errors: " + string.Join(" | ", runtimeErrors));
         }
+
+        private AtmosphereEvidence CheckAtmosphere(Transform architecture)
+        {
+            var atmosphere = architecture.Find("Ambiente_Preenchido");
+            Require(atmosphere != null && atmosphere.gameObject.activeInHierarchy,
+                "The furnished museum environment is saved and active");
+            var objects = atmosphere.GetComponentsInChildren<Transform>();
+            var panels = objects.Where(item => item.name.StartsWith("Painel_curvo_", StringComparison.Ordinal)).ToArray();
+            var cases = objects.Where(item => item.name.StartsWith("Vitrine_ilha_", StringComparison.Ordinal)).ToArray();
+            var planters = objects.Where(item => item.name.StartsWith("Vaso_galeria_", StringComparison.Ordinal)).ToArray();
+            var benches = objects.Where(item => item.name.StartsWith("Banco_curvo_Ilha_", StringComparison.Ordinal)).ToArray();
+            var shadowRoot = atmosphere.Find("Sombras_de_contato");
+            Require(panels.Length == 2 && cases.Length == 4 && planters.Length == 8 && benches.Length == 2,
+                "Two curved panels, four document islands, eight planted corners and two curved benches fill the saved museum; " +
+                "found " + panels.Length + ", " + cases.Length + ", " + planters.Length + ", " + benches.Length);
+            Require(shadowRoot != null, "Contact shadows are saved with the new furnishings");
+            var shadows = shadowRoot.GetComponentsInChildren<Renderer>().Where(renderer => renderer.enabled).ToArray();
+            Require(shadows.Length > 0, "Contact shadows ground the new furnishings");
+            foreach (var furniture in panels.Concat(cases).Concat(planters).Concat(benches))
+            {
+                Require(furniture.GetComponentsInChildren<Renderer>().Any(renderer => renderer.enabled),
+                    "Furniture has visible geometry: " + furniture.name);
+                Require(furniture.GetComponentsInChildren<Collider>().Any(collider => collider.enabled && !collider.isTrigger),
+                    "Furniture prevents walking through its solid base: " + furniture.name);
+            }
+            Require(!shadowRoot.GetComponentsInChildren<Collider>().Any(collider => collider.enabled),
+                "Contact shadows do not add invisible walking obstacles");
+            var result = new AtmosphereEvidence
+            {
+                curvedPanels = panels.Length,
+                islandCases = cases.Length,
+                planters = planters.Length,
+                contactShadows = shadows.Length,
+                addedBenches = benches.Length,
+                solidColliders = atmosphere.GetComponentsInChildren<Collider>()
+                    .Count(collider => collider.enabled && !collider.isTrigger),
+                displayRaycasts = CheckDisplayReferences(atmosphere)
+            };
+            Debug.Log("[LouvreValidation] Furnished environment: " + result.curvedPanels + " panels, " +
+                result.islandCases + " island cases, " + result.planters + " planters, " + result.contactShadows +
+                " contact shadows and " + result.solidColliders + " solid colliders: PASS");
+            return result;
+        }
+
+        private DisplayHitEvidence[] CheckDisplayReferences(Transform atmosphere)
+        {
+            var references = atmosphere.GetComponentsInChildren<ExhibitGuideReference>();
+            Require(references.Length == 8, "Both faces of two panels and four vitrines link to existing guides");
+            var result = new List<DisplayHitEvidence>();
+            foreach (var reference in references)
+            {
+                Require(reference.Source != null && reference.Source.PaintingData != null,
+                    "Display reference has an existing source exhibit: " + reference.name);
+                var proxy = reference.GetComponent<BoxCollider>();
+                Require(proxy != null && proxy.enabled && !proxy.isTrigger,
+                    "Display reference has its own solid gaze surface: " + reference.name);
+                bool isVitrine = reference.Source.PaintingData.categoria == "Vitrine documental";
+                var aim = reference.transform.TransformPoint(proxy.center);
+                var approach = reference.transform.forward;
+                if (isVitrine)
+                {
+                    aim = reference.transform.TransformPoint(proxy.center + Vector3.up * (proxy.size.y * .5f));
+                    approach = (Vector3.up + reference.transform.forward * .45f).normalized;
+                }
+                Position(isVitrine ? aim + reference.transform.forward * 1.8f + Vector3.up * .45f : aim + approach * 1.8f, aim);
+                Physics.SyncTransforms();
+                var ray = new Ray(eye.transform.position, eye.transform.forward);
+                var hit = Physics.RaycastAll(ray, 2.5f, Physics.DefaultRaycastLayers, QueryTriggerInteraction.Ignore)
+                    .Where(candidate => !BelongsToPlayer(candidate.collider)).OrderBy(candidate => candidate.distance).FirstOrDefault();
+                Require(hit.collider != null && hit.collider.GetComponentInParent<ExhibitGuideReference>() == reference &&
+                    gaze.RaycastExhibit(ray) == reference.Source,
+                    "The first physical hit on the new display resolves its original guide: " + reference.name +
+                    "; first collider " + (hit.collider != null ? hit.collider.name : "none"));
+                result.Add(new DisplayHitEvidence
+                {
+                    display = reference.name,
+                    exhibitId = reference.Source.PaintingData.uniqueId,
+                    collider = hit.collider.name,
+                    hitPoint = hit.point
+                });
+            }
+            Debug.Log("[LouvreValidation] Eight new display surfaces select existing guides with real physics raycasts: PASS");
+            return result.ToArray();
+        }
+
+        private CirculationEvidence[] CheckGalleryCirculation()
+        {
+            var evidence = new List<CirculationEvidence>();
+            // The sculpture at (13, 0) is part of the original exhibition. Its route
+            // passes between the pedestals instead of casting through the bronze.
+            var painting = new[] { new Vector3(0, 0, 11.4f), new Vector3(0, 0, 22) };
+            var sculpture = new[]
+            {
+                new Vector3(11.4f, 0, 0), new Vector3(11.4f, 0, -2),
+                new Vector3(21, 0, -2), new Vector3(21, 0, 0)
+            };
+            var literature = new[] { new Vector3(-11.4f, 0, 0), new Vector3(-22, 0, 0) };
+            foreach (float height in new[] { .55f, 1.7f })
+            {
+                CheckRoute("painting", painting, height, evidence);
+                CheckRoute("sculpture", sculpture, height, evidence);
+                CheckRoute("literature", literature, height, evidence);
+            }
+            Debug.Log("[LouvreValidation] Gallery circulation at knee and eye height, 0.30 m radius: PASS (" +
+                evidence.Count + " route segments, including endpoint overlaps)");
+            return evidence.ToArray();
+        }
+
+        private void CheckRoute(string label, Vector3[] path, float height, List<CirculationEvidence> evidence)
+        {
+            const float radius = .30f;
+            for (int i = 0; i < path.Length - 1; i++)
+            {
+                var from = path[i] + Vector3.up * height;
+                var to = path[i + 1] + Vector3.up * height;
+                var delta = to - from;
+                var obstacles = Physics.SphereCastAll(from, radius, delta.normalized, delta.magnitude,
+                    Physics.DefaultRaycastLayers, QueryTriggerInteraction.Ignore).Select(hit => hit.collider)
+                    .Concat(Physics.OverlapSphere(from, radius, Physics.DefaultRaycastLayers, QueryTriggerInteraction.Ignore))
+                    .Concat(Physics.OverlapSphere(to, radius, Physics.DefaultRaycastLayers, QueryTriggerInteraction.Ignore))
+                    .Where(collider => !BelongsToPlayer(collider)).Distinct().ToArray();
+                Require(obstacles.Length == 0, "Continuous circulation through " + label + " at " + height +
+                    " m, " + from + " to " + to + ", is blocked by " +
+                    string.Join(", ", obstacles.Select(collider => collider.name)));
+                evidence.Add(new CirculationEvidence { route = label, from = from, to = to, clearanceRadius = radius });
+            }
+        }
+
+        private PaintingEvidence[] CheckEnlargedPaintings(PaintingExhibit[] exhibits,
+            out int neighbourPairs, out float smallestGap)
+        {
+            var paintings = exhibits.Where(exhibit =>
+                exhibit.PaintingData.categoria != "Escultura cenográfica" &&
+                exhibit.PaintingData.categoria != "Vitrine documental").ToArray();
+            Require(paintings.Length == 24, "All 24 wall paintings and panels are enlarged");
+            var evidence = new List<PaintingEvidence>();
+            var frameBounds = new Dictionary<PaintingExhibit, Bounds>();
+            foreach (var painting in paintings)
+            {
+                var scale = painting.transform.lossyScale;
+                float width = Mathf.Abs(scale.x), height = Mathf.Abs(scale.y);
+                Require(width >= 2.37f && height >= 1.86f,
+                    "The enlarged canvas measures at least 2.37 x 1.86 m: " + painting.name + "; " + width + " x " + height);
+                var frame = GameObject.Find("Moldura_perfilada_" + painting.PaintingData.uniqueId);
+                Require(frame != null, "The enlarged canvas has its own sophisticated frame: " + painting.name);
+                Require(Vector3.Distance(frame.transform.position, painting.transform.position) < .005f &&
+                    Quaternion.Angle(frame.transform.rotation, painting.transform.rotation) < .1f,
+                    "Frame center and plane follow their canvas: " + painting.name);
+                var renderers = frame.GetComponentsInChildren<Renderer>().Where(renderer => renderer.enabled).ToArray();
+                Require(renderers.Length > 0, "Frame geometry is active: " + painting.name);
+                var materials = renderers.SelectMany(renderer => renderer.sharedMaterials).Where(material => material != null).Distinct().Count();
+                Require(materials <= 3, "At most three shared materials dress each frame: " + painting.name + "; found " + materials);
+                var bounds = renderers[0].bounds;
+                foreach (var renderer in renderers.Skip(1)) bounds.Encapsulate(renderer.bounds);
+                Require(Finite(bounds.center) && Finite(bounds.size), "Frame bounds contain only finite values: " + painting.name);
+                frameBounds.Add(painting, bounds);
+
+                int cornerHits = 0;
+                // Four rays cover the newly expanded interaction area. Their targets are
+                // 90% of the way to each canvas edge, clear of the real frame opening.
+                foreach (int x in new[] { -1, 1 })
+                    foreach (int y in new[] { -1, 1 })
+                    {
+                        var target = painting.transform.TransformPoint(new Vector3(x * .45f, y * .45f, 0));
+                        Position(target + painting.transform.forward * 2.5f, target);
+                        Physics.SyncTransforms();
+                        var selected = gaze.RaycastExhibit(new Ray(eye.transform.position, eye.transform.forward));
+                        Require(selected == painting, "Expanded canvas corner selects its own guide: " + painting.name +
+                            " (" + x + ", " + y + "); found " + (selected != null ? selected.name : "solid/no hit"));
+                        cornerHits++;
+                    }
+                evidence.Add(new PaintingEvidence
+                {
+                    exhibitId = painting.PaintingData.uniqueId,
+                    canvasWidth = width,
+                    canvasHeight = height,
+                    centerHeight = painting.transform.position.y,
+                    cornerRaycastsPassed = cornerHits,
+                    frameMaterials = materials,
+                    frameBoundsCenter = bounds.center,
+                    frameBoundsSize = bounds.size
+                });
+            }
+
+            neighbourPairs = 0;
+            smallestGap = float.PositiveInfinity;
+            for (int i = 0; i < paintings.Length; i++)
+                for (int j = i + 1; j < paintings.Length; j++)
+                {
+                    var a = paintings[i];
+                    var b = paintings[j];
+                    var delta = b.transform.position - a.transform.position;
+                    if (Vector3.Dot(a.transform.forward, b.transform.forward) < .999f ||
+                        Mathf.Abs(Vector3.Dot(delta, a.transform.forward)) > .1f) continue;
+                    float gap = Mathf.Abs(Vector3.Dot(frameBounds[b].center - frameBounds[a].center, a.transform.right)) -
+                        BoundsRadius(frameBounds[a], a.transform.right) - BoundsRadius(frameBounds[b], a.transform.right);
+                    Require(gap >= .2f, "Frames on the same wall retain 20 cm of separation: " + a.name + " / " + b.name +
+                        "; gap " + gap.ToString("F3") + " m");
+                    smallestGap = Mathf.Min(smallestGap, gap);
+                    neighbourPairs++;
+                }
+            Require(neighbourPairs > 0, "Neighbouring wall frames were checked for overlap");
+            Debug.Log("[LouvreValidation] 24 enlarged canvases, 96 corner raycasts, " + neighbourPairs +
+                " wall-frame pairs: PASS; smallest frame gap " + smallestGap.ToString("F3") + " m");
+            return evidence.ToArray();
+        }
+
+        private static float BoundsRadius(Bounds bounds, Vector3 axis) =>
+            Mathf.Abs(axis.x) * bounds.extents.x + Mathf.Abs(axis.y) * bounds.extents.y + Mathf.Abs(axis.z) * bounds.extents.z;
+
+        private static bool Finite(Vector3 value) =>
+            !float.IsNaN(value.x) && !float.IsInfinity(value.x) &&
+            !float.IsNaN(value.y) && !float.IsInfinity(value.y) &&
+            !float.IsNaN(value.z) && !float.IsInfinity(value.z);
 
         private void CheckDoorway(string label, Vector3 from, Vector3 to)
         {

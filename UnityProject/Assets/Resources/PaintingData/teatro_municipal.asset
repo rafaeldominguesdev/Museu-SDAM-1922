@@ -30,7 +30,7 @@ MonoBehaviour:
   description: "O Theatro Municipal de S\xE3o Paulo recebeu exposi\xE7\xF5es, confer\xEAncias
     e concertos. Este museu virtual utiliza uma arquitetura pr\xF3pria para organizar
     esse percurso hist\xF3rico."
-  funFact:
+  funFact: 
   paintingTexture: {fileID: 0}
   thumbnailSprite: {fileID: 0}
   audioGuide: {fileID: 0}

@@ -11,7 +11,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 14256d4cfae25415f84295e8fa960519, type: 3}
   m_Name: escultura_cenografica_1
-  m_EditorClassIdentifier:
+  m_EditorClassIdentifier: 
   title: Estudo de volumes 1
   artist: "Cria\xE7\xE3o cenogr\xE1fica do projeto"
   year: 2026
@@ -30,7 +30,7 @@ MonoBehaviour:
   description: "Planos e volumes geom\xE9tricos variam conforme o visitante circula
     ao redor da pe\xE7a. A composi\xE7\xE3o prop\xF5e um exerc\xEDcio de observa\xE7\xE3o
     de equil\xEDbrio, luz e espa\xE7o."
-  funFact:
+  funFact: 
   paintingTexture: {fileID: 0}
   thumbnailSprite: {fileID: 0}
   audioGuide: {fileID: 0}

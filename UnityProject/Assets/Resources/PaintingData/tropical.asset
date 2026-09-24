@@ -17,22 +17,30 @@ MonoBehaviour:
   year: 1917
   movement: Modernismo brasileiro
   periodo: 1917
-  tecnica: "\xD3leo sobre tela (obra de refer\xEAncia)"
+  tecnica: "\xD3leo sobre tela"
   categoria: Pintura
-  relacao_com_a_semana_de_1922: "Obra anterior \xE0 Semana, apresentada aqui como
-    contexto da trajet\xF3ria de uma de suas participantes."
-  obra_historica_ou_reinterpretacao: "Painel did\xE1tico criado para este museu virtual.
-    A composi\xE7\xE3o visual \xE9 cenogr\xE1fica; n\xE3o reproduz uma obra original.
-    Autor e per\xEDodo informados referem-se ao assunto hist\xF3rico."
-  resumo: "A presen\xE7a humana e os frutos aproximam figura e ambiente tropical."
-  fontes: 'https://pinacoteca.org.br/qrcode/p2-s19-9-b/
+  relacao_com_a_semana_de_1922: "Pintura anterior \xE0 Semana, apresentada como contexto
+    da trajet\xF3ria de Anita Malfatti, uma de suas participantes."
+  obra_historica_ou_reinterpretacao: "Reprodu\xE7\xE3o digital da obra hist\xF3rica
+    identificada nesta ficha. A imagem preserva a composi\xE7\xE3o e as propor\xE7\xF5es
+    da fonte. Cr\xE9dito da reprodu\xE7\xE3o: Anita Malfatti. Pinacoteca do Estado
+    de S\xE3o Paulo. Fotografia: P. H. O. V. Campos e E. Kajiya. Fonte: tese de Pedro
+    Herzilio Ottoni Viviani de Campos, USP, 2015."
+  resumo: "Uma mulher aparece diante de vegeta\xE7\xE3o tropical, com um cesto de
+    frutas em primeiro plano."
+  fontes: 'https://teses.usp.br/teses/disponiveis/43/43134/tde-06112015-143351/pt-br.php
 
-    https://anitamalfatti.ieb.usp.br/1921-1922/'
-  description: "A presen\xE7a humana e os frutos aproximam figura e ambiente tropical.
-    O painel prop\xF5e uma leitura sobre representa\xE7\xE3o do Brasil e escolhas
-    de cor."
-  funFact:
-  paintingTexture: {fileID: 0}
+    https://pinacoteca.org.br/qrcode/p2-s19-9-b/
+
+    https://jornal.usp.br/universidade/como-a-ciencia-pode-desvendar-os-bastidores-das-obras-de-arte/
+
+    Imagem:
+    https://teses.usp.br/teses/disponiveis/43/43134/tde-06112015-143351/publico/TesePCampos.pdf#page=76'
+  description: "Uma mulher aparece diante de vegeta\xE7\xE3o tropical, com um cesto
+    de frutas em primeiro plano. A obra articula a figura humana e elementos da paisagem
+    brasileira."
+  funFact: 
+  paintingTexture: {fileID: 2800000, guid: 1e272bc1d18b04200aea88643545fff9, type: 3}
   thumbnailSprite: {fileID: 0}
   audioGuide: {fileID: 0}
   audioDuration: 0

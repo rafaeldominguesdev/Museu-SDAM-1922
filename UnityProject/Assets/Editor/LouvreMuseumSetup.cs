@@ -42,10 +42,10 @@ namespace MuseumModerna
             zone = "Salao";
             Dome(); Chandelier(new Vector3(0,5.5f,0));
             FloorMedallion();
-            PortalCaption(new Vector3(0,5.35f,9.73f), Quaternion.Euler(0,180,0), "01   /   PINTURA");
-            PortalCaption(new Vector3(9.73f,5.35f,0), Quaternion.Euler(0,-90,0), "02   /   ESCULTURA");
-            PortalCaption(new Vector3(-9.73f,5.35f,0), Quaternion.Euler(0,90,0), "03   /   PALAVRA E MÚSICA");
-            PortalCaption(new Vector3(0,5.35f,-9.73f), Quaternion.identity, "SEMANA   /   1922");
+            PortalCaption(new Vector3(0,5.35f,9.73f), Quaternion.Euler(0,180,0), "01   /   COR, FORMA E RUPTURA");
+            PortalCaption(new Vector3(9.73f,5.35f,0), Quaternion.Euler(0,-90,0), "02   /   VOLUME, MATÉRIA E GESTO");
+            PortalCaption(new Vector3(-9.73f,5.35f,0), Quaternion.Euler(0,90,0), "03   /   PALAVRA, SOM E MANIFESTO");
+            PortalCaption(new Vector3(0,5.35f,-9.73f), Quaternion.identity, "SEMANA DE ARTE MODERNA   /   1922");
             FinishMeshes();
             LouvreExhibitionDetails.Apply(root, gold, stone, dark, velvet);
             ConfigureLight();
@@ -179,6 +179,15 @@ namespace MuseumModerna
                 float a=i*Mathf.PI/6; var p=origin+new Vector3(Mathf.Cos(a)*radius*.93f,.35f,Mathf.Sin(a)*radius*.93f);
                 Tube(new[]{p,p+Vector3.up*(h-.76f)},.014f,stone,5);
             }
+            // A malha arquitetônica é agrupada no final do build; portanto cada
+            // pilastra precisa de um collider próprio para não ficar atravessável.
+            var collision = new GameObject("Colisao_Pilastra_"+(colliderIndex++));
+            collision.transform.SetParent(root);
+            collision.transform.position = origin + Vector3.up * (h * .5f);
+            var capsule = collision.AddComponent<CapsuleCollider>();
+            capsule.direction = 1;
+            capsule.radius = radius * 1.28f;
+            capsule.height = h;
         }
         static void Vault(Vector3 c,float width,float depth,float spring,float rise)
         {

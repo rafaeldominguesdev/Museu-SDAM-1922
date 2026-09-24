@@ -32,7 +32,7 @@ MonoBehaviour:
   description: "O livro re\xFAne poemas breves que exploram s\xEDntese e humor. O
     painel apresenta a publica\xE7\xE3o como parte da continuidade do modernismo
     na d\xE9cada de 1920."
-  funFact:
+  funFact: 
   paintingTexture: {fileID: 0}
   thumbnailSprite: {fileID: 0}
   audioGuide: {fileID: 0}

@@ -78,10 +78,15 @@ namespace MuseumModerna
         private static void RunFullSetup()
         {
             int changes = 0;
-
-            changes += AddCollidersToSurface(FloorNames,   "Chão");
-            changes += AddCollidersToSurface(WallNames,    "Paredes");
-            changes += AddCollidersOrCreateCeiling();
+            var architecture = GameObject.Find("Museum_LouvreStyle");
+            if (architecture != null)
+                changes += PillarPhysicsRepair.Repair(architecture.transform);
+            else
+            {
+                changes += AddCollidersToSurface(FloorNames, "Chão");
+                changes += AddCollidersToSurface(WallNames, "Paredes");
+                changes += AddCollidersOrCreateCeiling();
+            }
             changes += SetupPlayer();
 
             if (changes > 0)
@@ -111,11 +116,16 @@ namespace MuseumModerna
                 {
                     if (go.name.ToLowerInvariant().Contains(name.ToLowerInvariant()))
                     {
+                        // Um grupo vazio não representa uma superfície: um BoxCollider
+                        // padrão nesse pai criava uma barreira invisível na origem.
+                        var mesh = go.GetComponent<MeshFilter>();
+                        if (mesh == null || mesh.sharedMesh == null) break;
                         Undo.RecordObject(go, $"Add Collider {label}");
                         if (go.GetComponent<Collider>() == null)
                         {
-                            BoxCollider bc = Undo.AddComponent<BoxCollider>(go);
-                            Debug.Log($"[MuseumModerna] BoxCollider adicionado em '{go.name}' ({label}).");
+                            var collider = Undo.AddComponent<MeshCollider>(go);
+                            collider.sharedMesh = mesh.sharedMesh;
+                            Debug.Log($"[MuseumModerna] Collider da superfície adicionado em '{go.name}' ({label}).");
                             count++;
                         }
                         else
@@ -139,6 +149,9 @@ namespace MuseumModerna
             // Tenta encontrar teto existente
             int found = AddCollidersToSurface(CeilingNames, "Teto");
             if (found > 0) return found;
+            foreach (var collider in FindObjectsByType<Collider>(FindObjectsSortMode.None))
+                foreach (string name in CeilingNames)
+                    if (collider.name.ToLowerInvariant().Contains(name.ToLowerInvariant())) return 0;
 
             // Cria um teto baseado nos bounds do chão
             GameObject floor = FindByNames(FloorNames);
@@ -178,7 +191,8 @@ namespace MuseumModerna
 
         private static int SetupPlayer()
         {
-            GameObject player = FindByNames(PlayerNames);
+            var controller = FindAnyObjectByType<PlayerController>();
+            GameObject player = controller != null ? controller.gameObject : FindByNames(PlayerNames);
             if (player == null)
             {
                 Debug.LogWarning("[MuseumModerna] Player não encontrado. " +
@@ -215,6 +229,10 @@ namespace MuseumModerna
             {
                 Debug.Log($"[MuseumModerna] '{player.name}' já possui CharacterController.");
             }
+            Undo.RecordObject(cc, "Configure CharacterController");
+            cc.minMoveDistance = 0f;
+            cc.skinWidth = Mathf.Clamp(cc.radius * .1f, .01f, .04f);
+            cc.stepOffset = Mathf.Min(cc.stepOffset, .2f);
 
             return count;
         }

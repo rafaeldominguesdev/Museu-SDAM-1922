@@ -15,6 +15,19 @@ namespace MuseumModerna
     {
         private const string MeshFolder = "Assets/MuseumStyle/Meshes";
 
+        [MenuItem("Museum/Visual/Destacar pinturas e aplicar molduras de gala")]
+        public static void ApplyPaintingUpgrade()
+        {
+            var scene = UnityEditor.SceneManagement.EditorSceneManager.OpenScene("Assets/Scenes/MuseumScene.unity");
+            var root = GameObject.Find("Museum_LouvreStyle");
+            if (root == null) throw new InvalidOperationException("Aplique primeiro as galerias inspiradas no Louvre.");
+            Material Load(string name) => AssetDatabase.LoadAssetAtPath<Material>("Assets/MuseumStyle/Materials/" + name + ".mat");
+            Apply(root.transform, Load("Bronze_dourado"), Load("Calcario"), Load("Verde_profundo"), Load("Veludo_vinho"));
+            UnityEditor.SceneManagement.EditorSceneManager.MarkSceneDirty(scene);
+            if (!UnityEditor.SceneManagement.EditorSceneManager.SaveScene(scene))
+                throw new InvalidOperationException("Falha ao salvar as pinturas ampliadas.");
+        }
+
         public static void Apply(Transform root, Material gold, Material stone, Material dark, Material velvet)
         {
             if (root == null) throw new ArgumentNullException(nameof(root));
@@ -32,13 +45,16 @@ namespace MuseumModerna
 
             int panels = 0, sculptures = 0;
             var bronze = BronzeMaterial(gold);
+            var frameGold = FrameMaterial(gold, "Ouro_patina", new Color(.63f, .43f, .19f), .42f, .47f);
+            var burnishedGold = FrameMaterial(gold, "Ouro_brunido", new Color(.83f, .63f, .30f), .62f, .56f);
             foreach (var exhibit in exhibits)
             {
                 string id = exhibit.PaintingData.uniqueId;
                 var legacy = sceneObjects.FirstOrDefault(t => t != null && t.name == "Expografia_" + id);
                 if (legacy != null)
                 {
-                    Frame(details, exhibit, legacy, gold, dark);
+                    EnlargePainting(exhibit, legacy);
+                    Frame(details, exhibit, legacy, frameGold, burnishedGold, dark);
                     var slab = sceneObjects.FirstOrDefault(t => t != null && t.name == "Moldura_" + id);
                     HideRenderers(slab);
                     panels++;
@@ -69,12 +85,37 @@ namespace MuseumModerna
                     Bench(details, new Vector3(x * 5, 0, z * 5), velvet, dark, gold,
                         seatMesh, backMesh, trimMesh, legMesh);
 
+            ArtworkTextureSetup.ApplyWallImages();
+            LouvreAtmosphereSetup.ApplyTo(root);
             AssetDatabase.SaveAssets();
-            Debug.Log($"[LouvreStyle] Expografia: {panels} molduras perfiladas, {sculptures} bronzes originais e 4 bancos curvos. Fichas preservadas.");
+            Debug.Log($"[LouvreStyle] Expografia: {panels} telas de 2,38 × 1,87 m com molduras ornamentadas, {sculptures} bronzes originais e 4 bancos curvos. Fichas preservadas.");
+        }
+
+        private static void EnlargePainting(PaintingExhibit exhibit, Transform legacy)
+        {
+            // Dimensões absolutas: reaplicar o setup não acumula escala nem desloca as obras.
+            var current = exhibit.transform.lossyScale;
+            var factor = new Vector3(2.38f / Mathf.Abs(current.x), 1.87f / Mathf.Abs(current.y), 1);
+            exhibit.transform.localScale = Vector3.Scale(exhibit.transform.localScale, factor);
+            var center = exhibit.transform.position; center.y = 2.55f;
+            exhibit.transform.position = center;
+            legacy.SetPositionAndRotation(center, exhibit.transform.rotation);
+            var art = legacy.Find("Composicao_cenografica");
+            if (art != null) art.localScale = Vector3.Scale(art.localScale, factor);
+            var captions = legacy.GetComponentsInChildren<TextMesh>(true)
+                .Where(text => text.transform.parent == legacy).ToArray();
+            foreach (var text in captions)
+            {
+                bool disclaimer = text.name == "Credito_reproducao" ||
+                    text.text.StartsWith("PAINEL DIDÁTICO", StringComparison.Ordinal) ||
+                    text.text.StartsWith("REPRODUÇÃO", StringComparison.Ordinal);
+                text.transform.localPosition = new Vector3(0, -1.87f / 2 - .46f + (disclaimer ? -.105f : .052f), .052f);
+                text.characterSize = (disclaimer ? .024f : .034f) * .25f;
+            }
         }
 
         private static void Frame(Transform details, PaintingExhibit exhibit, Transform legacy,
-            Material gold, Material dark)
+            Material gold, Material burnishedGold, Material dark)
         {
             foreach (Transform child in legacy)
                 if (child.name.StartsWith("Moldura_", StringComparison.Ordinal) ||
@@ -90,21 +131,27 @@ namespace MuseumModerna
             float width = Mathf.Abs(exhibit.transform.lossyScale.x);
             float height = Mathf.Abs(exhibit.transform.lossyScale.y);
             if (width < .1f || height < .1f) { width = 1.4f; height = 1.1f; }
-            // A sequência raio/profundidade modela filete, gola côncava e toro externo.
-            // Há uma abertura real no centro: a geometria nunca cobre a tela original.
+            // Perfil de madeira entalhada e dourada: filete interno, caveto amplo,
+            // conta externa e rebaixo escuro. A abertura mantém toda a tela visível.
             var profile = new[]
             {
-                new Vector2(.008f, .018f), new Vector2(.012f, .040f),
-                new Vector2(.022f, .052f), new Vector2(.035f, .052f),
-                new Vector2(.047f, .038f), new Vector2(.054f, .027f),
-                new Vector2(.069f, .020f), new Vector2(.082f, .023f),
-                new Vector2(.099f, .045f), new Vector2(.107f, .069f),
-                new Vector2(.122f, .081f), new Vector2(.139f, .075f),
-                new Vector2(.150f, .057f), new Vector2(.153f, .016f),
-                new Vector2(.149f, -.020f)
+                new Vector2(.008f, .018f), new Vector2(.014f, .044f),
+                new Vector2(.027f, .060f), new Vector2(.045f, .060f),
+                new Vector2(.056f, .045f), new Vector2(.063f, .038f),
+                new Vector2(.083f, .038f), new Vector2(.098f, .045f),
+                new Vector2(.112f, .057f), new Vector2(.129f, .077f),
+                new Vector2(.146f, .101f), new Vector2(.163f, .122f),
+                new Vector2(.18f, .130f), new Vector2(.191f, .125f),
+                new Vector2(.199f, .104f), new Vector2(.205f, .102f),
+                new Vector2(.213f, .127f), new Vector2(.225f, .136f),
+                new Vector2(.238f, .125f), new Vector2(.249f, .101f),
+                new Vector2(.252f, .020f), new Vector2(.248f, -.026f)
             };
             MeshObject(frame, "Ouro_com_gola_e_toro", SaveMesh("ProfileFrame_" + id,
-                FrameRing(width, height, .025f, profile, 5)), gold);
+                FrameRing(width, height, .012f, profile, 8)), gold);
+            // Um único mesh de relevos por tamanho, compartilhado pelas 24 molduras.
+            MeshObject(frame, "Folhas_volutas_e_perolas", SaveMesh("Ornament_Gala",
+                LouvreOrnateFrame.Create(width, height, profile)), burnishedGold);
             MeshObject(frame, "Filete_de_sombra", SaveMesh("FrameInset_" + id,
                 FrameRing(width, height, .022f, new[]
                 {
@@ -112,19 +159,19 @@ namespace MuseumModerna
                     new Vector2(.011f, .025f), new Vector2(.013f, .019f)
                 }, 5)), dark);
             var plaque = MeshObject(frame, "Cartela_com_cantos_suaves",
-                SaveMesh("RoundedPlaque_" + id, RoundedPanel(width, .30f, .018f, .025f)), dark);
-            plaque.transform.localPosition = new Vector3(0, -height / 2 - .28f, .022f);
+                SaveMesh("RoundedPlaque_" + id, RoundedPanel(width * .86f, .32f, .018f, .025f)), dark);
+            plaque.transform.localPosition = new Vector3(0, -height / 2 - .46f, .022f);
             // Substitui a luminária-caixa por uma haste cilíndrica discreta.
             var lamp = MeshObject(frame, "Luminaria_tubular",
                 SaveMesh("PictureLight_" + id, Lathe(new[]
                 {
-                    new Vector2(0, -.23f), new Vector2(.022f, -.23f),
-                    new Vector2(.027f, -.215f), new Vector2(.027f, .215f),
-                    new Vector2(.022f, .23f), new Vector2(0, .23f)
+                    new Vector2(0, -.43f), new Vector2(.022f, -.43f),
+                    new Vector2(.032f, -.412f), new Vector2(.032f, .412f),
+                    new Vector2(.022f, .43f), new Vector2(0, .43f)
                 }, 12)), gold);
-            lamp.transform.localPosition = new Vector3(0, height / 2 + .28f, .23f);
+            lamp.transform.localPosition = new Vector3(0, height / 2 + .43f, .23f);
             lamp.transform.localRotation = Quaternion.Euler(0, 0, 90);
-            // Dois materiais por quadro, com culling local; evitamos um único lote do museu inteiro.
+            // Três materiais por quadro, culling local e nenhuma luz ou sombra extra.
             CombineChildren(frame, gold, "Frame_Gold_" + id);
             CombineChildren(frame, dark, "Frame_Dark_" + id);
         }
@@ -453,6 +500,19 @@ namespace MuseumModerna
             if (material.HasProperty("_Metallic")) material.SetFloat("_Metallic", .76f);
             if (material.HasProperty("_Glossiness")) material.SetFloat("_Glossiness", .53f);
             if (material.HasProperty("_EmissionColor")) material.SetColor("_EmissionColor", Color.black);
+            material.DisableKeyword("_EMISSION");
+            EditorUtility.SetDirty(material); return material;
+        }
+
+        private static Material FrameMaterial(Material source, string name, Color color, float metallic, float smoothness)
+        {
+            string path = "Assets/MuseumStyle/Materials/" + name + ".mat";
+            var material = AssetDatabase.LoadAssetAtPath<Material>(path);
+            if (material == null) { material = new Material(source); AssetDatabase.CreateAsset(material, path); }
+            material.color = color;
+            material.SetFloat("_Metallic", metallic);
+            material.SetFloat("_Glossiness", smoothness);
+            material.SetColor("_EmissionColor", Color.black);
             material.DisableKeyword("_EMISSION");
             EditorUtility.SetDirty(material); return material;
         }

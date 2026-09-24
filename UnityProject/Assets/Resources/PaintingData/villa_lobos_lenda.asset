@@ -29,7 +29,7 @@ MonoBehaviour:
   description: "A programa\xE7\xE3o musical teve papel central nos encontros de 1922.
     Este painel prop\xF5e imaginar a conviv\xEAncia entre concerto, leitura e exposi\xE7\xE3o
     visual."
-  funFact:
+  funFact: 
   paintingTexture: {fileID: 0}
   thumbnailSprite: {fileID: 0}
   audioGuide: {fileID: 0}

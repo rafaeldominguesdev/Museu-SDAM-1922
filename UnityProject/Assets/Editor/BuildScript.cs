@@ -13,8 +13,17 @@ public class BuildScript
         string workspacePath = Directory.GetParent(projectPath).FullName;
         string outputDir   = Path.Combine(workspacePath, "artifacts", "MuseumVR_Build");
         string apkPath     = Path.Combine(outputDir, "MuseudaSemanaArteModerna.apk");
+        string requestedPath = System.Environment.GetEnvironmentVariable("MUSEUM_APK_OUTPUT");
+        if (!string.IsNullOrWhiteSpace(requestedPath)) apkPath = Path.GetFullPath(requestedPath);
 
         Directory.CreateDirectory(outputDir);
+        Directory.CreateDirectory(Path.GetDirectoryName(apkPath));
+        if (File.Exists(apkPath))
+        {
+            string backup = apkPath + ".previous-" + System.DateTime.Now.ToString("yyyyMMdd-HHmmssfff");
+            File.Copy(apkPath, backup);
+            Debug.Log("[BuildScript] APK anterior preservado em: " + backup);
+        }
 
         // Usa SDK/NDK/JDK configurados no Unity, inclusive os módulos do Unity Hub.
         PlayerSettings.companyName = "SemanaArteModerna";
@@ -23,6 +32,7 @@ public class BuildScript
         EditorUserBuildSettings.buildAppBundle = false;
         EditorUserBuildSettings.exportAsGoogleAndroidProject = false;
         MobileVrSetup.Apply();
+        MuseumModerna.AndroidBrandingSetup.Apply();
 
         // Um APK do museu deve conter a cena real, nunca uma cena padrão vazia.
         string[] scenes = GetScenes();
@@ -42,7 +52,7 @@ public class BuildScript
 
         if (summary.result == BuildResult.Succeeded)
         {
-            Debug.Log($"[BuildScript] BUILD OK. APK em: {Path.GetFullPath(apkPath)} ({summary.totalSize / 1024 / 1024} MB)");
+            Debug.Log($"[BuildScript] BUILD OK. APK em: {Path.GetFullPath(apkPath)} ({new FileInfo(apkPath).Length / 1024 / 1024} MiB)");
         }
         else
         {

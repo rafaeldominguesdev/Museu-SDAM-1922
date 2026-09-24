@@ -30,7 +30,7 @@ MonoBehaviour:
   description: "A obra re\xFAne pe\xE7as originalmente escritas para piano e posteriormente
     transcritas para octeto. A mudan\xE7a de forma\xE7\xE3o permite pensar como timbre
     e ritmo alteram a escuta."
-  funFact:
+  funFact: 
   paintingTexture: {fileID: 0}
   thumbnailSprite: {fileID: 0}
   audioGuide: {fileID: 0}

@@ -29,7 +29,7 @@ MonoBehaviour:
   description: "Cat\xE1logos e programas d\xE3o forma p\xFAblica a uma exposi\xE7\xE3o.
     A composi\xE7\xE3o deste painel foi criada para a visita digital e n\xE3o \xE9
     um fac-s\xEDmile do impresso hist\xF3rico."
-  funFact:
+  funFact: 
   paintingTexture: {fileID: 0}
   thumbnailSprite: {fileID: 0}
   audioGuide: {fileID: 0}

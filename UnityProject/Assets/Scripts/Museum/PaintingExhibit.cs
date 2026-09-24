@@ -16,10 +16,13 @@ namespace MuseumModerna
     {
         [Tooltip("ScriptableObject com as informações deste quadro (título, artista, etc)")]
         [SerializeField] private PaintingInfo paintingData;
+        [SerializeField] private Renderer artworkRenderer;
 
         /// <summary>Dados deste quadro (título, artista, descrição, etc).</summary>
         public PaintingInfo PaintingData => paintingData;
         public void SetData(PaintingInfo data) => paintingData = data;
+        public Renderer ArtworkRenderer => artworkRenderer;
+        public void SetArtworkRenderer(Renderer renderer) => artworkRenderer = renderer;
 
         private void Awake()
         {
@@ -40,8 +43,8 @@ namespace MuseumModerna
         {
             if (paintingData != null && paintingData.paintingTexture != null)
             {
-                Renderer rend = GetComponent<Renderer>();
-                if (rend != null && rend.material != null)
+                Renderer rend = artworkRenderer != null ? artworkRenderer : GetComponent<Renderer>();
+                if (rend != null && rend.sharedMaterial != null && rend.sharedMaterial.mainTexture != paintingData.paintingTexture)
                 {
                     rend.material.mainTexture = paintingData.paintingTexture;
                 }
