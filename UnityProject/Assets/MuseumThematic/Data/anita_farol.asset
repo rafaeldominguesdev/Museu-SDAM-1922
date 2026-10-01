@@ -1,0 +1,41 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 14256d4cfae25415f84295e8fa960519, type: 3}
+  m_Name: anita_farol
+  m_EditorClassIdentifier: 
+  title: O farol
+  artist: Anita Malfatti
+  year: 1915
+  movement: Modernismo brasileiro
+  periodo: "1915 \xB7 antes da Semana"
+  tecnica: Pintura
+  categoria: pintura
+  relacao_com_a_semana_de_1922: "Integra a produ\xE7\xE3o anterior \xE0 Semana e
+    foi apresentada no evento. Mostra como a renova\xE7\xE3o tamb\xE9m alcan\xE7ou
+    a pintura de paisagem."
+  obra_historica_ou_reinterpretacao: "Reprodu\xE7\xE3o digital da obra. Cole\xE7\xE3o
+    Gilberto Chateaubriand \xB7 MAM Rio"
+  resumo: "Uma paisagem em que cor e pincelada ganham for\xE7a expressiva pr\xF3pria."
+  fontes: 'https://mam.org.br/wp-content/uploads/2022/04/mam-modernoondemodernoquando-catalogo-com-ad.pdf
+
+    https://anpap.org.br/anais/2016/simposios/s1/renata_gomes_cardoso.pdf'
+  description: "O farol e as constru\xE7\xF5es aparecem numa paisagem trabalhada
+    por cores e dire\xE7\xF5es de pincelada. O tema relaciona-se \xE0 experi\xEAncia
+    de forma\xE7\xE3o da artista nos Estados Unidos. \xD3leo sobre tela, 46,3 \xD7
+    61 cm, da Cole\xE7\xE3o Gilberto Chateaubriand, MAM Rio."
+  funFact: 
+  paintingTexture: {fileID: 2800000, guid: 6d04b222e3442485bbc2a0b496cb102c, type: 3}
+  thumbnailSprite: {fileID: 0}
+  audioGuide: {fileID: 0}
+  audioDuration: 0
+  uniqueId: anita_farol
+  suggestedViewOffset: {x: 0, y: 0, z: 2}

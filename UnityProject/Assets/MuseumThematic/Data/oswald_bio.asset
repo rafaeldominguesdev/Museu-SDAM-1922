@@ -1,0 +1,40 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 14256d4cfae25415f84295e8fa960519, type: 3}
+  m_Name: oswald_bio
+  m_EditorClassIdentifier: 
+  title: Oswald de Andrade
+  artist: Escritor, jornalista e polemista
+  year: 1922
+  movement: Modernismo brasileiro
+  periodo: "1890\u20131954"
+  tecnica: "Painel did\xE1tico"
+  categoria: biografia
+  relacao_com_a_semana_de_1922: "Foi um dos articuladores da Semana e defensor da
+    renova\xE7\xE3o art\xEDstica. Os manifestos Pau-Brasil e Antrop\xF3fago, apresentados
+    na sala ao fundo, vieram depois de 1922."
+  obra_historica_ou_reinterpretacao: "Painel did\xE1tico original do museu sobre
+    a obra ou assunto; n\xE3o \xE9 reprodu\xE7\xE3o de pintura nem de capa hist\xF3rica."
+  resumo: "Humor, s\xEDntese e provoca\xE7\xE3o para questionar conven\xE7\xF5es
+    liter\xE1rias e depend\xEAncias culturais."
+  fontes: https://bndigital.bn.gov.br/oswald-de-andrade/
+  description: "Nascido em S\xE3o Paulo, Oswald de Andrade atuou na imprensa, na
+    literatura e no debate cultural. Viagens, conviv\xEAncia com artistas e experimenta\xE7\xE3o
+    da linguagem marcaram seus romances e poemas. Seus manifestos propuseram maneiras
+    diferentes de pensar a rela\xE7\xE3o entre o Brasil e a cultura estrangeira."
+  funFact: 
+  paintingTexture: {fileID: 0}
+  thumbnailSprite: {fileID: 0}
+  audioGuide: {fileID: 0}
+  audioDuration: 0
+  uniqueId: oswald_bio
+  suggestedViewOffset: {x: 0, y: 0, z: 2}

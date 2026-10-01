@@ -604,7 +604,7 @@ namespace MuseumModerna
             var cam = camGO.AddComponent<Camera>();
             cam.tag             = "MainCamera";
             cam.fieldOfView     = 80f;
-            cam.nearClipPlane   = 0.01f;
+            cam.nearClipPlane   = 0.1f;
             cam.farClipPlane    = 150f;
             cam.clearFlags      = CameraClearFlags.SolidColor;
             cam.backgroundColor = new Color(0.03f, 0.02f, 0.02f);

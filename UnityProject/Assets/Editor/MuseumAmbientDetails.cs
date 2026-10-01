@@ -13,11 +13,6 @@ namespace MuseumModerna
     {
         public const string RootName = "Ambientacao_Museologica";
         private const string Folder = "Assets/MuseumStyle/";
-        private static readonly string[][] Groups =
-        {
-            new[] { "homem_amarelo", "estudante_russa", "tropical", "di_cavalcanti_pierrot" },
-            new[] { "lasar_segall" }, new[] { "john_graz" }
-        };
 
         [MenuItem("Museum/Visual/Aplicar cordoes e luz de cornija")]
         public static void Apply()
@@ -30,21 +25,19 @@ namespace MuseumModerna
             AssetDatabase.SaveAssets();
             EditorSceneManager.MarkSceneDirty(scene);
             if (!EditorSceneManager.SaveScene(scene)) throw new InvalidOperationException("Falha ao salvar ambientação.");
-            Debug.Log("[MuseumAmbient] Cena salva: 3 conjuntos protegem 6 obras; 8 vasos; zero novas luzes.");
+            Debug.Log("[MuseumAmbient] Cena salva: cordões em todas as obras de parede; vasos sem rampa; faixas decorativas de brilho retiradas.");
         }
 
         public static void ApplyTo(Transform architecture)
         {
             var exhibits = UnityEngine.Object.FindObjectsByType<PaintingExhibit>(FindObjectsSortMode.None)
                 .Where(e => e.PaintingData != null).ToDictionary(e => e.PaintingData.uniqueId);
-            foreach (var id in Groups.SelectMany(g => g))
-                if (!exhibits.ContainsKey(id)) throw new InvalidOperationException("Obra ausente: " + id);
+            var groups = WallGroups(exhibits.Values).ToArray();
             var old = architecture.Find(RootName);
             if (old != null) UnityEngine.Object.DestroyImmediate(old.gameObject);
             var root = Child(architecture, RootName);
             var bronze = Material("Barreira_Bronze", "Standard", new Color(.25f, .16f, .075f), .65f, .32f);
             var cord = Material("Barreira_Veludo", "Standard", new Color(.18f, .022f, .035f), 0, .16f);
-            var wash = Material("Cornija_Quente", "Museum/Cornice Wash", Color.white, 0, 0);
             var post = Save("Poste", Lathe(new[]
             {
                 new Vector2(0,.025f), new Vector2(.18f,.025f), new Vector2(.19f,.045f),
@@ -54,10 +47,10 @@ namespace MuseumModerna
                 new Vector2(.049f,.825f), new Vector2(.057f,.843f), new Vector2(.061f,.865f),
                 new Vector2(.057f,.887f), new Vector2(.049f,.905f), new Vector2(.036f,.918f),
                 new Vector2(.018f,.927f), new Vector2(0,.93f)
-            }, 24));
-            for (int i = 0; i < Groups.Length; i++)
+            }, 12));
+            for (int i = 0; i < groups.Length; i++)
             {
-                var selected = Groups[i].Select(id => exhibits[id]).ToArray();
+                var selected = groups[i];
                 var front = selected[0].transform.forward;
                 var right = selected[0].transform.right;
                 var origin = selected[0].transform.position;
@@ -94,15 +87,7 @@ namespace MuseumModerna
                     col.center = new Vector3(end,.46f,-.44f); col.size = new Vector3(.055f,.92f,.88f);
                 }
                 Render(group, "Cordas", Save("Cordas_" + i, Mesh(vertices, indices)), cord);
-                var lighting = Child(root, "Cornija_" + i);
-                var wallPoint=origin;
-                // A espessura da parede varia entre versões da cena. Usa sua face real.
-                Physics.SyncTransforms();
-                if (Physics.Raycast(origin+Vector3.up*4.3f+front, -front, out var wallHit, 2f))
-                    wallPoint=wallHit.point+front*.012f;
-                wallPoint.y=0;
-                lighting.SetPositionAndRotation(wallPoint, Quaternion.LookRotation(front));
-                Render(lighting, "Luz_indireta_modelada", Save("Cornija_" + i, Wash(min, max)), wash);
+                Debug.Log("[MuseumAmbient] " + group.name + ": " + string.Join(",", selected.Select(e=>e.PaintingData.uniqueId)));
             }
             // Alguns quadros texturizados ainda tinham a geometria demonstrativa por cima.
             // Só oculta essa geometria quando a pintura já possui uma imagem real.
@@ -129,24 +114,33 @@ namespace MuseumModerna
             }
             var garden = decoration.Find("Vegetacao_de_galeria");
             foreach (Transform vase in garden)
+            {
+                LouvreGardenDetails.ConfigureCollider(vase);
                 if (vase.name == "Vaso_galeria_05" || vase.name == "Vaso_galeria_06")
                     vase.position = new Vector3(Mathf.Sign(vase.position.x) * 6.15f, 0, 10.85f);
+            }
             LouvreContactShadows.Apply(decoration);
         }
 
-        private static Mesh Wash(float min, float max)
+        private static IEnumerable<PaintingExhibit[]> WallGroups(IEnumerable<PaintingExhibit> exhibits)
         {
-            var vertices = new List<Vector3>(); var triangles = new List<int>(); var colors = new List<Color>();
-            float[] xs = { min, min + .3f, max - .3f, max };
-            float[] ys = { 3.95f, 4.22f, 4.48f, 4.56f };
-            float[] alpha = { 0, .035f, .13f, .02f };
-            for (int y = 0; y < 4; y++) for (int x = 0; x < 4; x++)
+            // Só obras com moldura de parede. Não cerca esculturas, vitrines ou portas.
+            var walls = exhibits.Where(e => GameObject.Find("Moldura_perfilada_" + e.PaintingData.uniqueId) != null)
+                .GroupBy(e => new Vector3(Mathf.Round(e.transform.forward.x), Mathf.Round(e.transform.forward.z),
+                    Mathf.Round(Vector3.Dot(e.transform.position, e.transform.forward) * 10f)));
+            foreach (var wall in walls)
             {
-                vertices.Add(new Vector3(xs[x], ys[y], 0));
-                colors.Add(new Color(1f,.65f,.30f,(x == 0 || x == 3) ? 0 : alpha[y]));
+                var right = wall.First().transform.right;
+                var ordered = wall.OrderBy(e => Vector3.Dot(e.transform.position, right)).ToArray();
+                var group = new List<PaintingExhibit>();
+                foreach (var exhibit in ordered)
+                {
+                    if (group.Count > 0 && Vector3.Dot(exhibit.transform.position - group[group.Count - 1].transform.position, right) > 4.2f)
+                    { yield return group.ToArray(); group.Clear(); }
+                    group.Add(exhibit);
+                }
+                if (group.Count > 0) yield return group.ToArray();
             }
-            for (int y = 0; y < 3; y++) for (int x = 0; x < 3; x++) Quad(triangles,y*4+x,y*4+x+1,(y+1)*4+x+1,(y+1)*4+x);
-            var mesh = Mesh(vertices, triangles); mesh.SetColors(colors); return mesh;
         }
 
         private static Mesh Lathe(Vector2[] profile, int sides)

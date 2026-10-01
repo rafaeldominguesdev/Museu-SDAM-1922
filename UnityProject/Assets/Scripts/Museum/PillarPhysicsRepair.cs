@@ -15,6 +15,9 @@ namespace MuseumModerna
 
         public static int Repair(Transform architecture)
         {
+            // A planta temática já salva todos os colisores nas posições dos seis
+            // portais. A reparação legada assumia apenas quatro acessos centrais.
+            if (architecture.Find("Planta_CincoSalas") != null) return 0;
             int added = 0;
             foreach (int x in new[] { -1, 1 })
             foreach (int z in new[] { -1, 1 })

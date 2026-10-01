@@ -21,6 +21,43 @@ namespace MuseumModerna
         static string zone;
         static int colliderIndex;
 
+        /// <summary>Reutiliza a arquitetura da galeria com cinco acessos diretos pelo Hall.</summary>
+        public static Transform BuildThematicArchitecture()
+        {
+            root = new GameObject(RootName).transform;
+            root.gameObject.AddComponent<LouvreGalleryLighting>();
+            root.gameObject.AddComponent<MuseumWorldText>();
+            new GameObject("Planta_CincoSalas").transform.SetParent(root, false);
+            parts.Clear(); partMaterials.Clear(); colliderIndex = 0;
+            Material Load(string name) => AssetDatabase.LoadAssetAtPath<Material>(AssetRoot + "/Materials/" + name + ".mat");
+            stone=Load("Calcario"); plaster=Load("Estuque"); gold=Load("Bronze_dourado");
+            dark=Load("Verde_profundo"); velvet=Load("Veludo_vinho"); glass=Load("Claraboia_leitosa"); crystal=Load("Cristal_fosco");
+            wood=Enumerable.Range(0,7).Select(i=>Load("Carvalho_"+i)).ToArray();
+            if(stone==null || wood.Any(m=>m==null)) throw new InvalidOperationException("Materiais arquitetônicos ausentes.");
+
+            zone="Tematico_Hall";
+            Floor(Vector3.zero,20,20);
+            Wall(new Vector3(0,0,10),Quaternion.Euler(0,180,0),20,6.4f,true);
+            Wall(new Vector3(0,0,-10),Quaternion.identity,20,6.4f,true);
+            foreach(int z in new[]{-5,5})
+            {
+                Wall(new Vector3(-10,0,z),Quaternion.Euler(0,90,0),10,6.4f,true);
+                Wall(new Vector3(10,0,z),Quaternion.Euler(0,-90,0),10,6.4f,true);
+            }
+            Dome(); Chandelier(new Vector3(0,5.5f,0));
+            Room("Tematico_Mario",new Vector3(-17,0,-5),14,10,5.2f,false,false,true,false);
+            Room("Tematico_Oswald",new Vector3(-17,0,5),14,10,5.2f,false,false,true,false);
+            Room("Tematico_Anita",new Vector3(17,0,5),14,10,5.2f,false,false,false,true);
+            Room("Tematico_Di",new Vector3(17,0,-5),14,10,5.2f,false,false,false,true);
+            Room("Tematico_Manifestos",new Vector3(0,0,17),16,14,5.2f,false,true,false,false);
+            Room("Tematico_Entrada",new Vector3(0,0,-15),10,10,5.2f,true,false,false,false);
+            FinishMeshes();
+            MuseumVisitRepair.BuildMedallion(root);
+            ConfigureLight();
+            MuseumEntranceSetup.Configure(root);
+            return root;
+        }
+
         [MenuItem("Museum/Visual/Aplicar galerias inspiradas no Louvre")]
         public static void Apply()
         {
@@ -41,13 +78,14 @@ namespace MuseumModerna
             Room("Entrada", new Vector3(0,0,-15), 10, 10, 5.2f, true, false, false, false);
             zone = "Salao";
             Dome(); Chandelier(new Vector3(0,5.5f,0));
-            FloorMedallion();
             PortalCaption(new Vector3(0,5.35f,9.73f), Quaternion.Euler(0,180,0), "01   /   COR, FORMA E RUPTURA");
             PortalCaption(new Vector3(9.73f,5.35f,0), Quaternion.Euler(0,-90,0), "02   /   VOLUME, MATÉRIA E GESTO");
             PortalCaption(new Vector3(-9.73f,5.35f,0), Quaternion.Euler(0,90,0), "03   /   PALAVRA, SOM E MANIFESTO");
             PortalCaption(new Vector3(0,5.35f,-9.73f), Quaternion.identity, "SEMANA DE ARTE MODERNA   /   1922");
             FinishMeshes();
+            MuseumVisitRepair.BuildMedallion(root);
             LouvreExhibitionDetails.Apply(root, gold, stone, dark, velvet);
+            MuseumEntranceSetup.Configure(root);
             ConfigureLight();
             AssetDatabase.SaveAssets();
             EditorSceneManager.MarkSceneDirty(scene);
@@ -279,21 +317,6 @@ namespace MuseumModerna
                 }
             }
         }
-        static void FloorMedallion()
-        {
-            for(int i=0;i<96;i++)
-            {
-                float a=i*Mathf.PI*2/96,b=(i+1)*Mathf.PI*2/96;
-                G(stone).Triangle(new Vector3(0,.016f,0),new Vector3(Mathf.Cos(a)*3.6f,.016f,Mathf.Sin(a)*3.6f),new Vector3(Mathf.Cos(b)*3.6f,.016f,Mathf.Sin(b)*3.6f),true);
-            }
-            Circle(new Vector3(0,.022f,0),3.6f,.025f,gold);Circle(new Vector3(0,.022f,0),3.35f,.014f,dark);
-            for(int i=0;i<16;i++)
-            {
-                float a=i*Mathf.PI/8;var dir=new Vector3(Mathf.Cos(a),0,Mathf.Sin(a));var side=new Vector3(-dir.z,0,dir.x);
-                G(i%2==0?gold:dark).Triangle(dir*.4f+Vector3.up*.018f,dir*(i%2==0?2.8f:2.0f)+Vector3.up*.018f,dir*.7f+side*.22f+Vector3.up*.018f,true);
-                G(i%2==0?gold:dark).Triangle(dir*.4f+Vector3.up*.018f,dir*.7f-side*.22f+Vector3.up*.018f,dir*(i%2==0?2.8f:2.0f)+Vector3.up*.018f,true);
-            }
-        }
         static void Floor(Vector3 center,float w,float d)
         {
             Box(center+Vector3.down*.09f,new Vector3(w,.18f,d),dark);ColliderBox(center+Vector3.down*.09f,new Vector3(w,.18f,d),Quaternion.identity);
@@ -339,17 +362,7 @@ namespace MuseumModerna
             LouvreGalleryLighting.ApplyDaylight();
             foreach(var renderer in UnityEngine.Object.FindObjectsByType<Renderer>(FindObjectsSortMode.None))
                 renderer.lightProbeUsage=LightProbeUsage.Off;
-            var reflection=new Cubemap(32,TextureFormat.RGB24,false);
-            foreach(CubemapFace face in new[]{CubemapFace.PositiveX,CubemapFace.NegativeX,CubemapFace.PositiveY,CubemapFace.NegativeY,CubemapFace.PositiveZ,CubemapFace.NegativeZ})
-                for(int y=0;y<32;y++)for(int x=0;x<32;x++)
-                {
-                    float panel=Mathf.Pow(Mathf.Max(0,1-Mathf.Abs(x-15.5f)/10),3);
-                    Color tone=face==CubemapFace.PositiveY?new Color(.88f,.90f,.91f):face==CubemapFace.NegativeY?new Color(.25f,.18f,.11f):Color.Lerp(new Color(.43f,.39f,.31f),new Color(.84f,.82f,.72f),panel*.8f);
-                    reflection.SetPixel(face,x,y,tone);
-                }
-            reflection.Apply();RenderSettings.defaultReflectionMode=DefaultReflectionMode.Custom;
-            RenderSettings.customReflection=SaveAsset(reflection,AssetRoot+"/Materials/Reflexo_da_galeria.asset");
-            RenderSettings.reflectionIntensity=.75f;
+            MuseumFloorReflectionRepair.ConfigureReflection();
             var sun=new GameObject("Luz_diurna");sun.transform.SetParent(root);sun.transform.rotation=Quaternion.Euler(65,-25,0);
             var l=sun.AddComponent<Light>();l.type=LightType.Directional;l.color=new Color(1,.94f,.82f);l.intensity=.65f;l.shadows=LightShadows.None;l.renderMode=LightRenderMode.ForcePixel;
             foreach(var p in new[]{new Vector3(0,5.5f,0),new Vector3(0,4.5f,17),new Vector3(17,4.5f,0),new Vector3(-17,4.5f,0),new Vector3(0,4.5f,-15)})

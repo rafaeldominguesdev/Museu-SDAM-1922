@@ -18,6 +18,7 @@ namespace MuseumModerna
             try { Validate(); }
             catch (Exception e) { Debug.LogException(e); UnityEditor.EditorApplication.Exit(1); yield break; }
             Debug.Log("[AmbientValidation] PASS: colisões, circulação, olhar e capturas reais da cena.");
+            yield return null; yield return null;
             UnityEditor.EditorApplication.Exit(0);
         }
         private void Validate()
@@ -25,10 +26,22 @@ namespace MuseumModerna
             var root = GameObject.Find("Museum_LouvreStyle").transform.Find("Ambientacao_Museologica");
             Require(root != null,"Ambientação persistida");
             Require(root.GetComponentsInChildren<Light>().Length == 0,"Nenhuma luz adicional");
-            Require(root.Cast<Transform>().Count(t => t.name.StartsWith("Cordao_")) == 3,"Três barreiras");
+            var barriers = root.Cast<Transform>().Where(t => t.name.StartsWith("Cordao_")).ToArray();
+            Require(barriers.Length == 15,"Quinze conjuntos de cordões");
+            Require(!root.Cast<Transform>().Any(t=>t.name.StartsWith("Cornija_")), "Sem faixas parciais de brilho decorativo");
+            var wallExhibits = FindObjectsByType<PaintingExhibit>(FindObjectsSortMode.None)
+                .Where(e=>GameObject.Find("Moldura_perfilada_"+e.PaintingData.uniqueId)!=null).ToArray();
+            Require(wallExhibits.Length==24,"24 obras de parede");
+            foreach(var exhibit in wallExhibits)
+            {
+                var target = exhibit.transform.position; target.y = .46f;
+                Require(barriers.Any(b => b.GetComponentsInChildren<BoxCollider>().Any(c=>c.Raycast(
+                    new Ray(target+exhibit.transform.forward*2f,-exhibit.transform.forward),out _,2f))),
+                    "Cordão protege " + exhibit.PaintingData.uniqueId);
+            }
             var all = root.GetComponentsInChildren<MeshFilter>();
             int triangles = all.Sum(m => m.sharedMesh.triangles.Length / 3);
-            Require(triangles < 25000,"Geometria adicional, vasos e sombras abaixo de 25 mil triângulos: " + triangles);
+            Require(triangles < 65000,"Geometria adicional, vasos e sombras abaixo de 65 mil triângulos: " + triangles);
             foreach (var filter in all)
                 foreach (var v in filter.sharedMesh.vertices)
                     Require(!float.IsNaN(v.sqrMagnitude) && !float.IsInfinity(v.sqrMagnitude),"Geometria finita");
@@ -86,9 +99,27 @@ namespace MuseumModerna
             }
             var garden=GameObject.Find("Vegetacao_de_galeria");
             Require(garden != null && garden.transform.childCount==8,"Oito vasos instalados");
-            foreach(var vase in garden.GetComponentsInChildren<CapsuleCollider>())
+            foreach(var vase in garden.GetComponentsInChildren<BoxCollider>())
+            {
                 foreach(var support in root.GetComponentsInChildren<CapsuleCollider>().Where(c=>c.name.StartsWith("Poste_cordao_")))
-                    Require(Vector3.Distance(vase.transform.position,support.transform.position)>vase.radius+support.radius+.1f,"Vaso livre de poste");
+                    Require(Vector3.Distance(vase.transform.position,support.transform.position)>.33f+support.radius+.1f,"Vaso livre de poste");
+                // Empurra contra as quatro faces durante três segundos de caminhada.
+                foreach(var direction in new[]{vase.transform.forward,-vase.transform.forward,vase.transform.right,-vase.transform.right})
+                {
+                    controller.enabled=false;
+                    player.transform.position=vase.transform.position+direction*1.1f;
+                    controller.enabled=true; Physics.SyncTransforms();
+                    float highest=player.transform.position.y;
+                    for(int frame=0;frame<180;frame++)
+                    {
+                        controller.Move(-direction*(1.25f/60f)+Vector3.down*.033f);
+                        highest=Mathf.Max(highest,player.transform.position.y);
+                    }
+                    Require(highest<.08f && Vector3.Dot(player.transform.position-vase.transform.position,direction)>.5f,
+                        "Não escala nem atravessa " + vase.name);
+                }
+                controller.enabled=false;
+            }
             foreach(var canvas in FindObjectsByType<Canvas>(FindObjectsSortMode.None)) canvas.enabled=false;
             // Captura com a iluminação e os materiais reais, em altura de visitação.
             Directory.CreateDirectory(Output);
@@ -98,9 +129,9 @@ namespace MuseumModerna
             Capture(eye,"plantas.png",new Vector3(3.7f,1.7f,14.8f),new Vector3(6.15f,1.1f,10.85f));
             Capture(eye,"detalhe.png",new Vector3(-3.2f,1.35f,21.5f),new Vector3(-4.4f,.7f,22.8f));
             File.WriteAllText(Path.Combine(Output,"validacao.txt"),
-                "PASS\n"+triangles+" triângulos adicionais\n"+solidChecks+" limites físicos\n3 testes de locomoção contra cordões\n"+
+                "PASS\n"+triangles+" triângulos adicionais\n"+solidChecks+" limites físicos\n15 testes de locomoção contra cordões\n24 obras protegidas\n32 tentativas de escalar vasos\n"+
                 gazeChecks+" fichas não escultóricas acessíveis\n6 percursos livres (raio 0,30 m)\n8 vasos instalados\n"+
-                "Zero novas luzes; banho de luz modelado com malha de gradiente.\nCapturas mono do Editor; aparelho VR não testado.\n");
+                "Zero novas luzes; faixas decorativas de brilho removidas.\nCapturas mono do Editor; aparelho VR não testado.\n");
         }
         private static void Route(PlayerController player,Vector3 from,Vector3 to)
         {

@@ -1,0 +1,41 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 14256d4cfae25415f84295e8fa960519, type: 3}
+  m_Name: mario_macunaima
+  m_EditorClassIdentifier: 
+  title: "Macuna\xEDma"
+  artist: "M\xE1rio de Andrade"
+  year: 1928
+  movement: Modernismo brasileiro
+  periodo: "1928 \xB7 depois da Semana"
+  tecnica: "Painel did\xE1tico"
+  categoria: livro
+  relacao_com_a_semana_de_1922: "Publicado seis anos depois da Semana, o livro desenvolve
+    pesquisas e experi\xEAncias modernistas. Sua presen\xE7a aqui apresenta o legado
+    de M\xE1rio, n\xE3o uma obra exposta em 1922."
+  obra_historica_ou_reinterpretacao: "Painel did\xE1tico original do museu sobre
+    a obra ou assunto; n\xE3o \xE9 reprodu\xE7\xE3o de pintura nem de capa hist\xF3rica."
+  resumo: "Destaque da sala: uma narrativa que mistura mitos, oralidade e contradi\xE7\xF5es
+    da vida brasileira."
+  fontes: https://brasilianafotografica.bn.gov.br/?p=26620
+  description: "O protagonista atravessa paisagens e experi\xEAncias em uma narrativa
+    constru\xEDda com fontes ind\xEDgenas, tradi\xE7\xF5es populares e inven\xE7\xE3o
+    liter\xE1ria. A linguagem mistura registros e recusa uma imagem simples e uniforme
+    do Brasil. A express\xE3o 'her\xF3i sem nenhum car\xE1ter' provoca perguntas
+    sobre identidade e transforma\xE7\xE3o."
+  funFact: 
+  paintingTexture: {fileID: 0}
+  thumbnailSprite: {fileID: 0}
+  audioGuide: {fileID: 0}
+  audioDuration: 0
+  uniqueId: mario_macunaima
+  suggestedViewOffset: {x: 0, y: 0, z: 2}

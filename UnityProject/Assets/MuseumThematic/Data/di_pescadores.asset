@@ -1,0 +1,41 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 14256d4cfae25415f84295e8fa960519, type: 3}
+  m_Name: di_pescadores
+  m_EditorClassIdentifier: 
+  title: Pescadores
+  artist: Di Cavalcanti
+  year: 1946
+  movement: Modernismo brasileiro
+  periodo: "1946 \xB7 depois da Semana"
+  tecnica: Pintura
+  categoria: pintura
+  relacao_com_a_semana_de_1922: Obra produzida depois da Semana. O interesse pelo
+    trabalho e pela vida popular mostra a continuidade da carreira de um dos organizadores
+    do evento.
+  obra_historica_ou_reinterpretacao: "Reprodu\xE7\xE3o digital da obra. Cole\xE7\xE3o
+    particular \xB7 Cat\xE1logo Almeida & Dale"
+  resumo: "Figuras junto aos barcos e aos peixes aproximam a pintura do trabalho
+    e da vida \xE0 beira-mar."
+  fontes: https://almeidaedale.com.br/wp-content/uploads/2025/04/2016_emiliano_di_cavalcanti_conquistador-de-lirismo.pdf#page=89
+  description: "Nesta vers\xE3o de Pescadores, figuras humanas, embarca\xE7\xF5es
+    e peixes comp\xF5em uma cena do cotidiano litor\xE2neo. O t\xEDtulo aparece em
+    diferentes obras de Di Cavalcanti. Esta sele\xE7\xE3o corresponde ao \xF3leo
+    sobre tela de 1946, 33 \xD7 46 cm, reproduzido na p\xE1gina 176 do cat\xE1logo
+    Conquistador de lirismos, da Almeida & Dale."
+  funFact: 
+  paintingTexture: {fileID: 2800000, guid: 9792bd464da644889b678a243e473e09, type: 3}
+  thumbnailSprite: {fileID: 0}
+  audioGuide: {fileID: 0}
+  audioDuration: 0
+  uniqueId: di_pescadores
+  suggestedViewOffset: {x: 0, y: 0, z: 2}

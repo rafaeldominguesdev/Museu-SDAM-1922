@@ -1,0 +1,42 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 14256d4cfae25415f84295e8fa960519, type: 3}
+  m_Name: hall_sociedade
+  m_EditorClassIdentifier: 
+  title: "Um pa\xEDs em transforma\xE7\xE3o"
+  artist: "Brasil no in\xEDcio do s\xE9culo XX"
+  year: 1922
+  movement: Modernismo brasileiro
+  periodo: Antes de 1922
+  tecnica: "Painel did\xE1tico"
+  categoria: contexto
+  relacao_com_a_semana_de_1922: "A Semana aconteceu nesse contexto e no ano do centen\xE1rio
+    da Independ\xEAncia. A renova\xE7\xE3o art\xEDstica n\xE3o significou o fim das
+    exclus\xF5es sociais."
+  obra_historica_ou_reinterpretacao: "Painel did\xE1tico original do museu sobre
+    a obra ou assunto; n\xE3o \xE9 reprodu\xE7\xE3o de pintura nem de capa hist\xF3rica."
+  resumo: "Cidades cresciam, mas o acesso \xE0 riqueza, \xE0 educa\xE7\xE3o e \xE0
+    cultura permanecia profundamente desigual."
+  fontes: https://bndigital.bn.gov.br/dossies/rede-da-memoria-virtual-brasileira/artes/o-modernismo/
+  description: "A economia cafeeira, a industrializa\xE7\xE3o e a imigra\xE7\xE3o
+    transformavam S\xE3o Paulo. Novos meios de transporte, jornais e f\xE1bricas
+    mudavam o cotidiano, enquanto persistiam desigualdades sociais e raciais do p\xF3s-aboli\xE7\xE3o.
+    A vida cultural valorizava modelos europeus e institui\xE7\xF5es frequentadas
+    sobretudo pelas elites. Nesse ambiente de tens\xF5es, artistas procuravam outras
+    maneiras de representar o pa\xEDs."
+  funFact: 
+  paintingTexture: {fileID: 0}
+  thumbnailSprite: {fileID: 0}
+  audioGuide: {fileID: 0}
+  audioDuration: 0
+  uniqueId: hall_sociedade
+  suggestedViewOffset: {x: 0, y: 0, z: 2}

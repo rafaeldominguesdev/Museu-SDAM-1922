@@ -85,15 +85,20 @@ namespace MuseumModerna
                 Render(vase, "Terra", soilMesh, dark);
                 Render(vase, "Folhas_verdes", greenMesh, green);
                 Render(vase, "Folhas_salvia", sageMesh, sage);
-                var collider = vase.gameObject.AddComponent<CapsuleCollider>();
-                collider.direction = 1;
-                collider.radius = .34f;
-                // Uma cápsula tem altura mínima igual ao diâmetro: .68 m.
-                collider.height = .68f;
-                collider.center = new Vector3(0, .34f, 0);
+                ConfigureCollider(vase);
             }
             AssetDatabase.SaveAssets();
             Debug.Log($"[LouvreStyle] Vegetação: 8 vasos, {trianglesPerVase * 8} triângulos, 2 materiais verdes opacos compartilhados, sem sombras em tempo real.");
+        }
+
+        public static void ConfigureCollider(Transform vase)
+        {
+            // Faces verticais até a altura da folhagem, sem a rampa arredondada
+            // que o CharacterController conseguia subir na cápsula de 68 cm.
+            foreach (var old in vase.GetComponents<Collider>()) UnityEngine.Object.DestroyImmediate(old);
+            var collider = vase.gameObject.AddComponent<BoxCollider>();
+            collider.size = new Vector3(.66f, 1.8f, .66f);
+            collider.center = Vector3.up * .9f;
         }
 
         private static void Leaf(Geometry output, float angle, float rise, float reach, float halfWidth)

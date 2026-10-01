@@ -19,13 +19,13 @@ namespace MuseumModerna
 
         [Header("Movimento")]
         [Tooltip("Velocidade de caminhada em m/s quando IsLookingDown = true")]
-        [SerializeField] private float walkSpeed = 2.5f;
+        [SerializeField] private float walkSpeed = 1.25f;
 
         [Tooltip("Fator de desaceleração ao parar de olhar para baixo (maior = para mais rápido)")]
-        [SerializeField] private float deceleration = 5f;
+        [SerializeField] private float deceleration = 14f;
 
         [Tooltip("Fator de aceleração ao começar a olhar para baixo (maior = acelera mais rápido)")]
-        [SerializeField] private float acceleration = 8f;
+        [SerializeField] private float acceleration = 14f;
 
         [Header("Gravidade")]
         [Tooltip("Força da gravidade aplicada ao CharacterController")]
@@ -60,7 +60,7 @@ namespace MuseumModerna
         private bool _movementEnabled = true;
         private bool _applicationPaused;
         private bool _applicationUnfocused;
-        private bool _gazeWasBlocked;
+        private bool _menuWasOpen;
 
         // Última direção horizontal válida — usada quando o olhar está quase a pino
         private Vector3 _lastFlatDir = Vector3.forward;
@@ -168,12 +168,15 @@ namespace MuseumModerna
             bool inVr = vr != null && vr.IsActive;
             bool gazeBlocked = inVr && vr.WorldGuide != null &&
                 (vr.WorldGuide.ConsumesGaze || vr.WorldGuide.MenuOpen);
-            if (gazeBlocked != _gazeWasBlocked)
+            bool menuOpen = inVr && vr.WorldGuide != null && vr.WorldGuide.MenuOpen;
+            if (menuOpen != _menuWasOpen)
             {
-                _gazeWasBlocked = gazeBlocked;
+                _menuWasOpen = menuOpen;
                 ResetMovement();
             }
-            if (gazeBlocked) return;
+            // Ler uma ficha suspende o avanço, mas não exige rearmar o gesto
+            // quando o olhar sai dela. Menus e pausas continuam exigindo olhar neutro.
+            if (gazeBlocked) { _currentSpeed = 0f; return; }
             bool isWalking = gyroController.IsLookingDown;
             float speed = inVr ? Mathf.Min(walkSpeed, 1.1f) : walkSpeed;
 
@@ -199,7 +202,9 @@ namespace MuseumModerna
             // obra na direção do olhar, sem prender o visitante ao se afastar.
             if (_currentSpeed > 0f && IsApproachingExhibit(lookDir))
             {
-                ResetMovement();
+                // O obstáculo bloqueia somente o avanço. Desarmar o gesto aqui
+                // prendia o visitante mesmo depois de virar para um caminho livre.
+                _currentSpeed = 0f;
                 return;
             }
 

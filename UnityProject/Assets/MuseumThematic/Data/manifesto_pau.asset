@@ -1,0 +1,39 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 14256d4cfae25415f84295e8fa960519, type: 3}
+  m_Name: manifesto_pau
+  m_EditorClassIdentifier: 
+  title: Manifesto da Poesia Pau-Brasil
+  artist: Oswald de Andrade
+  year: 1924
+  movement: Modernismo brasileiro
+  periodo: "1924 \xB7 depois da Semana"
+  tecnica: "Painel did\xE1tico"
+  categoria: manifesto
+  relacao_com_a_semana_de_1922: "Desdobramento da renova\xE7\xE3o modernista. N\xE3o
+    foi publicado durante a Semana de 1922."
+  obra_historica_ou_reinterpretacao: "Painel did\xE1tico original do museu sobre
+    a obra ou assunto; n\xE3o \xE9 reprodu\xE7\xE3o de pintura nem de capa hist\xF3rica."
+  resumo: "Uma poesia ligada \xE0 fala cotidiana e \xE0 experi\xEAncia brasileira,
+    capaz de dialogar com o mundo."
+  fontes: https://prefeitura.sp.gov.br/web/cultura/w/bibliotecas/noticias/9997
+  description: "Publicado em 1924, prop\xF5e uma cria\xE7\xE3o atenta \xE0 hist\xF3ria,
+    \xE0s paisagens e aos contrastes do Brasil. Humor e linguagem direta questionam
+    f\xF3rmulas liter\xE1rias importadas. A ideia de uma poesia de exporta\xE7\xE3o
+    inverte a posi\xE7\xE3o de simples consumidora de modelos estrangeiros."
+  funFact: 
+  paintingTexture: {fileID: 0}
+  thumbnailSprite: {fileID: 0}
+  audioGuide: {fileID: 0}
+  audioDuration: 0
+  uniqueId: manifesto_pau
+  suggestedViewOffset: {x: 0, y: 0, z: 2}

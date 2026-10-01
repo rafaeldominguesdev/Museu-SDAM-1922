@@ -114,6 +114,66 @@ namespace MuseumModerna
                 "Saída de XR preserva pose e publica direção no mundo");
             rig.transform.rotation = Quaternion.identity;
 
+            // Mede a cadeia inteira: pose de entrada, suavização, gesto e deslocamento.
+            foreach(int fps in new[]{20,30,60})
+            {
+                Time.captureDeltaTime=1f/fps;
+                yield return null;
+                eye.localRotation=Quaternion.identity;
+                gyro.ResumeFromCurrentPose();
+                Pose(0,4);
+                Set(gyro,"_targetRotation",Quaternion.Euler(50f,0,0));
+                Set(movement,"_currentSpeed",0f);
+                float elapsed=0f, started=-1f;
+                for(int frame=0;frame<fps;frame++)
+                {
+                    Invoke(gyro,"ApplyLookRotation",1f/fps); Invoke(movement,"Update");
+                    elapsed+=1f/fps;
+                    if(started<0 && movement.CurrentSpeed>.05f) started=elapsed;
+                    yield return null;
+                }
+                Require(started>0 && started<=.35f && movement.CurrentSpeed>1.2f && movement.CurrentSpeed<=1.251f,
+                    $"Modo normal a {fps} fps inicia em {started:F3}s e limita a 1,25 m/s");
+                Set(gyro,"_targetRotation",Quaternion.identity);
+                for(int frame=0;frame<fps/2;frame++)
+                { Invoke(gyro,"ApplyLookRotation",1f/fps); Invoke(movement,"Update"); yield return null; }
+                Require(movement.CurrentSpeed<.02f,"Modo normal para em até 0,5 s ao levantar o olhar");
+            }
+            Time.captureDeltaTime=1f/60f;
+            yield return null;
+
+            // A proteção da obra não pode desarmar o gesto: virar deve liberar a saída.
+            Pose(0, 4); Pose(-40, 2);
+            eye.localRotation = Quaternion.Euler(40, 0, 0);
+            var exhibit = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            exhibit.name = "MovementTestExhibit";
+            exhibit.transform.position = rig.transform.position + new Vector3(0, 1, .85f);
+            exhibit.transform.localScale = new Vector3(2, 2, .1f);
+            exhibit.AddComponent<PaintingExhibit>();
+            Physics.SyncTransforms();
+            before = rig.transform.position;
+            for (int frame = 0; frame < 30; frame++)
+            {
+                Pose(-40, 1);
+                Invoke(movement, "Update");
+                yield return null;
+            }
+            Require(movement.CurrentSpeed == 0 && HorizontalDistance(before, rig.transform.position) < .01f,
+                "Proteção mantém distância da obra enquanto o visitante insiste em avançar");
+            Require(gyro.IsLookingDown && gyro.IsWalkingGestureArmed,
+                "Proteção da obra preserva intenção de caminhada");
+            eye.localRotation = Quaternion.Euler(40, 180, 0);
+            for (int frame = 0; frame < 30; frame++)
+            {
+                Pose(-40, 1);
+                Invoke(movement, "Update");
+                yield return null;
+            }
+            Require(before.z - rig.transform.position.z > .35f,
+                "Virar para sair da obra retoma caminhada sem levantar a cabeça");
+            Destroy(exhibit);
+            yield return null;
+
             var mode = MobileVrMode.Instance;
             Require(mode != null, "Modo VR disponível para integração");
             mode.EnterEditorPreview();
@@ -154,6 +214,26 @@ namespace MuseumModerna
             Invoke(movement, "Update");
             Pose(-40, 10);
             Require(!gyro.IsLookingDown, "Fechar menu inclinado exige olhar à frente novamente");
+
+            // Uma ficha é uma suspensão temporária, não uma pausa de segurança.
+            Pose(0, 4); Pose(-40, 2);
+            var guide = mode.WorldGuide;
+            guide.Show(FindAnyObjectByType<PaintingExhibit>().PaintingData);
+            var guideEye = (Camera)guide.GetType().GetField("eye", Private).GetValue(guide);
+            var eyeRotation = guideEye.transform.rotation;
+            guideEye.transform.LookAt(guide.Board.position);
+            Invoke(guide, "Update");
+            Require(guide.ConsumesGaze, "Olhar sobre a ficha VR é detectado");
+            Invoke(movement, "Update");
+            Require(movement.CurrentSpeed == 0 && gyro.IsWalkingGestureArmed,
+                "Ler a ficha suspende avanço sem desarmar caminhada");
+            guide.Hide();
+            guideEye.transform.rotation = eyeRotation;
+            eye.localRotation = Quaternion.Euler(40, 180, 0);
+            before = rig.transform.position;
+            Invoke(movement, "Update");
+            Require(movement.CurrentSpeed > .05f && HorizontalDistance(before, rig.transform.position) > .001f,
+                "Sair da ficha retoma no primeiro frame, sem cooldown ou novo gesto");
 
             var controller = rig.GetComponent<CharacterController>();
             controller.enabled = false;

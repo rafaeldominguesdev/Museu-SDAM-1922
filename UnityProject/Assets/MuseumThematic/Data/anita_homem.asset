@@ -1,0 +1,41 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 14256d4cfae25415f84295e8fa960519, type: 3}
+  m_Name: anita_homem
+  m_EditorClassIdentifier: 
+  title: O homem amarelo
+  artist: Anita Malfatti
+  year: 1916
+  movement: Modernismo brasileiro
+  periodo: "1915\u20131916 \xB7 antes da Semana"
+  tecnica: Pintura
+  categoria: pintura
+  relacao_com_a_semana_de_1922: "Obra anterior \xE0 Semana, apresentada no evento
+    de 1922. Ajuda a entender o impacto das experi\xEAncias de Anita."
+  obra_historica_ou_reinterpretacao: "Reprodu\xE7\xE3o digital da obra. IEB-USP \xB7
+    Foto: Campos e Kajiya"
+  resumo: "Cores expressivas e contornos marcados transformam o retrato em experimenta\xE7\xE3o
+    pict\xF3rica."
+  fontes: 'https://brasilianafotografica.bn.gov.br/?p=26620
+
+    https://teses.usp.br/teses/disponiveis/43/43134/tde-06112015-143351/pt-br.php'
+  description: "A figura de palet\xF3 e gravata \xE9 organizada por contrastes de
+    cor e pelo desenho do rosto e das m\xE3os. O amarelo participa da express\xE3o,
+    sem precisar imitar fielmente uma apar\xEAncia natural. A obra pertence \xE0
+    Cole\xE7\xE3o de Artes Visuais do IEB-USP."
+  funFact: 
+  paintingTexture: {fileID: 2800000, guid: 01af6df7ef2824befbad138ecacca39c, type: 3}
+  thumbnailSprite: {fileID: 0}
+  audioGuide: {fileID: 0}
+  audioDuration: 0
+  uniqueId: anita_homem
+  suggestedViewOffset: {x: 0, y: 0, z: 2}

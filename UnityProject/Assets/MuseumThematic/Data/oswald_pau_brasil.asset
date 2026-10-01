@@ -1,0 +1,38 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 14256d4cfae25415f84295e8fa960519, type: 3}
+  m_Name: oswald_pau_brasil
+  m_EditorClassIdentifier: 
+  title: Pau Brasil
+  artist: Oswald de Andrade
+  year: 1925
+  movement: Modernismo brasileiro
+  periodo: "1925 \xB7 livro de poemas"
+  tecnica: "Painel did\xE1tico"
+  categoria: livro
+  relacao_com_a_semana_de_1922: "O livro amplia uma proposta formulada depois da
+    Semana e n\xE3o deve ser confundido com o manifesto de t\xEDtulo semelhante."
+  obra_historica_ou_reinterpretacao: "Painel did\xE1tico original do museu sobre
+    a obra ou assunto; n\xE3o \xE9 reprodu\xE7\xE3o de pintura nem de capa hist\xF3rica."
+  resumo: "Poemas concisos aproximam hist\xF3ria, cotidiano e linguagem brasileira."
+  fontes: https://www.prefeitura.sp.gov.br/web/cultura/w/bibliotecas/noticias/30801
+  description: "O livro combina humor, imagens r\xE1pidas e revis\xE3o cr\xEDtica
+    de narrativas sobre o pa\xEDs. A poesia transforma cenas comuns em mat\xE9ria
+    art\xEDstica. Esta ficha trata do livro de 1925; o Manifesto da Poesia Pau-Brasil,
+    publicado em 1924, est\xE1 na sala de manifestos."
+  funFact: 
+  paintingTexture: {fileID: 0}
+  thumbnailSprite: {fileID: 0}
+  audioGuide: {fileID: 0}
+  audioDuration: 0
+  uniqueId: oswald_pau_brasil
+  suggestedViewOffset: {x: 0, y: 0, z: 2}

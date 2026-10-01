@@ -39,7 +39,7 @@ namespace MuseumModerna
                 if (light != sun && light.type == LightType.Directional) light.enabled = false;
             sun.enabled = true;
             sun.renderMode = LightRenderMode.ForcePixel;
-            sun.shadows = LightShadows.Soft;
+            ConfigureSunShadows(Application.platform);
             sun.shadowCustomResolution = 2048;
             sun.shadowStrength = .65f;
             sun.shadowBias = .025f;
@@ -48,12 +48,21 @@ namespace MuseumModerna
             RenderSettings.sun = sun;
             QualitySettings.shadows = ShadowQuality.All;
             QualitySettings.shadowResolution = ShadowResolution.High;
-            QualitySettings.shadowDistance = 8f;
-            QualitySettings.shadowCascades = 2;
-            QualitySettings.shadowCascade2Split = .3f;
+            // Uma única projeção evita a troca de cascata ao redor da câmera móvel.
+            QualitySettings.shadowDistance = 12f;
+            QualitySettings.shadowCascades = 1;
             QualitySettings.shadowProjection = ShadowProjection.StableFit;
             QualitySettings.pixelLightCount = Mathf.Max(2, QualitySettings.pixelLightCount);
             ApplyLighting();
+        }
+
+        private void ConfigureSunShadows(RuntimePlatform platform)
+        {
+            // Contorno para o recorte quadrado relatado no Android/OpenGLES3,
+            // ainda não reproduzido no Metal do Editor: retire o passe suspeito;
+            // focos das obras e sombras de contato dos móveis são independentes.
+            // O Editor mantém a sombra dinâmica para o diagnóstico do corpo.
+            sun.shadows = platform == RuntimePlatform.Android ? LightShadows.None : LightShadows.Soft;
         }
 
         private void Update()

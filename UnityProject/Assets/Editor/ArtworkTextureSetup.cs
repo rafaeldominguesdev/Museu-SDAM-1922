@@ -51,7 +51,8 @@ namespace MuseumModerna
                 EditorUtility.SetDirty(exhibit);
                 count++;
             }
-            Debug.Log("[ArtworkLighting] " + count + " pinturas com material neutro e preenchimento próprio, sem novas luzes.");
+            MuseumVisitRepair.ConfigurePictureLights();
+            Debug.Log("[ArtworkLighting] " + count + " pinturas com material neutro e focos direcionados nas luminárias.");
         }
 
         public static Entry[] Read()
@@ -182,7 +183,7 @@ namespace MuseumModerna
             return material;
         }
 
-        private static void ConfigureTexture(string path)
+        public static void ConfigureTexture(string path)
         {
             var importer = AssetImporter.GetAtPath(path) as TextureImporter;
             if (importer == null) throw new InvalidOperationException("Arquivo de imagem não importável: " + path);

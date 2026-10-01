@@ -66,16 +66,16 @@ namespace MuseumModerna
             Require(Mathf.Abs(leftShoe.GetComponent<Renderer>().bounds.min.y - feetY) < .025f &&
                 Mathf.Abs(rightShoe.GetComponent<Renderer>().bounds.min.y - feetY) < .025f,
                 "Solas coincidem com a base real do CharacterController");
-            Require(renderers.Where(renderer => renderer.name == "Tronco" || renderer.name == "Cabeca" ||
-                    renderer.name == "BarraDaCamisa")
-                .All(renderer => renderer.shadowCastingMode == ShadowCastingMode.ShadowsOnly),
-                "Cabeça e camisa projetam sombra sem esconder as pernas ao olhar para baixo");
+            Require(body.Find("Tronco").GetComponent<Renderer>().shadowCastingMode == ShadowCastingMode.On &&
+                body.Find("Quadril").GetComponent<Renderer>().bounds.Intersects(body.Find("Tronco").GetComponent<Renderer>().bounds) &&
+                body.Find("Cabeca").GetComponent<Renderer>().shadowCastingMode == ShadowCastingMode.ShadowsOnly,
+                "Tronco visível conectado à bacia; cabeça fora da visão em primeira pessoa");
             var meshes = body.GetComponentsInChildren<MeshFilter>().Select(filter => filter.sharedMesh).Distinct().ToArray();
             var materials = renderers.Select(renderer => renderer.sharedMaterial).Distinct().ToArray();
-            Require(meshes.Length == 1 && meshes[0].triangles.Length / 3 * renderers.Length < 4000 &&
+            Require(meshes.Length == 2 && body.GetComponentsInChildren<MeshFilter>().Sum(f=>f.sharedMesh.triangles.Length/3) < 4500 &&
                 materials.Length <= 4 && renderers.All(renderer => renderer.sharedMaterial.shader.isSupported),
-                "Corpo usa malha compartilhada, menos de 4000 triângulos e materiais válidos");
-            Require(MeshFacesOutward(meshes[0]), "Malha arredondada tem faces externas, visíveis de todos os lados");
+                "Corpo usa duas malhas, menos de 4500 triângulos e materiais válidos");
+            Require(MeshFacesOutward(meshes.First(m=>m.name=="Visitante_FormaArredondada")), "Malha arredondada tem faces externas, visíveis de todos os lados");
             var directional = FindObjectsByType<Light>(FindObjectsSortMode.None)
                 .Where(light => light.isActiveAndEnabled && light.type == LightType.Directional).ToArray();
             Require(directional.Length == 1 && directional[0] == RenderSettings.sun &&
@@ -86,6 +86,9 @@ namespace MuseumModerna
             eye.transform.rotation = Quaternion.Euler(72, 0, 0);
             for (int frame = 0; frame < 30; frame++) yield return null;
             Capture(eye, "body-first-person-feet.png");
+            eye.transform.rotation = Quaternion.Euler(90, 0, 0);
+            Capture(eye, "body-looking-straight-down.png");
+            eye.transform.rotation = Quaternion.Euler(72, 0, 0);
             var diagnostic = new GameObject("BodyDiagnosticCamera").AddComponent<Camera>();
             diagnostic.enabled = false;
             diagnostic.CopyFrom(eye);
@@ -101,6 +104,12 @@ namespace MuseumModerna
 
             float leftRestY = leftShoe.localPosition.y;
             float maxLift = 0f, maxStride = 0f, minSole = float.PositiveInfinity;
+            var leftHand = body.Find("MaoEsquerdo");
+            var rightHand = body.Find("MaoDireito");
+            var chest = body.Find("Tronco");
+            float maxArmStride = 0, maxTorsoAngle = 0;
+            int oppositeSwingFrames = 0;
+            var cameraRotation = eye.transform.localRotation;
             var audio = FindAnyObjectByType<AmbientAudioManager>();
             Require(audio != null,"Áudio de passos disponível");
             int initialSteps=audio.PlayedFootsteps, contacts=0;
@@ -120,6 +129,12 @@ namespace MuseumModerna
                 maxStride = Mathf.Max(maxStride, Mathf.Abs(leftShoe.localPosition.z - rightShoe.localPosition.z));
                 minSole = Mathf.Min(minSole, Mathf.Min(leftShoe.GetComponent<Renderer>().bounds.min.y,
                     rightShoe.GetComponent<Renderer>().bounds.min.y) - controller.bounds.min.y);
+                float hands = leftHand.localPosition.z - rightHand.localPosition.z;
+                float feet = leftShoe.localPosition.z - rightShoe.localPosition.z;
+                maxArmStride = Mathf.Max(maxArmStride, Mathf.Abs(hands));
+                maxTorsoAngle = Mathf.Max(maxTorsoAngle, Quaternion.Angle(Quaternion.identity, chest.localRotation));
+                if (hands * feet < -.005f) oppositeSwingFrames++;
+                if (frame == 30 || frame == 45) Capture(eye, "body-stride-" + frame + ".png");
                 if(frame>20 && priorHeight<.057f && leftShoe.localPosition.y<.057f)
                 {
                     var drift=leftShoe.position-priorLeft; drift.y=0;
@@ -135,8 +150,15 @@ namespace MuseumModerna
                 "Pé apoiado permanece no chão sem patinar: desvio máximo "+maxSupportDrift.ToString("F4")+" m/frame");
             Require(maxLift > .04f && maxStride > .20f && minSole > -.025f,
                 "Deslocamento real alterna pernas, levanta pés e preserva solas acima do piso");
+            Require(maxArmStride > .2f && maxTorsoAngle > 2f && oppositeSwingFrames > 60,
+                "Braços alternam em oposição às pernas e tronco acompanha a passada");
+            Require(Quaternion.Angle(cameraRotation, eye.transform.localRotation) < .01f,
+                "Animação corporal não balança a câmera");
             for (int frame = 0; frame < 50; frame++) yield return null;
             Require(audio.PlayedFootsteps-initialSteps==contacts,"Parado não produz novos sons");
+            Require(Quaternion.Angle(Quaternion.identity, chest.localRotation) < .01f &&
+                Mathf.Abs(leftHand.localPosition.z-rightHand.localPosition.z) < .001f,
+                "Tronco e braços voltam ao repouso ao parar");
             Require(Mathf.Abs(leftShoe.localPosition.y - leftRestY) < .002f &&
                 Mathf.Abs(rightShoe.localPosition.y - leftRestY) < .002f &&
                 Mathf.Abs(leftShoe.localPosition.z - rightShoe.localPosition.z) < .002f,

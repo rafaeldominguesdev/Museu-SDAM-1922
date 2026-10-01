@@ -1,0 +1,39 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 14256d4cfae25415f84295e8fa960519, type: 3}
+  m_Name: mario_pauliceia
+  m_EditorClassIdentifier: 
+  title: Pauliceia desvairada
+  artist: "M\xE1rio de Andrade"
+  year: 1922
+  movement: Modernismo brasileiro
+  periodo: 1922
+  tecnica: "Painel did\xE1tico"
+  categoria: livro
+  relacao_com_a_semana_de_1922: "Publicado no ano da Semana, \xE9 central para compreender
+    a renova\xE7\xE3o liter\xE1ria daquele momento. Publica\xE7\xE3o em 1922 n\xE3o
+    equivale a lan\xE7amento durante os festivais."
+  obra_historica_ou_reinterpretacao: "Painel did\xE1tico original do museu sobre
+    a obra ou assunto; n\xE3o \xE9 reprodu\xE7\xE3o de pintura nem de capa hist\xF3rica."
+  resumo: "A cidade de S\xE3o Paulo aparece em versos livres, vozes e ritmos fragmentados."
+  fontes: https://brasilianafotografica.bn.gov.br/?p=26620
+  description: "O livro transforma a experi\xEAncia da metr\xF3pole em poesia. Ruas,
+    sons, multid\xF5es e contradi\xE7\xF5es sociais entram em uma escrita que rompe
+    com a regularidade tradicional. Seu Pref\xE1cio interessant\xEDssimo apresenta
+    reflex\xF5es ir\xF4nicas sobre a cria\xE7\xE3o po\xE9tica."
+  funFact: 
+  paintingTexture: {fileID: 0}
+  thumbnailSprite: {fileID: 0}
+  audioGuide: {fileID: 0}
+  audioDuration: 0
+  uniqueId: mario_pauliceia
+  suggestedViewOffset: {x: 0, y: 0, z: 2}

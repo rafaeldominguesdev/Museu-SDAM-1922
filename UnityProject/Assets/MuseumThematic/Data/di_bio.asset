@@ -1,0 +1,42 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 14256d4cfae25415f84295e8fa960519, type: 3}
+  m_Name: di_bio
+  m_EditorClassIdentifier: 
+  title: Di Cavalcanti
+  artist: Pintor, ilustrador e cronista
+  year: 1922
+  movement: Modernismo brasileiro
+  periodo: "1897\u20131976"
+  tecnica: "Painel did\xE1tico"
+  categoria: biografia
+  relacao_com_a_semana_de_1922: "Foi idealizador e organizador da Semana e criou
+    sua identidade gr\xE1fica, incluindo o cat\xE1logo. As pinturas desta sala apresentam
+    a continuidade de sua carreira depois de 1922."
+  obra_historica_ou_reinterpretacao: "Painel did\xE1tico original do museu sobre
+    a obra ou assunto; n\xE3o \xE9 reprodu\xE7\xE3o de pintura nem de capa hist\xF3rica."
+  resumo: "A vida urbana, a m\xFAsica e personagens do cotidiano atravessam sua produ\xE7\xE3o."
+  fontes: 'https://tainacan.senado.leg.br/acervo/mocas-com-violoes-reproducao/
+
+    https://brasilianafotografica.bn.gov.br/?p=26620'
+  description: "Nascido no Rio de Janeiro, Emiliano Di Cavalcanti iniciou a carreira
+    na ilustra\xE7\xE3o e na caricatura. Trabalhou entre arte e imprensa, conviveu
+    com escritores e desenvolveu uma pintura ligada a cenas populares. Suas figuras
+    e composi\xE7\xF5es dialogam com experi\xEAncias modernas internacionais e com
+    a sociedade brasileira."
+  funFact: 
+  paintingTexture: {fileID: 0}
+  thumbnailSprite: {fileID: 0}
+  audioGuide: {fileID: 0}
+  audioDuration: 0
+  uniqueId: di_bio
+  suggestedViewOffset: {x: 0, y: 0, z: 2}

@@ -1,0 +1,42 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 14256d4cfae25415f84295e8fa960519, type: 3}
+  m_Name: anita_boba
+  m_EditorClassIdentifier: 
+  title: A boba
+  artist: Anita Malfatti
+  year: 1916
+  movement: Modernismo brasileiro
+  periodo: "1915\u20131916 \xB7 antes da Semana"
+  tecnica: Pintura
+  categoria: pintura
+  relacao_com_a_semana_de_1922: "Obra fundamental da fase de forma\xE7\xE3o modernista
+    da artista. Sua inclus\xE3o nesta sala apresenta a trajet\xF3ria de Anita; n\xE3o
+    afirma que toda obra selecionada foi exposta em 1922."
+  obra_historica_ou_reinterpretacao: "Reprodu\xE7\xE3o digital da obra. MAC-USP \xB7
+    Cat\xE1logo Moderno onde? Moderno quando?"
+  resumo: "\xC1reas de cor e pinceladas marcadas tornam o retrato uma experi\xEAncia
+    de forma e express\xE3o."
+  fontes: 'https://mam.org.br/wp-content/uploads/2022/04/mam-modernoondemodernoquando-catalogo-com-ad.pdf
+
+    https://anpap.org.br/anais/2016/simposios/s1/renata_gomes_cardoso.pdf'
+  description: "A figura sentada \xE9 constru\xEDda por contrastes de cores e contornos
+    que n\xE3o se limitam \xE0 descri\xE7\xE3o naturalista. \xD3leo sobre tela, 61
+    \xD7 50,6 cm, do acervo do MAC-USP. O t\xEDtulo hist\xF3rico identifica a obra
+    e n\xE3o deve ser usado como diagn\xF3stico sobre a pessoa retratada."
+  funFact: 
+  paintingTexture: {fileID: 2800000, guid: c7cfc4f1a021241e4bd5b3d07bfd795f, type: 3}
+  thumbnailSprite: {fileID: 0}
+  audioGuide: {fileID: 0}
+  audioDuration: 0
+  uniqueId: anita_boba
+  suggestedViewOffset: {x: 0, y: 0, z: 2}

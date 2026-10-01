@@ -42,6 +42,16 @@ namespace MuseumModerna
             var eye = player.GetComponentInChildren<Camera>();
             Require(Mathf.Abs(controller.bounds.min.y) < .07f && eye.transform.position.y > 1.5f &&
                 eye.transform.position.y < 1.8f, "Spawn coloca pés no piso e olhos na altura humana");
+            var entrance = GameObject.Find(PlayerSpawnAnchor.EntranceAnchorName);
+            Require(entrance != null && Vector2.Distance(
+                new Vector2(player.transform.position.x, player.transform.position.z),
+                new Vector2(entrance.transform.position.x, entrance.transform.position.z)) < .05f,
+                "Inicialização real começa na âncora do foyer");
+            Require(entrance.GetComponentsInChildren<Renderer>(true).Length == 0 &&
+                entrance.GetComponentsInChildren<Collider>(true).Length == 0,
+                "Spawn é invisível e não possui bloco nem colisor");
+            Require(Vector3.Dot(player.transform.forward, entrance.transform.forward) > .99f,
+                "Visitante inicia orientado para o Hall");
             foreach (var gyro in FindObjectsByType<GyroscopeController>(FindObjectsSortMode.None)) gyro.enabled = false;
             foreach (var gaze in FindObjectsByType<GazeDwellInteraction>(FindObjectsSortMode.None)) gaze.enabled = false;
             movement.enabled = false;
@@ -49,7 +59,26 @@ namespace MuseumModerna
             probe = player.gameObject.AddComponent<PhysicsCollisionProbe>();
             Physics.SyncTransforms();
 
+            // Simula a posição legada que SaveSystem restaura antes da âncora.
+            Position(new Vector3(0, .02f, 0));
+            var spawn = FindAnyObjectByType<PlayerSpawnAnchor>();
+            var restart = (IEnumerator)typeof(PlayerSpawnAnchor).GetMethod("Start",
+                BindingFlags.Instance | BindingFlags.NonPublic).Invoke(spawn, null);
+            while (restart.MoveNext()) { }
+            Require(Vector3.Distance(player.transform.position, entrance.transform.position) < .07f,
+                "Posição antiga no centro é substituída pela entrada segura");
+
             var architecture = GameObject.Find("Museum_LouvreStyle").transform;
+            Require(Vector3.Distance(architecture.InverseTransformPoint(entrance.transform.position),
+                new Vector3(0, 0, -13)) < .01f, "Âncora está dentro do foyer");
+            var centerObstacles = Physics.OverlapCapsule(
+                architecture.TransformPoint(new Vector3(0, .4f, 0)),
+                architecture.TransformPoint(new Vector3(0, 1.4f, 0)), .3f,
+                ~0, QueryTriggerInteraction.Ignore);
+            Require(centerObstacles.Length == 0,
+                "Centro do Hall livre de bloco sólido na altura do visitante; encontrados: " +
+                string.Join(", ", centerObstacles.Select(c => c.name + " em " + c.bounds.center + " tamanho " + c.bounds.size)));
+            Require(GameObject.Find("Pedestal") == null, "Pedestal central legado permanece desativado");
             var columns = architecture.GetComponentsInChildren<CapsuleCollider>()
                 .Where(collider => collider.name.StartsWith("Colisao_Pilastra_")).ToArray();
             Require(columns.Length == 20, "Quatro pilastras centrais e dezesseis colunas de portais são sólidas");
@@ -61,7 +90,9 @@ namespace MuseumModerna
             {
                 // Aproxime pelo vão livre. As duas faces do portal ficam alinhadas:
                 // vir pela frente da outra face começaria dentro do seu collider.
-                Vector3 direction = Vector3.forward;
+                // As pilastras centrais ficam nos cantos; aproxime pelo salão.
+                // O ponto fixo ao sul podia começar dentro da parede externa.
+                Vector3 direction = Vector3.ProjectOnPlane(column.bounds.center - architecture.position, Vector3.up).normalized;
                 if (column.name.Contains("Portal_"))
                 {
                     var point = architecture.InverseTransformPoint(column.bounds.center);
@@ -93,6 +124,8 @@ namespace MuseumModerna
 
             foreach (var route in new[]
             {
+                new[] { new Vector3(0, .02f, -13), new Vector3(0, .02f, -7) },
+                new[] { new Vector3(0, .02f, -2), new Vector3(0, .02f, 2) },
                 new[] { new Vector3(0, .02f, 7), new Vector3(0, .02f, 12) },
                 new[] { new Vector3(7, .02f, 0), new Vector3(12, .02f, 0) },
                 new[] { new Vector3(-7, .02f, 0), new Vector3(-12, .02f, 0) },
@@ -151,9 +184,23 @@ namespace MuseumModerna
             start.y = .02f;
             Position(start);
             probe.Hits.Clear();
-            for (int frame = 0; frame < 180; frame++) controller.Move(direction * .025f - Vector3.up * .033f);
+            float minSeparation = float.PositiveInfinity;
+            for (int frame = 0; frame < 180; frame++)
+            {
+                controller.Move(direction * .025f - Vector3.up * .033f);
+                var horizontal = controller.bounds.center - bounds.center;
+                horizontal.y = 0;
+                minSeparation = Mathf.Min(minSeparation, horizontal.magnitude);
+            }
             float progress = Vector3.Dot(player.transform.position - start, direction);
-            Require(probe.Hits.Contains(obstacle) && progress > .1f && progress < extent + .85f,
+            // Uma pilastra redonda pode desviar a cápsula para o lado e permitir
+            // seguir adiante. Meça a separação durante todo o trajeto, não apenas
+            // o avanço final, que confundia contornar com atravessar a coluna.
+            bool blocked = obstacle is CapsuleCollider column
+                ? minSeparation >= column.radius * Mathf.Max(column.transform.lossyScale.x, column.transform.lossyScale.z) +
+                    controller.radius - controller.skinWidth - .025f
+                : progress < extent + .85f;
+            Require(probe.Hits.Contains(obstacle) && progress > .1f && blocked,
                 "Cápsula do visitante é bloqueada por " + obstacle.name + " (avanço " + progress.ToString("F2") + " m)");
         }
 

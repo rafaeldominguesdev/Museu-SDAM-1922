@@ -38,7 +38,8 @@ namespace MuseumModerna
             ui = managerUI;
             player = FindAnyObjectByType<PlayerController>();
             eye = player.GetComponentInChildren<GazeDwellInteraction>().GetComponent<Camera>();
-            normalNearClip = eye.nearClipPlane;
+            // Initialize roda antes de AutoBootstrap: não guardar o antigo near de 0,01 m.
+            normalNearClip = Mathf.Max(.1f, eye.nearClipPlane);
             eye.stereoTargetEye = StereoTargetEyeMask.None;
             desktopCanvas = ui.GetComponent<Canvas>();
             WorldGuide = new GameObject("FichaVR").AddComponent<VrWorldGuide>();
@@ -247,7 +248,7 @@ namespace MuseumModerna
             if (prepared) manager?.StopSubsystems();
 #endif
             eye.stereoTargetEye = StereoTargetEyeMask.None;
-            eye.nearClipPlane = normalNearClip;
+            eye.nearClipPlane = Mathf.Max(.1f, normalNearClip);
             eye.rect = new Rect(0, 0, 1, 1);
             eye.ResetAspect(); eye.ResetProjectionMatrix();
             desktopCanvas.enabled = true;

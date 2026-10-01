@@ -23,6 +23,9 @@ namespace MuseumModerna
         [Tooltip("Fator de suavização da rotação (0 = instantâneo, 1 = nunca move). Recomendado: 0.05 - 0.15")]
         [SerializeField] private float smoothFactor = 0.1f;
 
+        [Tooltip("Tempo de resposta da câmera no modo normal, independente da taxa de quadros.")]
+        [SerializeField, Min(.01f)] private float normalResponseSeconds = .045f;
+
         [Header("Limite de Olhar")]
         [Tooltip("Ângulo de pitch (em graus) abaixo do qual IsLookingDown = true. Ex: -30 = olhando 30° abaixo do horizonte")]
         [SerializeField] private float lookDownThreshold = -30f;
@@ -136,8 +139,17 @@ namespace MuseumModerna
                 UpdateFallbackInput();
             }
 
-            // Aplica suavização
-            _currentRotation = Quaternion.Slerp(_currentRotation, _targetRotation, smoothFactor);
+            ApplyLookRotation(Time.unscaledDeltaTime);
+        }
+
+        private void ApplyLookRotation(float deltaTime)
+        {
+            // O tempo do sensor também é usado pelo gesto: ambos respondem igual a 20/30/60 fps.
+            bool inVr = MobileVrMode.Instance != null && MobileVrMode.Instance.IsActive;
+            float blend = inVr
+                ? 1f - Mathf.Pow(1f - Mathf.Clamp01(smoothFactor), deltaTime * 60f)
+                : 1f - Mathf.Exp(-deltaTime / Mathf.Max(.01f, normalResponseSeconds));
+            _currentRotation = Quaternion.Slerp(_currentRotation, _targetRotation, blend);
 
             // Removido: ClampPitch causava gimbal lock e impedia o giro 360 livre no celular
             // _currentRotation = ClampPitch(_currentRotation, pitchMin, pitchMax);
@@ -147,7 +159,7 @@ namespace MuseumModerna
             transform.localRotation = _currentRotation;
             // Movimento e XR usam a mesma direção no mundo, incluindo a rotação do Player.
             CurrentLookDirection = transform.forward;
-            UpdateLookDownState(PitchFromDirection(CurrentLookDirection), Time.unscaledDeltaTime);
+            UpdateLookDownState(PitchFromDirection(CurrentLookDirection), deltaTime);
         }
 
         // ─── Inicialização ─────────────────────────────────────────────────────
@@ -350,7 +362,8 @@ namespace MuseumModerna
                 return;
             }
             _lookDownTime = pitch < lookDownThreshold ? _lookDownTime + elapsed : 0f;
-            IsLookingDown = _lookDownTime >= LookDownHoldSeconds;
+            bool inVr = MobileVrMode.Instance != null && MobileVrMode.Instance.IsActive;
+            IsLookingDown = _lookDownTime >= (inVr ? LookDownHoldSeconds : .12f);
         }
 
         /// <summary>Exige olhar à frente antes de aceitar um novo gesto de caminhada.</summary>

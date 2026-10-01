@@ -28,7 +28,15 @@ namespace MuseumModerna
         private Transform body;
         private Leg leftLeg;
         private Leg rightLeg;
+        private sealed class Arm
+        {
+            public float side;
+            public Transform upper, lower, hand;
+        }
+        private Arm leftArm, rightArm;
+        private Transform torso;
         private Mesh roundedMesh;
+        private Mesh torsoMesh;
         private Material trousersMaterial;
         private Material shirtMaterial;
         private Material shoesMaterial;
@@ -65,18 +73,19 @@ namespace MuseumModerna
             body.rotation = Quaternion.Euler(0f, transform.eulerAngles.y, 0f);
             UpdateBodyOrigin();
 
-            CreatePart("Quadril", body, new Vector3(0, .91f, -.025f), new Vector3(.35f, .23f, .24f), trousersMaterial);
-            // A camisa contribui na sombra sem ocupar a visão de primeira pessoa.
-            CreatePart("BarraDaCamisa", body, new Vector3(0, 1.06f, -.045f), new Vector3(.37f, .30f, .25f), shirtMaterial, true);
+            CreatePart("Quadril", body, new Vector3(0, .93f, -.025f), new Vector3(.37f, .30f, .29f), trousersMaterial);
             leftLeg = CreateLeg("Esquerda", -1f);
             rightLeg = CreateLeg("Direita", 1f);
 
-            // A parte superior completa a silhueta da sombra sem atravessar a câmera,
-            // inclusive quando o visitante olha verticalmente para baixo em VR.
-            CreatePart("Tronco", body, new Vector3(0, 1.27f, -.035f), new Vector3(.43f, .47f, .26f), shirtMaterial, true);
+            // Camisa contínua da cintura aos ombros, conectada ao quadril.
+            torsoMesh = CreateTorsoMesh();
+            torso = CreatePart("Tronco", body, Vector3.zero, Vector3.one, shirtMaterial);
+            torso.GetComponent<MeshFilter>().sharedMesh = torsoMesh;
+            // Só a cabeça fica invisível para a câmera situada nos olhos.
             CreatePart("Cabeca", body, new Vector3(0, 1.60f, 0), new Vector3(.20f, .25f, .21f), skinMaterial, true);
-            CreateArm(-1f);
-            CreateArm(1f);
+            leftArm = CreateArm(-1f);
+            rightArm = CreateArm(1f);
+            PoseUpperBody();
             PoseLeg(leftLeg, 0f);
             PoseLeg(rightLeg, Mathf.PI);
             previousPosition = transform.position;
@@ -142,6 +151,7 @@ namespace MuseumModerna
             UpdateBodyOrigin();
             PoseLeg(leftLeg, gaitPhase);
             PoseLeg(rightLeg, gaitPhase + Mathf.PI);
+            PoseUpperBody();
         }
 
         private void UpdateBodyOrigin()
@@ -213,16 +223,75 @@ namespace MuseumModerna
             segment.localScale = new Vector3(width, delta.magnitude + .08f, depth);
         }
 
-        private void CreateArm(float side)
+        private Arm CreateArm(float side)
         {
             string suffix = side < 0f ? "Esquerdo" : "Direito";
-            var upper = CreatePart("Braco" + suffix, body, Vector3.zero, Vector3.one, shirtMaterial, true);
-            var lower = CreatePart("Antebraco" + suffix, body, Vector3.zero, Vector3.one, skinMaterial, true);
-            var shoulder = new Vector3(side * .23f, 1.40f, -.03f);
-            var elbow = new Vector3(side * .285f, 1.12f, 0f);
-            var hand = new Vector3(side * .27f, .91f, .055f);
-            PoseSegment(upper, shoulder, elbow, .12f, .12f);
-            PoseSegment(lower, elbow, hand, .095f, .095f);
+            return new Arm
+            {
+                side = side,
+                upper = CreatePart("Braco" + suffix, body, Vector3.zero, Vector3.one, shirtMaterial),
+                lower = CreatePart("Antebraco" + suffix, body, Vector3.zero, Vector3.one, skinMaterial),
+                hand = CreatePart("Mao" + suffix, body, Vector3.zero, new Vector3(.085f,.14f,.065f), skinMaterial)
+            };
+        }
+
+        private void PoseUpperBody()
+        {
+            // Mesma fase e peso das pernas: só anima com deslocamento real e
+            // desacelera junto delas. Nenhum balanço é aplicado à câmera VR.
+            float swing = Mathf.Cos(gaitPhase) * gaitWeight;
+            var pivot = new Vector3(0, 1f, -.025f);
+            var rotation = Quaternion.Euler(1.5f * gaitWeight, -3f * swing, 1f * swing);
+            var bob = Vector3.up * (Mathf.Cos(gaitPhase * 2f) * .008f * gaitWeight);
+            torso.localRotation = rotation;
+            torso.localPosition = pivot - rotation * pivot + bob;
+            PoseArm(leftArm, swing, rotation, pivot, bob);
+            PoseArm(rightArm, -swing, rotation, pivot, bob);
+        }
+
+        private static void PoseArm(Arm arm, float swing, Quaternion torsoRotation, Vector3 pivot, Vector3 bob)
+        {
+            Vector3 FollowTorso(Vector3 p) => pivot + torsoRotation * (p - pivot) + bob;
+            var shoulder = new Vector3(arm.side * .23f, 1.40f, -.03f);
+            var upperRotation = Quaternion.Euler(swing * 18f, 0, 0);
+            var elbow = shoulder + upperRotation * new Vector3(arm.side * .055f, -.28f, .03f);
+            var hand = elbow + Quaternion.Euler(swing * 22f, 0, 0) * new Vector3(-arm.side * .015f, -.21f, .055f);
+            PoseSegment(arm.upper, FollowTorso(shoulder), FollowTorso(elbow), .12f, .12f);
+            PoseSegment(arm.lower, FollowTorso(elbow), FollowTorso(hand), .095f, .095f);
+            arm.hand.localPosition = FollowTorso(hand - Vector3.up * .025f);
+            arm.hand.localRotation = torsoRotation * Quaternion.Euler(swing * 22f, 0, 0);
+        }
+
+        private static Mesh CreateTorsoMesh()
+        {
+            const int sides = 20;
+            // y, meia largura, meia profundidade. A cintura sobrepõe a bacia.
+            var rings = new[] { new Vector3(.99f,.17f,.125f), new Vector3(1.07f,.18f,.135f),
+                new Vector3(1.27f,.205f,.14f), new Vector3(1.41f,.215f,.13f),
+                new Vector3(1.48f,.15f,.09f), new Vector3(1.50f,.075f,.07f) };
+            var vertices = new System.Collections.Generic.List<Vector3>();
+            var triangles = new System.Collections.Generic.List<int>();
+            foreach (var ring in rings)
+                for (int s=0;s<=sides;s++)
+                {
+                    float angle=s*Mathf.PI*2/sides;
+                    vertices.Add(new Vector3(Mathf.Cos(angle)*ring.y,ring.x,Mathf.Sin(angle)*ring.z-.035f));
+                }
+            for(int r=0;r<rings.Length-1;r++) for(int s=0;s<sides;s++)
+            {
+                int a=r*(sides+1)+s,b=a+sides+1;
+                triangles.AddRange(new[]{a,b,a+1,a+1,b,b+1});
+            }
+            for(int s=1;s<sides-1;s++)
+            {
+                triangles.AddRange(new[]{0,s,s+1});
+                int top=(rings.Length-1)*(sides+1);
+                triangles.AddRange(new[]{top,top+s+1,top+s});
+            }
+            var mesh=new Mesh { name="Visitante_CamisaContinua" };
+            mesh.SetVertices(vertices); mesh.SetTriangles(triangles,0);
+            mesh.RecalculateNormals(); mesh.RecalculateBounds();
+            return mesh;
         }
 
         private Transform CreatePart(string partName, Transform parent, Vector3 position, Vector3 scale,
@@ -291,6 +360,7 @@ namespace MuseumModerna
         {
             if (body != null) DestroyOwned(body.gameObject);
             DestroyOwned(roundedMesh);
+            DestroyOwned(torsoMesh);
             DestroyOwned(trousersMaterial);
             DestroyOwned(shirtMaterial);
             DestroyOwned(shoesMaterial);

@@ -1,14 +1,14 @@
 using System.Collections;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace MuseumModerna
 {
     /// <summary>
-    /// Garante que o player sempre nasça no centro seguro da sala, mesmo que a
-    /// sala esteja posicionada em qualquer altura no mundo.
+    /// Posiciona o visitante na entrada, apoiado no piso físico.
     ///
     /// Estratégia:
-    ///   1. Busca o piso físico próximo da origem arquitetônica da sala.
+    ///   1. Usa a âncora invisível da entrada ou a posição inicial da cena.
     ///   2. Ignora o visitante, triggers e superfícies acima do piso.
     ///   3. Posiciona os pés, preservando a altura local da câmera.
     ///
@@ -23,11 +23,25 @@ namespace MuseumModerna
         [Tooltip("Pequena folga dos pés acima do chão, resolvida pela gravidade no primeiro frame")]
         [SerializeField, Range(0f, .05f)] private float floorClearance = .02f;
 
-        [Tooltip("Sempre reposiciona o visitante no centro seguro da sala ao abrir o aplicativo.")]
-        [SerializeField] private bool resetToRoomCenterOnLaunch = true;
+        [Tooltip("Sempre reposiciona o visitante na entrada ao abrir o aplicativo.")]
+        [FormerlySerializedAs("resetToRoomCenterOnLaunch")]
+        [SerializeField] private bool resetToEntranceOnLaunch = true;
 
         [Tooltip("Layers consideradas chão (deixe 'Everything' para pegar qualquer coisa)")]
         [SerializeField] private LayerMask floorLayers = ~0;
+
+        public const string EntranceAnchorName = "Spawn_Entrada";
+        private Vector3 sceneEntryPosition;
+        private Quaternion sceneEntryRotation;
+
+        private void Awake()
+        {
+            // Captura a posição autorada antes que SaveSystem.Start carregue o save.
+            var player = FindAnyObjectByType<PlayerController>();
+            if (player == null) return;
+            sceneEntryPosition = player.transform.position;
+            sceneEntryRotation = player.transform.rotation;
+        }
 
         // ─── Ciclo de Vida ────────────────────────────────────────────────────
 
@@ -40,16 +54,17 @@ namespace MuseumModerna
             if (player == null) yield break;
 
             Physics.SyncTransforms();
-            Vector3 spawnBase = FindRoomCenter();
+            var entrance = GameObject.Find(EntranceAnchorName);
+            Vector3 spawnBase = entrance != null ? entrance.transform.position : sceneEntryPosition;
             if (!TryFindRoomFloor(spawnBase, out Vector3 floorPosition))
             {
                 Debug.LogWarning("[MuseumModerna] Spawn mantido: não há piso físico abaixo da entrada.");
                 yield break;
             }
-            if (!resetToRoomCenterOnLaunch && player.transform.position.y >= floorPosition.y - 3f) yield break;
+            if (!resetToEntranceOnLaunch && player.transform.position.y >= floorPosition.y - 3f) yield break;
 
             // Saves continuam existindo para outros dados, mas nunca definem a
-            // posição inicial: cada abertura começa no centro da sala.
+            // posição inicial: cada abertura começa no foyer.
             var controller = player.GetComponent<CharacterController>();
             // O pivot fica nos pés na cena atual. A câmera já tem os seus 1,6 m
             // locais: acrescentar 1 m à raiz suspendia todo o corpo sobre móveis.
@@ -57,8 +72,9 @@ namespace MuseumModerna
                 ? player.transform.TransformVector(controller.center - Vector3.up * (controller.height * .5f)).y
                 : 0f;
             Vector3 spawnPos = floorPosition + Vector3.up * (floorClearance - footOffset);
-            TeleportPlayer(player, spawnPos);
-            Debug.Log($"[MuseumModerna] Spawn reiniciado no centro seguro: {spawnPos}.");
+            var rotation = entrance != null ? entrance.transform.rotation : sceneEntryRotation;
+            TeleportPlayer(player, spawnPos, rotation);
+            Debug.Log($"[MuseumModerna] Spawn reiniciado na entrada: {spawnPos}.");
         }
 
         // ─── Encontrar o Chão ─────────────────────────────────────────────────
@@ -92,23 +108,14 @@ namespace MuseumModerna
             return false;
         }
 
-        private Vector3 FindRoomCenter()
-        {
-            var architecture = GameObject.Find("Museum_LouvreStyle");
-            // O gerador constrói o piso da galeria central na origem local.
-            // Bounds globais também incluem jardins e objetos sob o piso.
-            if (architecture != null) return architecture.transform.position;
-            return Vector3.zero;
-        }
-
         // ─── Teleportar ───────────────────────────────────────────────────────
 
-        private static void TeleportPlayer(PlayerController player, Vector3 position)
+        private static void TeleportPlayer(PlayerController player, Vector3 position, Quaternion rotation)
         {
             CharacterController cc = player.GetComponent<CharacterController>();
             bool wasEnabled = cc != null && cc.enabled;
             if (cc != null) cc.enabled = false;
-            player.transform.position = position;
+            player.transform.SetPositionAndRotation(position, rotation);
             if (cc != null) cc.enabled = wasEnabled;
             Physics.SyncTransforms();
 

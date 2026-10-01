@@ -1,0 +1,42 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 14256d4cfae25415f84295e8fa960519, type: 3}
+  m_Name: manifesto_verde
+  m_EditorClassIdentifier: 
+  title: "Nhenga\xE7u Verde-Amarelo"
+  artist: Grupo Verde-Amarelo / Escola da Anta
+  year: 1929
+  movement: Modernismo brasileiro
+  periodo: "1929 \xB7 depois da Semana"
+  tecnica: "Painel did\xE1tico"
+  categoria: manifesto
+  relacao_com_a_semana_de_1922: "O contraste entre os tr\xEAs manifestos mostra que
+    o Modernismo abrigou projetos culturais e pol\xEDticos diferentes, por vezes
+    conflitantes."
+  obra_historica_ou_reinterpretacao: "Painel did\xE1tico original do museu sobre
+    a obra ou assunto; n\xE3o \xE9 reprodu\xE7\xE3o de pintura nem de capa hist\xF3rica."
+  resumo: "Uma vertente nacionalista que valorizava tradi\xE7\xF5es e s\xEDmbolos
+    apresentados como brasileiros."
+  fontes: https://funag.gov.br/biblioteca-nova/produto/loc_pdf/1232/1/glossario_da_literatura_brasileira_para_leitores_estrangeiros
+  description: "Tamb\xE9m chamado Manifesto Verde-Amarelo, o texto de 1929 expressa
+    uma proposta distinta da antropofagia. Defende uma identidade nacional apoiada
+    na tradi\xE7\xE3o e na integra\xE7\xE3o, com uma vis\xE3o idealizada da forma\xE7\xE3o
+    do pa\xEDs. O grupo reuniu autores como Menotti del Picchia, Cassiano Ricardo
+    e Pl\xEDnio Salgado. O percurso posterior de alguns integrantes aproximou-se
+    do nacionalismo autorit\xE1rio."
+  funFact: 
+  paintingTexture: {fileID: 0}
+  thumbnailSprite: {fileID: 0}
+  audioGuide: {fileID: 0}
+  audioDuration: 0
+  uniqueId: manifesto_verde
+  suggestedViewOffset: {x: 0, y: 0, z: 2}

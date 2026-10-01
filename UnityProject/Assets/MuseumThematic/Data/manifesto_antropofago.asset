@@ -1,0 +1,43 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 14256d4cfae25415f84295e8fa960519, type: 3}
+  m_Name: manifesto_antropofago
+  m_EditorClassIdentifier: 
+  title: "Manifesto Antrop\xF3fago"
+  artist: Oswald de Andrade
+  year: 1928
+  movement: Modernismo brasileiro
+  periodo: "1928 \xB7 depois da Semana"
+  tecnica: "Painel did\xE1tico"
+  categoria: manifesto
+  relacao_com_a_semana_de_1922: "Desdobramento modernista de 1928. Tarsila estava
+    em Paris durante a Semana de 1922; sua import\xE2ncia para o Modernismo se amplia
+    nos anos seguintes."
+  obra_historica_ou_reinterpretacao: "Painel did\xE1tico original do museu sobre
+    a obra ou assunto; n\xE3o \xE9 reprodu\xE7\xE3o de pintura nem de capa hist\xF3rica."
+  resumo: "Transformar influ\xEAncias externas por meio de uma apropria\xE7\xE3o
+    cr\xEDtica e criadora."
+  fontes: 'https://bndigital.bn.gov.br/revista-de-antropofagia/
+
+    https://www.al.sp.gov.br/noticia/?id=515046'
+  description: "Publicado na Revista de Antropofagia em 1928, usa a antropofagia
+    como met\xE1fora cultural: assimilar e transformar, em vez de repetir passivamente.
+    Questiona a depend\xEAncia colonial e prop\xF5e rela\xE7\xF5es inventivas entre
+    refer\xEAncias locais e estrangeiras. Tarsila do Amaral e Abaporu integram o
+    contexto desse movimento posterior \xE0 Semana."
+  funFact: 
+  paintingTexture: {fileID: 0}
+  thumbnailSprite: {fileID: 0}
+  audioGuide: {fileID: 0}
+  audioDuration: 0
+  uniqueId: manifesto_antropofago
+  suggestedViewOffset: {x: 0, y: 0, z: 2}

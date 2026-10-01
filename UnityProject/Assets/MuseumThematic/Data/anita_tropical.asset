@@ -1,0 +1,41 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 14256d4cfae25415f84295e8fa960519, type: 3}
+  m_Name: anita_tropical
+  m_EditorClassIdentifier: 
+  title: Tropical
+  artist: Anita Malfatti
+  year: 1917
+  movement: Modernismo brasileiro
+  periodo: "1917 \xB7 antes da Semana"
+  tecnica: Pintura
+  categoria: pintura
+  relacao_com_a_semana_de_1922: "Foi apresentada na Semana de 1922, mostrando que
+    o evento reuniu tamb\xE9m obras criadas anteriormente."
+  obra_historica_ou_reinterpretacao: "Reprodu\xE7\xE3o digital da obra. Pinacoteca
+    \xB7 Foto: Campos e Kajiya"
+  resumo: "Uma figura humana e a vegeta\xE7\xE3o tropical aproximam a pintura de
+    temas brasileiros."
+  fontes: 'https://pinacoteca.org.br/qrcode/p2-s19-9-b/
+
+    https://brasilianafotografica.bn.gov.br/?p=26620'
+  description: "A mulher diante da vegeta\xE7\xE3o e o cesto de frutas articulam
+    figura e paisagem. A obra permite observar o interesse por refer\xEAncias locais
+    dentro da pesquisa moderna da artista. Integra o acervo da Pinacoteca de S\xE3o
+    Paulo."
+  funFact: 
+  paintingTexture: {fileID: 2800000, guid: 1e272bc1d18b04200aea88643545fff9, type: 3}
+  thumbnailSprite: {fileID: 0}
+  audioGuide: {fileID: 0}
+  audioDuration: 0
+  uniqueId: anita_tropical
+  suggestedViewOffset: {x: 0, y: 0, z: 2}

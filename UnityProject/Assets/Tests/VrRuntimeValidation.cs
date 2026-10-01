@@ -43,7 +43,8 @@ namespace MuseumModerna
             foreach (var locked in FindObjectsByType<LockPosition>(FindObjectsSortMode.None)) locked.enabled = false;
             var player = FindAnyObjectByType<PlayerController>();
             var gaze = eye.GetComponent<GazeDwellInteraction>();
-            var original = FindObjectsByType<PaintingExhibit>(FindObjectsSortMode.None).First(e => e.PaintingData.uniqueId == "homem_amarelo");
+            var original = FindObjectsByType<PaintingExhibit>(FindObjectsSortMode.None).First(e =>
+                e.PaintingData.uniqueId == "homem_amarelo" || e.PaintingData.uniqueId == "anita_homem");
             player.transform.position += original.transform.position + original.transform.forward * 3 - eye.transform.position;
             eye.transform.LookAt(original.transform.position);
             gaze.SetPanelsEnabled(true);
@@ -166,7 +167,8 @@ namespace MuseumModerna
             var previous = RenderTexture.active; RenderTexture.active = target;
             var texture = new Texture2D(1440, 900, TextureFormat.RGB24, false);
             texture.ReadPixels(new Rect(0, 0, 1440, 900), 0, 0); texture.Apply();
-            string folder = Path.GetFullPath(Path.Combine(Application.dataPath, "../../artifacts/bugfix-2026-09-21"));
+            string folder = Path.GetFullPath(Environment.GetEnvironmentVariable("MUSEUM_CAPTURE_OUTPUT") ??
+                Path.Combine(Application.dataPath, "../../artifacts/bugfix-2026-09-21"));
             Directory.CreateDirectory(folder); File.WriteAllBytes(Path.Combine(folder, filename), texture.EncodeToPNG());
             eye.targetTexture = null; RenderTexture.active = previous;
             Destroy(texture); target.Release(); Destroy(target);

@@ -1,0 +1,38 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 14256d4cfae25415f84295e8fa960519, type: 3}
+  m_Name: oswald_caderno
+  m_EditorClassIdentifier: 
+  title: Primeiro caderno do aluno de poesia
+  artist: Oswald de Andrade
+  year: 1927
+  movement: Modernismo brasileiro
+  periodo: "1927 \xB7 depois da Semana"
+  tecnica: "Painel did\xE1tico"
+  categoria: livro
+  relacao_com_a_semana_de_1922: "Uma experi\xEAncia editorial posterior \xE0 Semana,
+    ligada aos interc\xE2mbios entre escritores e artistas."
+  obra_historica_ou_reinterpretacao: "Painel did\xE1tico original do museu sobre
+    a obra ou assunto; n\xE3o \xE9 reprodu\xE7\xE3o de pintura nem de capa hist\xF3rica."
+  resumo: Palavra e desenho se encontram em poemas breves e linguagem experimental.
+  fontes: https://www.prefeitura.sp.gov.br/web/cultura/w/bibliotecas/noticias/30801
+  description: "Primeiro caderno do aluno de poesia Oswald de Andrade explora a apar\xEAncia
+    de um caderno e a rela\xE7\xE3o entre texto e imagem. A simplicidade aparente
+    abre espa\xE7o para humor, cr\xEDtica e inven\xE7\xE3o, aproximando literatura
+    e artes visuais."
+  funFact: 
+  paintingTexture: {fileID: 0}
+  thumbnailSprite: {fileID: 0}
+  audioGuide: {fileID: 0}
+  audioDuration: 0
+  uniqueId: oswald_caderno
+  suggestedViewOffset: {x: 0, y: 0, z: 2}

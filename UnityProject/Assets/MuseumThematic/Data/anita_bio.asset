@@ -1,0 +1,43 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 14256d4cfae25415f84295e8fa960519, type: 3}
+  m_Name: anita_bio
+  m_EditorClassIdentifier: 
+  title: Anita Malfatti
+  artist: Pintora, desenhista e professora
+  year: 1922
+  movement: Modernismo brasileiro
+  periodo: "1889\u20131964"
+  tecnica: "Painel did\xE1tico"
+  categoria: biografia
+  relacao_com_a_semana_de_1922: "Participou da exposi\xE7\xE3o da Semana de 1922.
+    Sua trajet\xF3ria deve ser compreendida por suas escolhas art\xEDsticas e atua\xE7\xE3o,
+    al\xE9m da conhecida pol\xEAmica de 1917."
+  obra_historica_ou_reinterpretacao: "Painel did\xE1tico original do museu sobre
+    a obra ou assunto; n\xE3o \xE9 reprodu\xE7\xE3o de pintura nem de capa hist\xF3rica."
+  resumo: "Sua experimenta\xE7\xE3o com cor e forma foi decisiva para os debates
+    que antecederam a Semana."
+  fontes: 'https://anitamalfatti.ieb.usp.br/1950-1954/
+
+    https://brasilianafotografica.bn.gov.br/?p=26620'
+  description: "Anita Malfatti nasceu em S\xE3o Paulo e estudou arte na Alemanha
+    e nos Estados Unidos. Sua exposi\xE7\xE3o de 1917 provocou discuss\xF5es sobre
+    pintura moderna e reuniu em sua defesa futuros integrantes do movimento. Cor
+    expressiva, pincelada vis\xEDvel e deforma\xE7\xE3o afastaram parte de sua produ\xE7\xE3o
+    dos padr\xF5es acad\xEAmicos."
+  funFact: 
+  paintingTexture: {fileID: 0}
+  thumbnailSprite: {fileID: 0}
+  audioGuide: {fileID: 0}
+  audioDuration: 0
+  uniqueId: anita_bio
+  suggestedViewOffset: {x: 0, y: 0, z: 2}

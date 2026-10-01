@@ -1,0 +1,41 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 14256d4cfae25415f84295e8fa960519, type: 3}
+  m_Name: mario_bio
+  m_EditorClassIdentifier: 
+  title: "M\xE1rio de Andrade"
+  artist: Escritor e pesquisador da cultura
+  year: 1922
+  movement: Modernismo brasileiro
+  periodo: "1893\u20131945"
+  tecnica: "Painel did\xE1tico"
+  categoria: biografia
+  relacao_com_a_semana_de_1922: "Foi articulador e participante da Semana. Pauliceia
+    desvairada, publicada em 1922, liga-se ao momento de ruptura; Macuna\xEDma e
+    outros livros da sala mostram caminhos desenvolvidos depois do evento."
+  obra_historica_ou_reinterpretacao: "Painel did\xE1tico original do museu sobre
+    a obra ou assunto; n\xE3o \xE9 reprodu\xE7\xE3o de pintura nem de capa hist\xF3rica."
+  resumo: "Literatura, m\xFAsica e pesquisa das culturas brasileiras atravessam sua
+    trajet\xF3ria."
+  fontes: https://brasilianafotografica.bn.gov.br/?p=26620
+  description: "Nascido em S\xE3o Paulo, M\xE1rio de Andrade foi poeta, romancista,
+    cr\xEDtico e pesquisador de m\xFAsica e manifesta\xE7\xF5es populares. Sua escrita
+    experimentou ritmos e modos de falar do Brasil. A produ\xE7\xE3o intelectual
+    e sua atua\xE7\xE3o cultural ajudaram a ampliar o debate sobre o que merecia
+    ser estudado, preservado e reconhecido como cultura."
+  funFact: 
+  paintingTexture: {fileID: 0}
+  thumbnailSprite: {fileID: 0}
+  audioGuide: {fileID: 0}
+  audioDuration: 0
+  uniqueId: mario_bio
+  suggestedViewOffset: {x: 0, y: 0, z: 2}
