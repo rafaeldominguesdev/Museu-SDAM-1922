@@ -42,6 +42,77 @@ namespace MuseumModerna
             GetWindow<MuseumLightingSetup>("Museum Lighting").minSize = new Vector2(400, 580);
         }
 
+        /// <summary>
+        /// Versão reutilizável pela instalação do percurso e por batch mode. Mantém
+        /// uma única estratégia de focos: remove os antigos Focos_das_obras e recria
+        /// somente os Spotlight_ filhos dos painéis.
+        /// </summary>
+        public static void ApplyToScene()
+        {
+            var legacyRoot = GameObject.Find("Museum_LouvreStyle")?.transform.Find("Focos_das_obras");
+            if (legacyRoot != null) DestroyImmediate(legacyRoot.gameObject);
+
+            var setup = CreateInstance<MuseumLightingSetup>();
+            try
+            {
+                setup.spotColor=new Color(1f,.94f,.84f);
+                setup.spotAngle=95f;
+                setup.spotForward=1.5f;
+                setup.addCandleFlicker=false;
+                setup.ApplyAll();
+                LouvreGalleryLighting.ApplyGallery();
+                var exhibition=GameObject.Find("Museum_GuidedExhibition");
+                if(exhibition.GetComponent<MuseumPictureLighting>()==null)
+                    exhibition.AddComponent<MuseumPictureLighting>();
+                foreach(var light in exhibition.GetComponentsInChildren<Light>()) light.enabled=false;
+                var architecture=GameObject.Find("Museum_LouvreStyle");
+                foreach(var renderer in architecture.GetComponentsInChildren<MeshRenderer>())
+                {
+                    bool sky=renderer.name.Contains("Ceu_noturno")||renderer.name.StartsWith("Lua_claraboia_");
+                    renderer.shadowCastingMode=sky?ShadowCastingMode.Off:ShadowCastingMode.On;
+                    renderer.receiveShadows=!sky;
+                }
+                foreach(var light in architecture.GetComponentsInChildren<Light>())
+                    if(light.name=="Luz_difusa") light.intensity=.4f;
+                var previous=architecture.transform.Find("Luz_do_lustre");
+                if(previous!=null) DestroyImmediate(previous.gameObject);
+                var chandelier=new GameObject("Luz_do_lustre").AddComponent<Light>();
+                chandelier.transform.SetParent(architecture.transform,false);
+                chandelier.transform.localPosition=new Vector3(0,4.8f,0);
+                chandelier.type=LightType.Point; chandelier.range=17;
+                chandelier.color=new Color(1f,.88f,.70f); chandelier.intensity=2.35f;
+                chandelier.renderMode=LightRenderMode.ForcePixel;
+                chandelier.shadows=LightShadows.Soft; chandelier.shadowCustomResolution=512;
+                chandelier.shadowStrength=.24f; chandelier.shadowBias=.045f; chandelier.shadowNormalBias=.35f;
+                // Luz fria atravessando as claraboias: a origem coincide com o céu
+                // estrelado e contrasta com o calor do lustre e das molduras.
+                foreach(var center in new[]{new Vector3(-17,0,-5),new Vector3(-17,0,5),new Vector3(17,0,-5),new Vector3(17,0,5),new Vector3(0,0,17),new Vector3(0,0,-15)})
+                {
+                    string legacyName="Luz_sala_"+center.x+"_"+center.z;
+                    var old=architecture.transform.Find(legacyName); if(old!=null) DestroyImmediate(old.gameObject);
+                    string name="Luz_lunar_sala_"+center.x+"_"+center.z;
+                    old=architecture.transform.Find(name); if(old!=null) DestroyImmediate(old.gameObject);
+                    var fill=new GameObject(name).AddComponent<Light>();
+                    fill.transform.SetParent(architecture.transform,false);
+                    fill.transform.position=center+Vector3.up*6.52f; fill.transform.rotation=Quaternion.Euler(90,0,0);
+                    fill.type=LightType.Spot; fill.spotAngle=112; fill.range=13; fill.intensity=1.5f;
+                    fill.color=new Color(.64f,.77f,1f); fill.shadows=LightShadows.Soft;
+                    fill.shadowCustomResolution=512; fill.shadowStrength=.38f;fill.shadowBias=.035f;
+                    fill.renderMode=LightRenderMode.Auto;
+                }
+                var hallOld=architecture.transform.Find("Luz_lunar_Hall");
+                if(hallOld!=null) DestroyImmediate(hallOld.gameObject);
+                var hallMoon=new GameObject("Luz_lunar_Hall").AddComponent<Light>();
+                hallMoon.transform.SetParent(architecture.transform,false);
+                hallMoon.transform.localPosition=new Vector3(0,9.25f,0);hallMoon.transform.localRotation=Quaternion.Euler(90,0,0);
+                hallMoon.type=LightType.Spot;hallMoon.spotAngle=118;hallMoon.range=16;hallMoon.intensity=1.05f;
+                hallMoon.color=new Color(.52f,.67f,1f);hallMoon.shadows=LightShadows.Soft;
+                hallMoon.shadowCustomResolution=512;hallMoon.shadowStrength=.32f;hallMoon.shadowBias=.04f;
+                hallMoon.renderMode=LightRenderMode.Auto;
+            }
+            finally { DestroyImmediate(setup); }
+        }
+
         // ─── GUI ──────────────────────────────────────────────────────────────
 
         private void OnGUI()
@@ -203,6 +274,9 @@ namespace MuseumModerna
                 light.spotAngle = spotAngle;
                 light.shadows   = spotShadows ? LightShadows.Soft : LightShadows.None;
                 light.shadowStrength = 0.7f;
+                light.shadowCustomResolution = 512;
+                light.shadowBias = .025f;
+                light.renderMode = LightRenderMode.ForcePixel;
 
                 created++;
             }

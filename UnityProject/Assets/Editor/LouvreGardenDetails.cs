@@ -8,7 +8,7 @@ namespace MuseumModerna
 {
     /// <summary>
     /// Vasos torneados e folhagem original, opaca e imóvel para as galerias móveis.
-    /// Cinco malhas compartilhadas pelos oito vasos; sem texturas ou luzes adicionais.
+    /// Cinco malhas compartilhadas pelos vasos; sem texturas ou luzes adicionais.
     /// </summary>
     public static class LouvreGardenDetails
     {
@@ -66,20 +66,28 @@ namespace MuseumModerna
             var sage = LeafMaterial("LouvreGarden_Salvia", new Color(.245f, .335f, .165f));
             int trianglesPerVase = (stoneMesh.triangles.Length + metalMesh.triangles.Length + soilMesh.triangles.Length +
                 greenMesh.triangles.Length + sageMesh.triangles.Length) / 3;
-            if (trianglesPerVase * 8 > 7000)
-                throw new InvalidOperationException("A vegetação ultrapassou o orçamento de 7.000 triângulos.");
+            const int vaseCount = 11;
+            if (trianglesPerVase * vaseCount > 10000)
+                throw new InvalidOperationException("A vegetação ultrapassou o orçamento de 10.000 triângulos.");
 
             var positions = new[]
             {
                 new Vector3(-7.6f, 0, -7.6f), new Vector3(7.6f, 0, -7.6f),
                 new Vector3(-7.6f, 0, 7.6f), new Vector3(7.6f, 0, 7.6f),
                 new Vector3(-6.5f, 0, 11.2f), new Vector3(6.5f, 0, 11.2f),
-                new Vector3(21.7f, 0, -5.5f), new Vector3(-21.7f, 0, -5.5f)
+                new Vector3(-22.65f, 0, -8.65f),
+                // A sala Di Cavalcanti recebe um vaso em cada canto. As posições
+                // preservam o arco de entrada, as fichas e os cordões de segurança.
+                new Vector3(11.25f, 0, -8.35f), new Vector3(22.75f, 0, -8.35f),
+                new Vector3(11.25f, 0, -1.65f), new Vector3(22.75f, 0, -1.65f)
             };
             for (int i = 0; i < positions.Length; i++)
             {
                 var vase = Child(garden, "Vaso_galeria_" + (i + 1).ToString("00"));
+                if (i >= 7) vase.name = "Vaso_Di_Cavalcanti_" + (i - 6).ToString("00");
                 vase.SetPositionAndRotation(positions[i], Quaternion.Euler(0, i * 41, 0));
+                float heightVariation=.90f+(i%4)*.07f;
+                vase.localScale=new Vector3(.95f+(i%3)*.035f,heightVariation,.95f+(i%3)*.035f);
                 Render(vase, "Pedra_torneada", stoneMesh, stone);
                 Render(vase, "Filetes_de_bronze", metalMesh, gold);
                 Render(vase, "Terra", soilMesh, dark);
@@ -88,7 +96,7 @@ namespace MuseumModerna
                 ConfigureCollider(vase);
             }
             AssetDatabase.SaveAssets();
-            Debug.Log($"[LouvreStyle] Vegetação: 8 vasos, {trianglesPerVase * 8} triângulos, 2 materiais verdes opacos compartilhados, sem sombras em tempo real.");
+            Debug.Log($"[LouvreStyle] Vegetação: {positions.Length} vasos, {trianglesPerVase * positions.Length} triângulos, 2 materiais verdes opacos compartilhados, sem sombras em tempo real.");
         }
 
         public static void ConfigureCollider(Transform vase)

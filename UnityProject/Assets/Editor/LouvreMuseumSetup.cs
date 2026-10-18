@@ -14,7 +14,7 @@ namespace MuseumModerna
         const string AssetRoot = "Assets/MuseumStyle";
         const string RootName = "Museum_LouvreStyle";
         static Transform root;
-        static Material stone, plaster, gold, dark, velvet, glass, crystal;
+        static Material stone, plaster, gold, dark, velvet, glass, crystal, nightSky;
         static Material[] wood;
         static readonly Dictionary<string, Geometry> parts = new Dictionary<string, Geometry>();
         static readonly Dictionary<string, Material> partMaterials = new Dictionary<string, Material>();
@@ -29,11 +29,13 @@ namespace MuseumModerna
             root.gameObject.AddComponent<MuseumWorldText>();
             new GameObject("Planta_CincoSalas").transform.SetParent(root, false);
             parts.Clear(); partMaterials.Clear(); colliderIndex = 0;
+            MuseumAtmosphereUpgrade.PrepareMaterials();
             Material Load(string name) => AssetDatabase.LoadAssetAtPath<Material>(AssetRoot + "/Materials/" + name + ".mat");
             stone=Load("Calcario"); plaster=Load("Estuque"); gold=Load("Bronze_dourado");
             dark=Load("Verde_profundo"); velvet=Load("Veludo_vinho"); glass=Load("Claraboia_leitosa"); crystal=Load("Cristal_fosco");
             wood=Enumerable.Range(0,7).Select(i=>Load("Carvalho_"+i)).ToArray();
             if(stone==null || wood.Any(m=>m==null)) throw new InvalidOperationException("Materiais arquitetônicos ausentes.");
+            PrepareNightSky();
 
             zone="Tematico_Hall";
             Floor(Vector3.zero,20,20);
@@ -44,7 +46,7 @@ namespace MuseumModerna
                 Wall(new Vector3(-10,0,z),Quaternion.Euler(0,90,0),10,6.4f,true);
                 Wall(new Vector3(10,0,z),Quaternion.Euler(0,-90,0),10,6.4f,true);
             }
-            Dome(); Chandelier(new Vector3(0,5.5f,0));
+            Dome(); HallNightSky(); Chandelier(new Vector3(0,5.5f,0));
             Room("Tematico_Mario",new Vector3(-17,0,-5),14,10,5.2f,false,false,true,false);
             Room("Tematico_Oswald",new Vector3(-17,0,5),14,10,5.2f,false,false,true,false);
             Room("Tematico_Anita",new Vector3(17,0,5),14,10,5.2f,false,false,false,true);
@@ -149,7 +151,42 @@ namespace MuseumModerna
             Wall(c+new Vector3(0,0,-d/2),Quaternion.identity,w,h,s);
             Wall(c+new Vector3(w/2,0,0),Quaternion.Euler(0,-90,0),d,h,e);
             Wall(c+new Vector3(-w/2,0,0),Quaternion.Euler(0,90,0),d,h,west);
-            if(!central) Vault(c,w-.3f,d-.3f,4.88f,1.75f);
+            if(!central)
+            {
+                Vault(c,w-.3f,d-.3f,4.88f,1.75f);
+                NightSkylight(name,c,w,d);
+            }
+        }
+
+        static void PrepareNightSky()
+        {
+            EnsureFolder(AssetRoot + "/Materials");
+            // O material histórico tinha aparência leitosa, mas continuava em modo
+            // opaco e escondia qualquer conteúdo acima da claraboia.
+            glass.shader=Shader.Find("Standard");
+            glass.color=new Color(.16f,.23f,.34f,.07f);
+            glass.SetFloat("_Glossiness",.38f);
+            glass.SetFloat("_Mode",3);
+            glass.SetFloat("_SrcBlend",(float)BlendMode.SrcAlpha);
+            glass.SetFloat("_DstBlend",(float)BlendMode.OneMinusSrcAlpha);
+            glass.SetFloat("_ZWrite",0);
+            glass.DisableKeyword("_ALPHATEST_ON");glass.EnableKeyword("_ALPHABLEND_ON");
+            glass.DisableKeyword("_ALPHAPREMULTIPLY_ON");glass.renderQueue=(int)RenderQueue.Transparent;
+            glass.DisableKeyword("_EMISSION");glass.SetColor("_EmissionColor",Color.black);
+            glass.globalIlluminationFlags=MaterialGlobalIlluminationFlags.None;
+            EditorUtility.SetDirty(glass);
+            nightSky=MuseumAtmosphereUpgrade.NightSky();
+        }
+
+        static void NightSkylight(string name,Vector3 center,float width,float depth)
+        {
+            Box(center+Vector3.up*6.69f,new Vector3(Mathf.Min(width*.35f,4.5f),.035f,depth-.7f),nightSky);
+        }
+
+        static void HallNightSky()
+        {
+            zone="Tematico_Hall";
+            Box(new Vector3(0,9.56f,0),new Vector3(5.6f,.035f,5.6f),nightSky);
         }
         static void Wall(Vector3 origin,Quaternion rot,float width,float height,bool door)
         {
@@ -334,8 +371,10 @@ namespace MuseumModerna
                 var points=new List<Vector3>{turn*new Vector3(x+gap,.008f,z+gap),turn*new Vector3(x+gap,.008f,z+sz-gap),turn*new Vector3(x+sx-gap,.008f,z+sz-gap),turn*new Vector3(x+sx-gap,.008f,z+gap)};
                 for(int edge=0;edge<4&&points.Count>0;edge++) points=Clip(points,edge,edge<2?w/2-.20f:d/2-.20f);
                 if(points.Count<3)return;
-                var geom=G(wood[Mathf.Abs(i*31+j*17)%wood.Length]);
-                var uvs=points.Select(p=>{var q=Quaternion.Inverse(turn)*p;return vertical?new Vector2((q.z-z)/sz,(q.x-x)/sx):new Vector2((q.x-x)/sx,(q.z-z)/sz);}).ToArray();
+                uint seed=unchecked((uint)(i*73856093)^(uint)(j*19349663));seed^=seed>>13;seed*=1274126177u;
+                var geom=G(wood[seed%(uint)wood.Length]);
+                var offset=new Vector2((seed%113)/113f,((seed>>8)%127)/127f);
+                var uvs=points.Select(p=>{var q=Quaternion.Inverse(turn)*p;var uv=vertical?new Vector2((q.z-z)/sz,(q.x-x)/sx):new Vector2((q.x-x)/sx,(q.z-z)/sz);return Vector2.Scale(uv,new Vector2((seed&1)==0?1:-1,.72f))+offset;}).ToArray();
                 geom.Polygon(points.Select(p=>p+center).ToArray(),uvs);
             }
             for(int sign=-1;sign<=1;sign+=2)
@@ -435,7 +474,9 @@ namespace MuseumModerna
         {
             var existing=AssetDatabase.LoadAssetAtPath<T>(path);
             if(existing==null){AssetDatabase.CreateAsset(obj,path);return obj;}
-            EditorUtility.CopySerialized(obj,existing);UnityEngine.Object.DestroyImmediate(obj);EditorUtility.SetDirty(existing);return existing;
+            EditorUtility.CopySerialized(obj,existing);
+            if(existing is Mesh mesh)mesh.UploadMeshData(false);
+            UnityEngine.Object.DestroyImmediate(obj);EditorUtility.SetDirty(existing);return existing;
         }
         static void EnsureFolder(string path)
         {

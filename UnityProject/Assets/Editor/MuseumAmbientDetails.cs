@@ -60,9 +60,10 @@ namespace MuseumModerna
                 var group = Child(root, "Cordao_" + i);
                 group.SetPositionAndRotation(origin + front * .95f, Quaternion.LookRotation(front));
                 var posts = new List<float> { min };
-                // Vãos moderados, sem postes duplicados entre quadros vizinhos.
-                int spans = Mathf.CeilToInt((max - min) / 2.5f);
-                for (int j = 1; j <= spans; j++) posts.Add(Mathf.Lerp(min, max, j / (float)spans));
+                // Supports between artworks, never directly in front of a credit or face.
+                var orderedPositions=positions.OrderBy(p=>p).ToArray();
+                for(int j=1;j<orderedPositions.Length;j++)posts.Add((orderedPositions[j-1]+orderedPositions[j])*.5f);
+                posts.Add(max);
                 for (int j = 0; j < posts.Count; j++)
                 {
                     var support = Child(group, "Poste_cordao_" + j);
@@ -101,7 +102,9 @@ namespace MuseumModerna
                     (renderer.sharedMaterial.mainTexture != null || exhibit.PaintingData.paintingTexture != null))
                     composition.gameObject.SetActive(false);
             }
-            ArtworkTextureSetup.ApplyDisplayLightingToScene();
+            // A planta temática usa MuseumLightingSetup (Spotlight_ com sombras).
+            // Não reinstale o conjunto legado Focos_das_obras nesta passagem.
+            ArtworkTextureSetup.ApplyDisplayLightingToScene(configureLegacyPictureLights: false);
             // Afasta os vasos da entrada das bases dos novos cordões laterais.
             var environment = architecture.Find("Ambiente_Preenchido");
             // Cenas recentes podem ter apenas a arquitetura, sem as ilhas antigas.
@@ -185,7 +188,8 @@ namespace MuseumModerna
             string path = Folder+"Meshes/MuseumAmbient_"+name+".asset"; mesh.name = "MuseumAmbient_"+name;
             var previous = AssetDatabase.LoadAssetAtPath<Mesh>(path);
             if (previous == null) { AssetDatabase.CreateAsset(mesh,path); return mesh; }
-            EditorUtility.CopySerialized(mesh,previous); UnityEngine.Object.DestroyImmediate(mesh); EditorUtility.SetDirty(previous); return previous;
+            EditorUtility.CopySerialized(mesh,previous); previous.UploadMeshData(false);
+            UnityEngine.Object.DestroyImmediate(mesh); EditorUtility.SetDirty(previous); return previous;
         }
         private static Material Material(string name,string shader,Color color,float metal,float gloss)
         {

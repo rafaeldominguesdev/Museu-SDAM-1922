@@ -17,7 +17,7 @@ namespace MuseumModerna
                 entrance.SetParent(architecture, false);
             }
             // Um Transform vazio: não produz bloco visível nem colisão.
-            entrance.localPosition = new Vector3(0, 0, -13);
+            entrance.localPosition = Vector3.zero;
             entrance.localRotation = Quaternion.identity;
             var player = UnityEngine.Object.FindAnyObjectByType<PlayerController>();
             if (player == null) throw new InvalidOperationException("Visitante ausente.");

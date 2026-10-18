@@ -49,7 +49,8 @@ namespace MuseumModerna
                     geometry.CurvedBench(target);
                 else if (target.name.StartsWith("Soclo_circular_", StringComparison.Ordinal) ||
                          target.name.StartsWith("Poste_cordao_", StringComparison.Ordinal) ||
-                         target.name.StartsWith("Vaso_galeria_", StringComparison.Ordinal))
+                         target.name.StartsWith("Vaso_galeria_", StringComparison.Ordinal) ||
+                         target.name.StartsWith("Vaso_Di_Cavalcanti_", StringComparison.Ordinal))
                     geometry.Ellipse(target, bounds, .25f, .78f);
                 else
                     geometry.RoundedRectangle(target, bounds,
@@ -89,7 +90,8 @@ namespace MuseumModerna
                    name.StartsWith("Painel_curvo_", StringComparison.Ordinal) ||
                    name.StartsWith("Vitrine_ilha_", StringComparison.Ordinal) ||
                    name.StartsWith("Poste_cordao_", StringComparison.Ordinal) ||
-                   name.StartsWith("Vaso_galeria_", StringComparison.Ordinal);
+                   name.StartsWith("Vaso_galeria_", StringComparison.Ordinal) ||
+                   name.StartsWith("Vaso_Di_Cavalcanti_", StringComparison.Ordinal);
         }
 
         private static string RoomAt(Vector3 position)

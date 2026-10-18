@@ -32,7 +32,7 @@ namespace MuseumModerna
             if (!EditorSceneManager.SaveScene(scene)) throw new InvalidOperationException("Falha ao salvar iluminação das obras.");
         }
 
-        public static void ApplyDisplayLightingToScene()
+        public static void ApplyDisplayLightingToScene(bool configureLegacyPictureLights = true)
         {
             var exhibits = UnityEngine.Object.FindObjectsByType<PaintingExhibit>(FindObjectsSortMode.None)
                 .Where(e => e.PaintingData != null).ToDictionary(e => e.PaintingData.uniqueId);
@@ -51,8 +51,9 @@ namespace MuseumModerna
                 EditorUtility.SetDirty(exhibit);
                 count++;
             }
-            MuseumVisitRepair.ConfigurePictureLights();
-            Debug.Log("[ArtworkLighting] " + count + " pinturas com material neutro e focos direcionados nas luminárias.");
+            if (configureLegacyPictureLights) MuseumVisitRepair.ConfigurePictureLights();
+            Debug.Log("[ArtworkLighting] " + count + " pinturas com material neutro" +
+                (configureLegacyPictureLights ? " e focos direcionados nas luminárias." : "."));
         }
 
         public static Entry[] Read()
