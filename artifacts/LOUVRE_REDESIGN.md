@@ -1,4 +1,4 @@
-# Redesign do museu — 9 de setembro de 2026
+# Redesign do museu — atualizado em 11 de setembro de 2026
 
 O ambiente foi redesenhado como uma galeria palaciana clara, preservando o percurso
 e as 28 fichas sobre a Semana de Arte Moderna de 1922. A referência foi a arquitetura
@@ -14,10 +14,13 @@ com detalhes dourados inspirados na
 | Passagens retangulares | Quatro portais em arco com colunas e inscrições |
 | Piso escuro uniforme | Parquet em espinha, bordas de madeira e medalhão central |
 | Luminárias simples | Lustre em dois níveis e claraboias nas galerias |
-| Molduras em barras | 24 molduras douradas com perfis, filetes e cantos suaves |
+| Molduras em barras | 24 telas de 2,38 × 1,87 m com molduras entalhadas, palmetas, volutas e pérolas |
 | Volumes geométricos nas esculturas | Três bronzes orgânicos originais sobre pedestais circulares |
 | Bancos retos concentrados no centro | Quatro bancos curvos, com estofado vinho e pés torneados |
 | Ficha VR retangular | Cantos suaves e contorno bronze, mantendo os controles pelo olhar |
+
+A ampliação e o acabamento das pinturas estão detalhados em [Pinturas e molduras de gala](PAINTING_UPGRADE.md).
+O preenchimento com painéis, vitrines, bancos, vegetação e sombras está em [Ilhas de exposição](ENVIRONMENT_UPGRADE.md).
 
 ## Capturas da cena real
 
@@ -35,13 +38,16 @@ O aplicativo usa MSAA 2x. As capturas não medem qualidade ou desempenho no viso
 
 ## Validação
 
-- APK atualizado gerado em 9 de setembro; pacote e assinatura v2 verificados em 10 de setembro.
-- Regressão 2D aprovada: 28 fichas, 12 cenários de estado, acessibilidade e integração.
+- APK atualizado gerado e verificado em 11 de setembro, incluindo as pinturas ampliadas, molduras e ilhas de exposição.
+- Regressão 2D aprovada na etapa anterior: 28 fichas, 12 cenários de estado, acessibilidade e integração.
+- Ampliação validada: 96 raycasts nos cantos das 24 telas e 20 pares de molduras sem sobreposição.
+- Controles de VR validados novamente após a ampliação: dwell, leitura, páginas, fixação, menu e saída.
 - 28 fichas e respectivos raycasts preservados.
 - Testes adicionais atingiram superfícies reais na parte superior das três esculturas.
 - Quatro passagens verificadas com margem corporal de 25 cm; seis pontos com piso sólido.
 - Uma única câmera ativa; controles de VR aprovados em Play Mode.
-- Geometria agrupada por material e ambiente, com cerca de 163 mil triângulos na cena ativa.
+- Oito novas superfícies interativas e dez trechos de circulação aprovados na cena preenchida.
+- Geometria agrupada por material e ambiente, com 347.092 triângulos na cena ativa.
   A medição considera os trechos de cada renderer nos meshes compartilhados por static batching.
 - Seis luzes ativas; nenhuma gera sombras em tempo real. Luz ambiente e reflexos não dependem
   dos probes da arquitetura antiga. FPS, aquecimento e conforto precisam de medição no celular.
@@ -50,14 +56,16 @@ O aplicativo usa MSAA 2x. As capturas não medem qualidade ou desempenho no viso
 
 ### APK atualizado
 
-[Instalador Android](MuseumVR_Build/MuseudaSemanaArteModerna.apk): 33.578.493 bytes
-(33,6 MB), ARM64, Android 8 ou superior. Biblioteca nativa Cardboard, código de
+[Instalador Android](MuseumVR_Build/MuseudaSemanaArteModerna.apk): 36.390.476 bytes
+(36,4 MB), ARM64, Android 8 ou superior. Biblioteca nativa Cardboard, código de
 iluminação novo e objetos da cena redesenhada confirmados dentro do pacote.
 
-SHA-256: `2da555e7923e996cbfb92f3a573fbdd78d91e71c1d147b90e4d0732e871cd677`.
+SHA-256: `fc4366c73830821a461c8e87976c1377fdb31f3538b2083a3d7ab477887bea45`.
 [Registro da verificação do APK](louvre-apk-verification.json).
 
-O pacote anterior foi preservado em `before-louvre/MuseuVR-before-louvre.apk`.
+O pacote anterior à ampliação foi preservado em
+`before-painting-upgrade/MuseuVR-before-painting-upgrade.apk`. A versão anterior à arquitetura
+permanece em `before-louvre/MuseuVR-before-louvre.apk`.
 
 Durante a revisão foram corrigidos: teto antigo recriado no início, molduras antigas
 reconstruídas por OnValidate, frestas nas extremidades das abóbadas, luz ambiente antiga,
@@ -70,6 +78,8 @@ são criações didáticas do projeto; não foram atribuídas como originais de 
 ## Manutenção
 
 - Aplicar arquitetura: **Museum > Visual > Aplicar galerias inspiradas no Louvre**.
+- Destacar pinturas: **Museum > Visual > Destacar pinturas e aplicar molduras de gala**.
+- Preencher as salas: **Museum > Visual > Preencher ambiente com ilhas de exposição**.
 - Gerar APK: **Museum > VR Box > Gerar APK Android**.
 - Testar a cena: `MuseumModerna.LouvreValidation.Run` em Unity batch mode, sem `-quit`.
 - Fontes de geração: `LouvreMuseumSetup.cs` e `LouvreExhibitionDetails.cs` em `Assets/Editor`.

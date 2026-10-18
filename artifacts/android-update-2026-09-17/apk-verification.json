@@ -1,0 +1,17 @@
+{
+  "apk": "/Users/rafaeldomingues/SemanaArteModerna/artifacts/android-update-2026-09-17/Museu-VR-1.1.0-17-09-2026.apk",
+  "desktop": "/Users/rafaeldomingues/Desktop/Museu-VR-1.1.0-17-09-2026.apk",
+  "sizeBytes": 94842022,
+  "sha256": "c7fe0295a4bb4723cdf31baf5e08905fad0c96c82292ccaa57d53d658115a3fb",
+  "zipIntegrity": true,
+  "signatureV2": true,
+  "sameSignerAsPrevious": true,
+  "packageId": "com.SemanaArteModerna.MuseudaSemanaArteModerna",
+  "versionCode": 2,
+  "versionName": "1.1.0",
+  "minSdk": 26,
+  "targetSdk": 35,
+  "arm64Cardboard": true,
+  "desktopCopyMatches": true,
+  "previousApkPreserved": true
+}

@@ -1,11 +1,17 @@
 {
-  "verified_on": "2026-09-10",
-  "apk_size_bytes": 33578493,
-  "sha256": "2da555e7923e996cbfb92f3a573fbdd78d91e71c1d147b90e4d0732e871cd677",
+  "verified_on": "2026-09-11",
+  "apk_size_bytes": 36390476,
+  "sha256": "fc4366c73830821a461c8e87976c1377fdb31f3538b2083a3d7ab477887bea45",
   "scene_markers": {
     "Museum_LouvreStyle": true,
     "Louvre_GazeProxy": true,
-    "Expografia_Curva": true
+    "Expografia_Curva": true,
+    "Folhas_volutas_e_perolas": true,
+    "Ambiente_Preenchido": true,
+    "Painel_curvo_01": true,
+    "Vitrine_ilha_Salao_01": true,
+    "Vaso_galeria_01": true,
+    "Sombras_de_contato": true
   },
   "louvre_runtime_in_metadata": true,
   "cardboard_native_library": true,
@@ -14,5 +20,14 @@
   "min_sdk": 26,
   "target_sdk": 35,
   "architecture": "arm64-v8a",
-  "runtime_source_newer_than_apk": []
+  "runtime_source_newer_than_apk": [],
+  "built_on": "2026-09-11",
+  "painting_upgrade_included": true,
+  "physical_device_tested": false,
+  "runtime_classes": {
+    "LouvreGalleryLighting": true,
+    "ExhibitGuideReference": true,
+    "MuseumWorldText": true
+  },
+  "environment_upgrade_included": true
 }

@@ -1,0 +1,70 @@
+{
+  "items": [
+    {
+      "exhibitId": "homem_amarelo",
+      "filepath": "/Users/rafaeldomingues/SemanaArteModerna/artifacts/artwork-sources/anita/homem_amarelo.jpg",
+      "title": "O homem amarelo",
+      "artist": "Anita Malfatti",
+      "year": 1916,
+      "periodo": "1915/1916",
+      "tecnica": "Óleo sobre tela",
+      "description": "Retrato de um homem de paletó e gravata, construído com contornos marcados e cores expressivas. Pintura da fase de formação modernista de Anita Malfatti.",
+      "sourcePage": "https://teses.usp.br/teses/disponiveis/43/43134/tde-06112015-143351/pt-br.php",
+      "imageUrl": "https://teses.usp.br/teses/disponiveis/43/43134/tde-06112015-143351/publico/TesePCampos.pdf#page=78",
+      "credit": "IEB-USP · Foto: Campos e Kajiya",
+      "width": 1261,
+      "height": 1504,
+      "notes": "Fotografia em luz visível; figura 3.2, página impressa 57 (página 78 do PDF). Arquivo JPEG extraído diretamente, sem redimensionamento ou alteração de cor. Fonte disponibilizada para pesquisa e ensino; não constitui declaração de licença comercial da pintura.",
+      "verificationSources": [
+        "https://anitamalfatti.ieb.usp.br/1931-xxxviii-egba/",
+        "https://jornal.usp.br/universidade/como-a-ciencia-pode-desvendar-os-bastidores-das-obras-de-arte/"
+      ],
+      "sha256": "ffbb3459fd94e2e9ae191581929a90d7ef542445f770b9ad7097a7db03d9a0e8",
+      "creditFull": "Anita Malfatti. Coleção de Artes Visuais, Instituto de Estudos Brasileiros da USP. Fotografia: P. H. O. V. Campos e E. Kajiya. Fonte: tese de Pedro Herzilio Ottoni Viviani de Campos, USP, 2015."
+    },
+    {
+      "exhibitId": "estudante_russa",
+      "filepath": "/Users/rafaeldomingues/SemanaArteModerna/artifacts/artwork-sources/anita/estudante_russa.jpg",
+      "title": "A estudante russa",
+      "artist": "Anita Malfatti",
+      "year": 1915,
+      "periodo": "c. 1915",
+      "tecnica": "Óleo sobre tela",
+      "description": "Retrato de uma mulher sentada em cadeira vermelha, com uma mão apoiada sobre o colo. Os contornos e as áreas de cor aproximam a pintura das experiências modernistas de Anita Malfatti.",
+      "sourcePage": "https://teses.usp.br/teses/disponiveis/43/43134/tde-06112015-143351/pt-br.php",
+      "imageUrl": "https://teses.usp.br/teses/disponiveis/43/43134/tde-06112015-143351/publico/TesePCampos.pdf#page=80",
+      "credit": "IEB-USP · Foto: Campos e Kajiya",
+      "width": 1339,
+      "height": 1667,
+      "notes": "Fotografia em luz visível; figura 3.3, página impressa 59 (página 80 do PDF). Arquivo JPEG extraído diretamente, sem redimensionamento ou alteração de cor. A obra pertence ao IEB-USP; a indicação MAM no material anterior estava incorreta. Preferida à reprodução mais saturada de 1772×2155 da Revista USP pela fotografia técnica creditada e pelo detalhe da tela. Fonte disponibilizada para pesquisa e ensino; não constitui declaração de licença comercial da pintura.",
+      "verificationSources": [
+        "https://anitamalfatti.ieb.usp.br/1931-xxxviii-egba/",
+        "https://jornal.usp.br/universidade/como-a-ciencia-pode-desvendar-os-bastidores-das-obras-de-arte/"
+      ],
+      "sha256": "2ffcc207254db5906a19fa7f3f1ace2c0a487ef1e428aaf74c9e33c10f11205c",
+      "creditFull": "Anita Malfatti. Coleção de Artes Visuais, Instituto de Estudos Brasileiros da USP. Fotografia: P. H. O. V. Campos e E. Kajiya. Fonte: tese de Pedro Herzilio Ottoni Viviani de Campos, USP, 2015."
+    },
+    {
+      "exhibitId": "tropical",
+      "filepath": "/Users/rafaeldomingues/SemanaArteModerna/artifacts/artwork-sources/anita/tropical.png",
+      "title": "Tropical",
+      "artist": "Anita Malfatti",
+      "year": 1917,
+      "periodo": "1917",
+      "tecnica": "Óleo sobre tela",
+      "description": "Uma mulher aparece diante de vegetação tropical, com um cesto de frutas em primeiro plano. A obra articula a figura humana e elementos da paisagem brasileira.",
+      "sourcePage": "https://teses.usp.br/teses/disponiveis/43/43134/tde-06112015-143351/pt-br.php",
+      "imageUrl": "https://teses.usp.br/teses/disponiveis/43/43134/tde-06112015-143351/publico/TesePCampos.pdf#page=76",
+      "credit": "Pinacoteca · Foto: Campos e Kajiya",
+      "width": 1546,
+      "height": 1154,
+      "notes": "Fotografia em luz visível; figura 3.1, página impressa 55 (página 76 do PDF). O JPEG embutido mede 1154×1546 e está deitado: aplicada somente rotação exata de 90 graus no sentido horário para reproduzir a orientação da obra, com saída PNG sem perdas. Sem recorte, upscale ou alteração de cor. Fonte disponibilizada para pesquisa e ensino; não constitui declaração de licença comercial da pintura.",
+      "verificationSources": [
+        "https://pinacoteca.org.br/qrcode/p2-s19-9-b/",
+        "https://jornal.usp.br/universidade/como-a-ciencia-pode-desvendar-os-bastidores-das-obras-de-arte/"
+      ],
+      "sha256": "226ff83b902545c19dbf4bdf7085179d65b5b3ddaa17fa326c4f6edd6a097157",
+      "creditFull": "Anita Malfatti. Pinacoteca do Estado de São Paulo. Fotografia: P. H. O. V. Campos e E. Kajiya. Fonte: tese de Pedro Herzilio Ottoni Viviani de Campos, USP, 2015."
+    }
+  ]
+}

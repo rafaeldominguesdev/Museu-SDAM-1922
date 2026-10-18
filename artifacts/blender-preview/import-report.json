@@ -1,0 +1,13 @@
+{
+  "source": "/Users/rafaeldomingues/SemanaArteModerna/artifacts/blender-preview/museum-export.json",
+  "output": "/Users/rafaeldomingues/SemanaArteModerna/artifacts/blender-preview/Museu_Com_Obras.blend",
+  "blender": "5.1.2",
+  "meshes": 337,
+  "triangles": 336822,
+  "texts": 99,
+  "sourceMaterials": 36,
+  "packedImages": 10,
+  "sourceLights": 6,
+  "previewLights": 5,
+  "warnings": []
+}

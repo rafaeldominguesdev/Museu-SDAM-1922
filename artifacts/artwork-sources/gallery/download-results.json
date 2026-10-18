@@ -1,0 +1,52 @@
+[
+  {
+    "id": "di_cavalcanti_pierrot",
+    "imageUrl": "https://assets.masp.org.br/uploads/temp/WEB_JB_C_01217_01.jpg",
+    "size": [
+      4058,
+      5816
+    ],
+    "mode": "RGB",
+    "bytes": 1492485
+  },
+  {
+    "id": "vicente_rego_monteiro",
+    "imageUrl": "https://assets.masp.org.br/uploads/temp/WEB_JM_MASP_00646_01.jpg",
+    "size": [
+      3320,
+      4280
+    ],
+    "mode": "CMYK",
+    "bytes": 4854521
+  },
+  {
+    "id": "john_graz",
+    "imageUrl": "https://assets.masp.org.br/uploads/temp/WEB_JM_MASP_01128_01.jpg",
+    "size": [
+      4516,
+      3498
+    ],
+    "mode": "RGB",
+    "bytes": 4927177
+  },
+  {
+    "id": "zina_aita",
+    "imageUrl": "https://lh3.googleusercontent.com/ci/AL18g_Qs_fVW3Fnm3qQtzWv_R38DZ4ajEcZ2xuLiFKbxOJtR95wbRxo8-sL3RmG9IliZHuXWX-TSCSE=s2400",
+    "size": [
+      1200,
+      855
+    ],
+    "mode": "RGB",
+    "bytes": 647327
+  },
+  {
+    "id": "lasar_segall",
+    "imageUrl": "https://lh3.googleusercontent.com/ci/AL18g_TLYfUkBZ4j6ILa3q9Q-VINDx-FqjcjTGa-ZmxHbpTxlaDFOYpEG0qwm-xt4hVagp0qSOuGhg=s2400",
+    "size": [
+      1200,
+      892
+    ],
+    "mode": "RGB",
+    "bytes": 111627
+  }
+]

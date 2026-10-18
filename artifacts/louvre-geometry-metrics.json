@@ -1,16 +1,252 @@
 {
     "activeCameras": 1,
-    "activeRenderers": 319,
-    "renderedMeshInstances": 239,
-    "renderedTriangles": 162828,
-    "sharedMeshVertices": 222268,
-    "uniqueMeshes": 11,
-    "uniqueMaterials": 22,
+    "activeRenderers": 436,
+    "renderedMeshInstances": 337,
+    "renderedTriangles": 336822,
+    "sharedMeshVertices": 377121,
+    "uniqueMeshes": 31,
+    "uniqueMaterials": 37,
     "activeLights": 6,
     "shadowCastingLights": 0,
-    "colliders": 364,
+    "colliders": 394,
     "exhibitRaycastsPassed": 28,
     "doorwaysPassed": 4,
+    "enlargedPaintingsPassed": 24,
+    "paintingCornerRaycastsPassed": 96,
+    "paintingNeighbourPairsChecked": 20,
+    "smallestPaintingNeighbourGap": 0.5159950256347656,
+    "atmosphere": {
+        "curvedPanels": 2,
+        "islandCases": 4,
+        "planters": 8,
+        "contactShadows": 4,
+        "solidColliders": 30,
+        "addedBenches": 2,
+        "displayRaycasts": [
+            {
+                "display": "Estudo_dupla_face_homem_amarelo",
+                "exhibitId": "homem_amarelo",
+                "collider": "Estudo_dupla_face_homem_amarelo",
+                "hitPoint": {
+                    "x": -3.359254837036133,
+                    "y": 1.559999942779541,
+                    "z": 16.878772735595704
+                }
+            },
+            {
+                "display": "Estudo_dupla_face_estudante_russa",
+                "exhibitId": "estudante_russa",
+                "collider": "Estudo_dupla_face_estudante_russa",
+                "hitPoint": {
+                    "x": -3.2615363597869875,
+                    "y": 1.559999942779541,
+                    "z": 16.419042587280275
+                }
+            },
+            {
+                "display": "Estudo_dupla_face_di_cavalcanti_pierrot",
+                "exhibitId": "di_cavalcanti_pierrot",
+                "collider": "Estudo_dupla_face_di_cavalcanti_pierrot",
+                "hitPoint": {
+                    "x": 3.359254837036133,
+                    "y": 1.559999942779541,
+                    "z": 16.878772735595704
+                }
+            },
+            {
+                "display": "Estudo_dupla_face_tropical",
+                "exhibitId": "tropical",
+                "collider": "Estudo_dupla_face_tropical",
+                "hitPoint": {
+                    "x": 3.2615363597869875,
+                    "y": 1.559999942779541,
+                    "z": 16.419042587280275
+                }
+            },
+            {
+                "display": "Vitrine_ilha_Salao_01",
+                "exhibitId": "vitrine_documentos",
+                "collider": "Vitrine_ilha_Salao_01",
+                "hitPoint": {
+                    "x": -5.0,
+                    "y": 1.25,
+                    "z": 1.6000001430511475
+                }
+            },
+            {
+                "display": "Vitrine_ilha_Salao_02",
+                "exhibitId": "vitrine_documentos",
+                "collider": "Vitrine_ilha_Salao_02",
+                "hitPoint": {
+                    "x": 5.0,
+                    "y": 1.25,
+                    "z": -1.6000005006790162
+                }
+            },
+            {
+                "display": "Vitrine_ilha_Literatura_01",
+                "exhibitId": "vitrine_documentos",
+                "collider": "Vitrine_ilha_Literatura_01",
+                "hitPoint": {
+                    "x": -18.799999237060548,
+                    "y": 1.2500001192092896,
+                    "z": -3.3999998569488527
+                }
+            },
+            {
+                "display": "Vitrine_ilha_Literatura_02",
+                "exhibitId": "vitrine_documentos",
+                "collider": "Vitrine_ilha_Literatura_02",
+                "hitPoint": {
+                    "x": -20.5,
+                    "y": 1.2500001192092896,
+                    "z": 3.799999952316284
+                }
+            }
+        ]
+    },
+    "circulation": [
+        {
+            "route": "painting",
+            "from": {
+                "x": 0.0,
+                "y": 0.550000011920929,
+                "z": 11.399999618530274
+            },
+            "to": {
+                "x": 0.0,
+                "y": 0.550000011920929,
+                "z": 22.0
+            },
+            "clearanceRadius": 0.30000001192092898
+        },
+        {
+            "route": "sculpture",
+            "from": {
+                "x": 11.399999618530274,
+                "y": 0.550000011920929,
+                "z": 0.0
+            },
+            "to": {
+                "x": 11.399999618530274,
+                "y": 0.550000011920929,
+                "z": -2.0
+            },
+            "clearanceRadius": 0.30000001192092898
+        },
+        {
+            "route": "sculpture",
+            "from": {
+                "x": 11.399999618530274,
+                "y": 0.550000011920929,
+                "z": -2.0
+            },
+            "to": {
+                "x": 21.0,
+                "y": 0.550000011920929,
+                "z": -2.0
+            },
+            "clearanceRadius": 0.30000001192092898
+        },
+        {
+            "route": "sculpture",
+            "from": {
+                "x": 21.0,
+                "y": 0.550000011920929,
+                "z": -2.0
+            },
+            "to": {
+                "x": 21.0,
+                "y": 0.550000011920929,
+                "z": 0.0
+            },
+            "clearanceRadius": 0.30000001192092898
+        },
+        {
+            "route": "literature",
+            "from": {
+                "x": -11.399999618530274,
+                "y": 0.550000011920929,
+                "z": 0.0
+            },
+            "to": {
+                "x": -22.0,
+                "y": 0.550000011920929,
+                "z": 0.0
+            },
+            "clearanceRadius": 0.30000001192092898
+        },
+        {
+            "route": "painting",
+            "from": {
+                "x": 0.0,
+                "y": 1.7000000476837159,
+                "z": 11.399999618530274
+            },
+            "to": {
+                "x": 0.0,
+                "y": 1.7000000476837159,
+                "z": 22.0
+            },
+            "clearanceRadius": 0.30000001192092898
+        },
+        {
+            "route": "sculpture",
+            "from": {
+                "x": 11.399999618530274,
+                "y": 1.7000000476837159,
+                "z": 0.0
+            },
+            "to": {
+                "x": 11.399999618530274,
+                "y": 1.7000000476837159,
+                "z": -2.0
+            },
+            "clearanceRadius": 0.30000001192092898
+        },
+        {
+            "route": "sculpture",
+            "from": {
+                "x": 11.399999618530274,
+                "y": 1.7000000476837159,
+                "z": -2.0
+            },
+            "to": {
+                "x": 21.0,
+                "y": 1.7000000476837159,
+                "z": -2.0
+            },
+            "clearanceRadius": 0.30000001192092898
+        },
+        {
+            "route": "sculpture",
+            "from": {
+                "x": 21.0,
+                "y": 1.7000000476837159,
+                "z": -2.0
+            },
+            "to": {
+                "x": 21.0,
+                "y": 1.7000000476837159,
+                "z": 0.0
+            },
+            "clearanceRadius": 0.30000001192092898
+        },
+        {
+            "route": "literature",
+            "from": {
+                "x": -11.399999618530274,
+                "y": 1.7000000476837159,
+                "z": 0.0
+            },
+            "to": {
+                "x": -22.0,
+                "y": 1.7000000476837159,
+                "z": 0.0
+            },
+            "clearanceRadius": 0.30000001192092898
+        }
+    ],
     "captureSettings": "Mono Editor camera renders at 1600 x 1000, 62-degree vertical FOV and 4x MSAA; these settings are for visual inspection, not a mobile performance measurement.",
     "sculptureTopHits": [
         {
@@ -26,7 +262,22 @@
                 "y": 1.100000023841858,
                 "z": -0.09209663420915604
             },
-            "rayDistance": 2.4999992847442629
+            "rayDistance": 2.4999985694885256
+        },
+        {
+            "exhibitId": "escultura_cenografica_1",
+            "collider": "Louvre_GazeProxy",
+            "localSurfaceAim": {
+                "x": -0.25502464175224306,
+                "y": 1.100000023841858,
+                "z": -0.010879285633563996
+            },
+            "localPhysicsHit": {
+                "x": -0.2550239562988281,
+                "y": 1.100000023841858,
+                "z": -0.010879755020141602
+            },
+            "rayDistance": 2.5000007152557375
         },
         {
             "exhibitId": "escultura_cenografica_3",
@@ -39,24 +290,443 @@
             "localPhysicsHit": {
                 "x": 0.12778854370117188,
                 "y": 1.100000023841858,
-                "z": -0.10827350616455078
+                "z": -0.10827302932739258
             },
             "rayDistance": 2.5
+        }
+    ],
+    "enlargedPaintings": [
+        {
+            "exhibitId": "lasar_segall",
+            "canvasWidth": 2.380000114440918,
+            "canvasHeight": 1.8700000047683716,
+            "centerHeight": 2.549999952316284,
+            "cornerRaycastsPassed": 4,
+            "frameMaterials": 3,
+            "frameBoundsCenter": {
+                "x": 7.706999778747559,
+                "y": 2.4710001945495607,
+                "z": 13.0
+            },
+            "frameBoundsSize": {
+                "x": 0.28800010681152346,
+                "y": 2.9519996643066408,
+                "z": 2.884002685546875
+            }
         },
         {
-            "exhibitId": "escultura_cenografica_1",
-            "collider": "Louvre_GazeProxy",
-            "localSurfaceAim": {
-                "x": -0.25502464175224306,
-                "y": 1.100000023841858,
-                "z": -0.010879285633563996
+            "exhibitId": "semana_1922",
+            "canvasWidth": 2.380000114440918,
+            "canvasHeight": 1.8700000047683716,
+            "centerHeight": 2.549999952316284,
+            "cornerRaycastsPassed": 4,
+            "frameMaterials": 3,
+            "frameBoundsCenter": {
+                "x": 4.706999778747559,
+                "y": 2.4710001945495607,
+                "z": -12.999999046325684
             },
-            "localPhysicsHit": {
-                "x": -0.25502490997314455,
-                "y": 1.100000023841858,
-                "z": -0.010879278182983399
+            "frameBoundsSize": {
+                "x": 0.28800010681152346,
+                "y": 2.9519996643066408,
+                "z": 2.884000778198242
+            }
+        },
+        {
+            "exhibitId": "ferrignac",
+            "canvasWidth": 2.380000114440918,
+            "canvasHeight": 1.8700000047683716,
+            "centerHeight": 2.549999952316284,
+            "cornerRaycastsPassed": 4,
+            "frameMaterials": 3,
+            "frameBoundsCenter": {
+                "x": -7.652000427246094,
+                "y": 2.4710001945495607,
+                "z": 21.39999771118164
             },
-            "rayDistance": 2.500000238418579
+            "frameBoundsSize": {
+                "x": 0.28800010681152346,
+                "y": 2.9519996643066408,
+                "z": 2.884002685546875
+            }
+        },
+        {
+            "exhibitId": "john_graz",
+            "canvasWidth": 2.380000114440918,
+            "canvasHeight": 1.8700000047683716,
+            "centerHeight": 2.549999952316284,
+            "cornerRaycastsPassed": 4,
+            "frameMaterials": 3,
+            "frameBoundsCenter": {
+                "x": -7.706999778747559,
+                "y": 2.4710001945495607,
+                "z": 13.0
+            },
+            "frameBoundsSize": {
+                "x": 0.28800010681152346,
+                "y": 2.9519996643066408,
+                "z": 2.884002685546875
+            }
+        },
+        {
+            "exhibitId": "organizadores",
+            "canvasWidth": 2.380000114440918,
+            "canvasHeight": 1.8700000047683716,
+            "centerHeight": 2.549999952316284,
+            "cornerRaycastsPassed": 4,
+            "frameMaterials": 3,
+            "frameBoundsCenter": {
+                "x": 4.706999778747559,
+                "y": 2.4710001945495607,
+                "z": -17.0
+            },
+            "frameBoundsSize": {
+                "x": 0.28800010681152346,
+                "y": 2.9519996643066408,
+                "z": 2.884002685546875
+            }
+        },
+        {
+            "exhibitId": "homem_amarelo",
+            "canvasWidth": 2.380000114440918,
+            "canvasHeight": 1.8700000047683716,
+            "centerHeight": 2.549999952316284,
+            "cornerRaycastsPassed": 4,
+            "frameMaterials": 3,
+            "frameBoundsCenter": {
+                "x": -5.0,
+                "y": 2.4710001945495607,
+                "z": 23.706998825073243
+            },
+            "frameBoundsSize": {
+                "x": 2.884000778198242,
+                "y": 2.9519996643066408,
+                "z": 0.2879981994628906
+            }
+        },
+        {
+            "exhibitId": "mario_pauliceia",
+            "canvasWidth": 2.380000114440918,
+            "canvasHeight": 1.8700000047683716,
+            "centerHeight": 2.549999952316284,
+            "cornerRaycastsPassed": 4,
+            "frameMaterials": 3,
+            "frameBoundsCenter": {
+                "x": -23.707000732421876,
+                "y": 2.4710001945495607,
+                "z": 0.0
+            },
+            "frameBoundsSize": {
+                "x": 0.28800201416015627,
+                "y": 2.9519996643066408,
+                "z": 2.8840012550354006
+            }
+        },
+        {
+            "exhibitId": "tropical",
+            "canvasWidth": 2.380000114440918,
+            "canvasHeight": 1.8700000047683716,
+            "centerHeight": 2.549999952316284,
+            "cornerRaycastsPassed": 4,
+            "frameMaterials": 3,
+            "frameBoundsCenter": {
+                "x": 2.0,
+                "y": 2.4710001945495607,
+                "z": 23.707000732421876
+            },
+            "frameBoundsSize": {
+                "x": 2.884000301361084,
+                "y": 2.9519996643066408,
+                "z": 0.28800201416015627
+            }
+        },
+        {
+            "exhibitId": "ronald_carvalho",
+            "canvasWidth": 2.380000114440918,
+            "canvasHeight": 1.8700000047683716,
+            "centerHeight": 2.549999952316284,
+            "cornerRaycastsPassed": 4,
+            "frameMaterials": 3,
+            "frameBoundsCenter": {
+                "x": -20.0,
+                "y": 2.4710001945495607,
+                "z": 7.706999778747559
+            },
+            "frameBoundsSize": {
+                "x": 2.884002685546875,
+                "y": 2.9519996643066408,
+                "z": 0.28800010681152346
+            }
+        },
+        {
+            "exhibitId": "manifesto_pau_brasil",
+            "canvasWidth": 2.380000114440918,
+            "canvasHeight": 1.8700000047683716,
+            "centerHeight": 2.549999952316284,
+            "cornerRaycastsPassed": 4,
+            "frameMaterials": 3,
+            "frameBoundsCenter": {
+                "x": 7.0,
+                "y": 2.4710001945495607,
+                "z": -9.707000732421875
+            },
+            "frameBoundsSize": {
+                "x": 2.884000778198242,
+                "y": 2.9519996643066408,
+                "z": 0.2879981994628906
+            }
+        },
+        {
+            "exhibitId": "brecheret_eva",
+            "canvasWidth": 2.380000114440918,
+            "canvasHeight": 1.8700000047683716,
+            "centerHeight": 2.549999952316284,
+            "cornerRaycastsPassed": 4,
+            "frameMaterials": 3,
+            "frameBoundsCenter": {
+                "x": 23.707000732421876,
+                "y": 2.4710001945495607,
+                "z": -1.0
+            },
+            "frameBoundsSize": {
+                "x": 0.28800201416015627,
+                "y": 2.9519996643066408,
+                "z": 2.8840012550354006
+            }
+        },
+        {
+            "exhibitId": "brecheret_moema",
+            "canvasWidth": 2.380000114440918,
+            "canvasHeight": 1.8700000047683716,
+            "centerHeight": 2.549999952316284,
+            "cornerRaycastsPassed": 4,
+            "frameMaterials": 3,
+            "frameBoundsCenter": {
+                "x": 20.0,
+                "y": 2.4710001945495607,
+                "z": -7.706999778747559
+            },
+            "frameBoundsSize": {
+                "x": 2.8839950561523439,
+                "y": 2.9519996643066408,
+                "z": 0.28800010681152346
+            }
+        },
+        {
+            "exhibitId": "teatro_municipal",
+            "canvasWidth": 2.380000114440918,
+            "canvasHeight": 1.8700000047683716,
+            "centerHeight": 2.549999952316284,
+            "cornerRaycastsPassed": 4,
+            "frameMaterials": 3,
+            "frameBoundsCenter": {
+                "x": -7.0,
+                "y": 2.4710001945495607,
+                "z": -9.707000732421875
+            },
+            "frameBoundsSize": {
+                "x": 2.884000778198242,
+                "y": 2.9519996643066408,
+                "z": 0.2879981994628906
+            }
+        },
+        {
+            "exhibitId": "zina_aita",
+            "canvasWidth": 2.380000114440918,
+            "canvasHeight": 1.8700000047683716,
+            "centerHeight": 2.549999952316284,
+            "cornerRaycastsPassed": 4,
+            "frameMaterials": 3,
+            "frameBoundsCenter": {
+                "x": -7.651999473571777,
+                "y": 2.4710001945495607,
+                "z": 18.0
+            },
+            "frameBoundsSize": {
+                "x": 0.28800010681152346,
+                "y": 2.9519996643066408,
+                "z": 2.884002685546875
+            }
+        },
+        {
+            "exhibitId": "graca_aranha_discurso",
+            "canvasWidth": 2.380000114440918,
+            "canvasHeight": 1.8700000047683716,
+            "centerHeight": 2.549999952316284,
+            "cornerRaycastsPassed": 4,
+            "frameMaterials": 3,
+            "frameBoundsCenter": {
+                "x": -14.0,
+                "y": 2.4710001945495607,
+                "z": 7.706999778747559
+            },
+            "frameBoundsSize": {
+                "x": 2.8839988708496095,
+                "y": 2.9519996643066408,
+                "z": 0.28800010681152346
+            }
+        },
+        {
+            "exhibitId": "di_cavalcanti_pierrot",
+            "canvasWidth": 2.380000114440918,
+            "canvasHeight": 1.8700000047683716,
+            "centerHeight": 2.549999952316284,
+            "cornerRaycastsPassed": 4,
+            "frameMaterials": 3,
+            "frameBoundsCenter": {
+                "x": 5.5,
+                "y": 2.4710001945495607,
+                "z": 23.707000732421876
+            },
+            "frameBoundsSize": {
+                "x": 2.884000778198242,
+                "y": 2.9519996643066408,
+                "z": 0.28800201416015627
+            }
+        },
+        {
+            "exhibitId": "villa_lobos_lenda",
+            "canvasWidth": 2.380000114440918,
+            "canvasHeight": 1.8700000047683716,
+            "centerHeight": 2.549999952316284,
+            "cornerRaycastsPassed": 4,
+            "frameMaterials": 3,
+            "frameBoundsCenter": {
+                "x": -4.706999778747559,
+                "y": 2.4710001945495607,
+                "z": -17.0
+            },
+            "frameBoundsSize": {
+                "x": 0.28800010681152346,
+                "y": 2.9519996643066408,
+                "z": 2.884002685546875
+            }
+        },
+        {
+            "exhibitId": "vicente_rego_monteiro",
+            "canvasWidth": 2.380000114440918,
+            "canvasHeight": 1.8700000047683716,
+            "centerHeight": 2.549999952316284,
+            "cornerRaycastsPassed": 4,
+            "frameMaterials": 3,
+            "frameBoundsCenter": {
+                "x": 7.651999473571777,
+                "y": 2.4710001945495607,
+                "z": 18.0
+            },
+            "frameBoundsSize": {
+                "x": 0.28800010681152346,
+                "y": 2.9519996643066408,
+                "z": 2.884002685546875
+            }
+        },
+        {
+            "exhibitId": "estudante_russa",
+            "canvasWidth": 2.380000114440918,
+            "canvasHeight": 1.8700000047683716,
+            "centerHeight": 2.549999952316284,
+            "cornerRaycastsPassed": 4,
+            "frameMaterials": 3,
+            "frameBoundsCenter": {
+                "x": -1.5,
+                "y": 2.4710001945495607,
+                "z": 23.706998825073243
+            },
+            "frameBoundsSize": {
+                "x": 2.884000301361084,
+                "y": 2.9519996643066408,
+                "z": 0.2879981994628906
+            }
+        },
+        {
+            "exhibitId": "brecheret_bandeiras",
+            "canvasWidth": 2.380000114440918,
+            "canvasHeight": 1.8700000047683716,
+            "centerHeight": 2.549999952316284,
+            "cornerRaycastsPassed": 4,
+            "frameMaterials": 3,
+            "frameBoundsCenter": {
+                "x": 14.0,
+                "y": 2.4710001945495607,
+                "z": 7.706999778747559
+            },
+            "frameBoundsSize": {
+                "x": 2.884000778198242,
+                "y": 2.9519996643066408,
+                "z": 0.28800010681152346
+            }
+        },
+        {
+            "exhibitId": "mario_ode_burgues",
+            "canvasWidth": 2.380000114440918,
+            "canvasHeight": 1.8700000047683716,
+            "centerHeight": 2.549999952316284,
+            "cornerRaycastsPassed": 4,
+            "frameMaterials": 3,
+            "frameBoundsCenter": {
+                "x": -23.707000732421876,
+                "y": 2.4710001945495607,
+                "z": 4.0
+            },
+            "frameBoundsSize": {
+                "x": 0.28800201416015627,
+                "y": 2.9519996643066408,
+                "z": 2.884000778198242
+            }
+        },
+        {
+            "exhibitId": "villa_lobos_dancas",
+            "canvasWidth": 2.380000114440918,
+            "canvasHeight": 1.8700000047683716,
+            "centerHeight": 2.549999952316284,
+            "cornerRaycastsPassed": 4,
+            "frameMaterials": 3,
+            "frameBoundsCenter": {
+                "x": -4.706999778747559,
+                "y": 2.4710001945495607,
+                "z": -12.999999046325684
+            },
+            "frameBoundsSize": {
+                "x": 0.28800010681152346,
+                "y": 2.9519996643066408,
+                "z": 2.884000778198242
+            }
+        },
+        {
+            "exhibitId": "brecheret_cabeca_cristo",
+            "canvasWidth": 2.380000114440918,
+            "canvasHeight": 1.8700000047683716,
+            "centerHeight": 2.549999952316284,
+            "cornerRaycastsPassed": 4,
+            "frameMaterials": 3,
+            "frameBoundsCenter": {
+                "x": 23.707000732421876,
+                "y": 2.4710001945495607,
+                "z": 2.999999761581421
+            },
+            "frameBoundsSize": {
+                "x": 0.28800201416015627,
+                "y": 2.9519996643066408,
+                "z": 2.8840012550354006
+            }
+        },
+        {
+            "exhibitId": "oswald_poemas",
+            "canvasWidth": 2.380000114440918,
+            "canvasHeight": 1.8700000047683716,
+            "centerHeight": 2.549999952316284,
+            "cornerRaycastsPassed": 4,
+            "frameMaterials": 3,
+            "frameBoundsCenter": {
+                "x": -23.707000732421876,
+                "y": 2.4710001945495607,
+                "z": -4.0
+            },
+            "frameBoundsSize": {
+                "x": 0.28800201416015627,
+                "y": 2.9519996643066408,
+                "z": 2.884000778198242
+            }
         }
     ],
     "scope": "Active saved scene geometry. Triangles count only each renderer's assigned submeshes, including its static-batch offset; vertices count once per shared mesh. These are not measured FPS, device draw calls or GPU time."

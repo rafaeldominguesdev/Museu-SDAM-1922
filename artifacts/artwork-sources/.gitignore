@@ -1,0 +1,7 @@
+# Downloads de consulta; as texturas finais estão em Assets/Artworks/Images.
+**/*.html
+**/*.pdf
+**/*.jpg
+**/*.jpeg
+**/*.png
+**/*-source-excerpt.txt

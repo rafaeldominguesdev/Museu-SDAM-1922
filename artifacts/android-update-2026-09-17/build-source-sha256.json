@@ -1,0 +1,12 @@
+{
+  "UnityProject/Assets/Scripts/VR/MobileVrMode.cs": "89c5d067087d251ff9961095769a2dd65c7fb9943ecbf4db9fe42d41499a60a8",
+  "UnityProject/Assets/Scripts/VR/VrWorldGuide.cs": "04beccfb06855130fb29f9c0e4a938a65bd920a21a41e867f236eb663b4b4bb5",
+  "UnityProject/Assets/Scripts/Player/GyroscopeController.cs": "4d3de7fddb441b0db9a295d7e8dfe3e6d08992cdad95a7df73299b187dad8ca9",
+  "UnityProject/Assets/Scripts/Player/HeadGazeMovement.cs": "035561a2d91e2eca26bd4ca57d51b082152504533511ef4d88bf628beb9113c2",
+  "UnityProject/Assets/Scripts/Player/PlayerController.cs": "dd28127e2585c6efef552518add85b74f2ca05b580c6bb2f272e25660b4a14df",
+  "UnityProject/Assets/Scripts/UI/WelcomeScreen.cs": "4ecbf8b6d04330d4f4ba3350e0cdaea95a8103ad55d2a89cc44a29d36acd93f4",
+  "UnityProject/Assets/Scripts/UI/MuseumGuidePanel.cs": "070d617e323ee949dcf107b52a2f576d476e47e679c933e5f3c0ebe3cfc3c9af",
+  "UnityProject/Assets/Scripts/UI/MuseumGuideTheme.cs": "66ce0ec0d1d1ba9dd6c287b587f2b71e28509a111e245ca7c84bbdf39996debf",
+  "UnityProject/Assets/Editor/BuildScript.cs": "1d80fa2e39890f333fd3dbe05071834474fef943ade58907ff50aabdd605d9b3",
+  "UnityProject/Assets/Editor/AndroidBrandingSetup.cs": "509dd33055ed8c45e09b224b7790c33fdd6967bc6c2ff3612bc2c2234ff2dddb"
+}

@@ -1,0 +1,13 @@
+{
+  "apk": "artifacts/MuseumVR_Build/MuseudaSemanaArteModerna.apk",
+  "bytes": 96041147,
+  "sha256": "b083996e0e830fa84b1c1272a0d40cde52cfb43e59395e65c27819f874689968",
+  "zipIntegrity": "PASS",
+  "artworkRendererPresent": true,
+  "signatureSchemeV2": "PASS",
+  "minSdk": 26,
+  "targetSdk": 35,
+  "architecture": "arm64-v8a",
+  "cardboardNativePlugin": true,
+  "desktopCopy": "/Users/rafaeldomingues/Desktop/Museu-VR-Atualizado-16-09-2026.apk"
+}
