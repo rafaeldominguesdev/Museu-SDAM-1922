@@ -17,15 +17,15 @@ MonoBehaviour:
   year: 1922
   movement: Modernismo brasileiro
   periodo: "1897\u20131976"
-  tecnica: "Painel did\xE1tico"
+  tecnica: Fotografia documental
   categoria: biografia
   relacao_com_a_semana_de_1922: "Foi idealizador e organizador da Semana e criou
     sua identidade gr\xE1fica, incluindo o cat\xE1logo. As pinturas desta sala apresentam
     a continuidade de sua carreira depois de 1922."
-  obra_historica_ou_reinterpretacao: "Painel did\xE1tico original do museu sobre
-    a obra ou assunto; n\xE3o \xE9 reprodu\xE7\xE3o de pintura nem de capa hist\xF3rica."
+  obra_historica_ou_reinterpretacao: "Reprodu\xE7\xE3o digital da obra. Arquivo Nacional
+    \xB7 fotografia documental de 1964 \xB7 dom\xEDnio p\xFAblico"
   resumo: "A vida urbana, a m\xFAsica e personagens do cotidiano atravessam sua produ\xE7\xE3o."
-  fontes: 'https://tainacan.senado.leg.br/acervo/mocas-com-violoes-reproducao/
+  fontes: 'https://commons.wikimedia.org/wiki/File:Di_Cavalcanti,_1964_-_restored_(cropped).tif
 
     https://brasilianafotografica.bn.gov.br/?p=26620'
   description: "Nascido no Rio de Janeiro, Emiliano Di Cavalcanti iniciou a carreira
@@ -34,7 +34,7 @@ MonoBehaviour:
     e composi\xE7\xF5es dialogam com experi\xEAncias modernas internacionais e com
     a sociedade brasileira."
   funFact: 
-  paintingTexture: {fileID: 0}
+  paintingTexture: {fileID: 2800000, guid: ad998b376f33e43babecbe6440781af9, type: 3}
   thumbnailSprite: {fileID: 0}
   audioGuide: {fileID: 0}
   audioDuration: 0

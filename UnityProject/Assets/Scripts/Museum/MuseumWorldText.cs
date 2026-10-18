@@ -21,6 +21,8 @@ namespace MuseumModerna
                     materials.Add(text.font, material);
                 }
                 text.GetComponent<MeshRenderer>().sharedMaterial = material;
+                text.GetComponent<MeshRenderer>().shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+                text.GetComponent<MeshRenderer>().receiveShadows = false;
             }
             Font.textureRebuilt += RefreshAtlas;
         }

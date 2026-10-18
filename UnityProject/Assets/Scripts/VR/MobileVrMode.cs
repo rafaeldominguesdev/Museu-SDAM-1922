@@ -3,6 +3,7 @@ using Google.XR.Cardboard;
 using UnityEngine;
 using UnityEngine.SpatialTracking;
 using UnityEngine.UI;
+using UnityEngine.EventSystems;
 using UnityEngine.XR;
 using UnityEngine.XR.Management;
 
@@ -23,10 +24,11 @@ namespace MuseumModerna
         private GameObject preparation;
         private RectTransform preparationSafe;
         private Text status;
-        private Button enterButton, scanButton;
+        private Button enterButton;
         private TrackedPoseDriver driver;
         private XRManagerSettings manager;
         private bool prepared, preparing, suspended;
+        private bool enterWhenPrepared;
         private bool applicationPaused, applicationUnfocused;
         private Coroutine entry;
         private float normalNearClip;
@@ -88,25 +90,16 @@ namespace MuseumModerna
             driver.UseRelativeTransform = false;
             Api.UpdateScreenParams();
             UpdatePreparation();
+            if(IsPreparationVisible && enterWhenPrepared) {enterWhenPrepared=false;EnterVR();}
         }
         private void UpdatePreparation()
         {
             if (status == null) return;
-            bool hasProfile = prepared && Api.HasDeviceParams();
-            scanButton.interactable = prepared;
             // O perfil do Cardboard melhora a correção das lentes, mas não é
             // pré-requisito para iniciar o XR. Exigi-lo aqui fazia o visitante
             // depender de sair para o leitor de QR e voltar ao app.
             enterButton.interactable = prepared;
-            status.text = hasProfile
-                ? "Perfil salvo. Se a imagem estiver pequena ou desalinhada, leia o QR do seu VR Box."
-                : "Você já pode entrar no VR. Ler o QR do visor é opcional e apenas ajusta as lentes.";
-        }
-        public void ScanViewer()
-        {
-#if UNITY_ANDROID && !UNITY_EDITOR
-            if (prepared && !IsActive) Api.ScanDeviceParams();
-#endif
+            status.text = "Visor pronto. Encaixe o celular na horizontal e olhe à frente.";
         }
         public void EnterVR()
         {
@@ -143,6 +136,7 @@ namespace MuseumModerna
             ui.Guide.CloseSettings();
             ui.GetComponent<WelcomeScreen>()?.Hide();
             IsActive = true;
+            EventSystem.current?.SetSelectedGameObject(null);
             desktopCanvas.enabled = false;
             if (preparation != null) preparation.SetActive(false);
             WorldGuide.SetVrEnabled(true);
@@ -191,7 +185,7 @@ namespace MuseumModerna
             ResetWalkingGesture();
             player.SetPaused(false);
             // Entrar no visor deve começar a visita, não cobrir a imagem com o
-            // menu central. O menu continua acessível olhando para cima.
+            // menu central. Os controles Caminhar e Menu ficam abaixo da linha de visão.
             WorldGuide.CloseMenu();
         }
         public void ResetWalkingGesture()
@@ -267,6 +261,7 @@ namespace MuseumModerna
         private void Update()
         {
             if (IsPreparationVisible) UpdateSafeArea();
+            if (Input.GetKeyDown(KeyCode.Escape)) { HandleBack(); return; }
 #if UNITY_ANDROID && !UNITY_EDITOR
             if (prepared && !suspended)
             {
@@ -279,8 +274,8 @@ namespace MuseumModerna
             }
             if (IsActive)
             {
-                if (Api.IsCloseButtonPressed || Input.GetKeyDown(KeyCode.Escape)) ShowMainMenu();
-                else if (Api.IsGearButtonPressed) { ShowPreparation(); ScanViewer(); }
+                if (Api.IsCloseButtonPressed) ShowMainMenu();
+                else if (Api.IsGearButtonPressed) WorldGuide.OpenMenu();
                 else if (Api.IsTriggerHeldPressed) Recenter();
                 else if (!suspended && entry == null)
                 {
@@ -288,9 +283,21 @@ namespace MuseumModerna
                     if (missingPoseTime >= .15f) BeginPoseRecovery();
                 }
             }
-            else if (Input.GetKeyDown(KeyCode.Escape) && ui.GetComponent<WelcomeScreen>()?.IsVisible != true)
-                ShowMainMenu();
 #endif
+        }
+        // One owner for Back: otherwise the same key closes settings, dismisses
+        // an artwork and exits the visit in a single frame on Android.
+        public void HandleBack()
+        {
+            if (IsActive)
+            {
+                if (WorldGuide.MenuOpen) WorldGuide.CloseMenu();
+                else ShowMainMenu();
+            }
+            else if (ui.Guide.SettingsOpen) ui.Guide.CloseSettings();
+            else if (player.GetComponentInChildren<GazeDwellInteraction>().Focus.Current != null)
+                player.GetComponentInChildren<GazeDwellInteraction>().Close();
+            else if (ui.GetComponent<WelcomeScreen>()?.IsVisible != true) ShowMainMenu();
         }
         private static void RestoreFullScreen()
         {
@@ -357,9 +364,8 @@ namespace MuseumModerna
             VrWorldGuide.MakeText(content, "MODO VR / PREPARAR VISOR", MuseumGuideTheme.Title, 40);
             status = VrWorldGuide.MakeText(content, "Preparando o visor…", MuseumGuideTheme.Body, 54);
             enterButton = VrWorldGuide.MakeButton(content, "Entrar em VR", EnterVR);
-            scanButton = VrWorldGuide.MakeButton(content, "Ajustar lentes · ler QR do visor", ScanViewer);
-            enterButton.interactable = scanButton.interactable = false;
-            VrWorldGuide.MakeText(content, "Encaixe o celular na horizontal. O QR é opcional: use-o apenas para calibrar as lentes. Olhe à frente; depois, abaixe a cabeça para andar e levante para parar.", MuseumGuideTheme.Label, 58);
+            enterButton.interactable = false;
+            VrWorldGuide.MakeText(content, "Encaixe o celular na horizontal. Baixe a cabeça para mostrar Caminhar e Menu. Mire em Caminhar por 1 segundo e levante a cabeça para andar.", MuseumGuideTheme.Label, 58);
             VrWorldGuide.MakeButton(content, "Voltar ao menu", ShowMainMenu);
             UpdateSafeArea();
         }
@@ -370,8 +376,9 @@ namespace MuseumModerna
             preparationSafe.anchorMax = new Vector2(safe.xMax / Screen.width, safe.yMax / Screen.height);
             preparationSafe.offsetMin = preparationSafe.offsetMax = Vector2.zero;
         }
-        public void ShowPreparation()
+        public void ShowPreparation(bool enterAutomatically=false)
         {
+            enterWhenPrepared=enterAutomatically;
             if (IsActive) RestoreNormalRendering();
             ui.GetComponent<WelcomeScreen>()?.Hide();
             ui.Guide.CloseSettings();
@@ -381,7 +388,7 @@ namespace MuseumModerna
             preparation.SetActive(true);
 #if UNITY_ANDROID && !UNITY_EDITOR
             RestoreFullScreen();
-            if (prepared) UpdatePreparation();
+            if (prepared) { UpdatePreparation(); if(enterWhenPrepared) {enterWhenPrepared=false;EnterVR();} }
             else if (!preparing) StartCoroutine(PrepareXR());
 #else
             status.text = "As lentes exigem Android. No Editor, teste os controles pelo olhar.";

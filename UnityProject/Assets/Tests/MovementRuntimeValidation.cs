@@ -18,15 +18,18 @@ namespace MuseumModerna
 
         private IEnumerator Start()
         {
+            bool savedTilt=HeadGazeMovement.TiltWalking;
+            HeadGazeMovement.SetTiltWalking(true);
             yield return null; yield return null;
             var routine = Tests();
             while (true)
             {
                 object value;
                 try { if (!routine.MoveNext()) break; value = routine.Current; }
-                catch (Exception e) { Debug.LogException(e); UnityEditor.EditorApplication.Exit(1); yield break; }
+                catch (Exception e) { HeadGazeMovement.SetTiltWalking(savedTilt); Debug.LogException(e); UnityEditor.EditorApplication.Exit(1); yield break; }
                 yield return value;
             }
+            HeadGazeMovement.SetTiltWalking(savedTilt);
             Debug.Log($"[MovementValidation] PASS: {checks} verificações de movimento (poses simuladas; sem aparelho físico).");
             UnityEditor.EditorApplication.Exit(0);
         }
@@ -60,6 +63,26 @@ namespace MuseumModerna
             Invoke(movement, "OnApplicationFocus", true);
             Physics.SyncTransforms();
             for (int frame = 0; frame < 10; frame++) Invoke(movement, "Update");
+
+            HeadGazeMovement.SetTiltWalking(false);
+            Pose(0,4);Pose(-40,2);Invoke(movement,"Update");
+            Require(movement.CurrentSpeed==0,"Modo por botão não caminha ao observar o chão");
+            eye.localRotation=Quaternion.identity;
+            movement.RequestManualWalk();Invoke(movement,"Update");
+            Require(movement.ManualWalkingRequested&&movement.CurrentSpeed>0,"Comando explícito inicia caminhada normal");
+            movement.CancelManualWalk();
+            Require(!movement.ManualWalkingRequested&&movement.CurrentSpeed==0,"Soltar botão interrompe imediatamente");
+            movement.RequestManualWalk();player.SetPaused(true);player.SetPaused(false);
+            Require(!movement.ManualWalkingRequested,"Pausa cancela intenção manual sem retomada automática");
+            HeadGazeMovement.SetTiltWalking(true);
+
+            Pose(0,4);Pose(-40,2);
+            movement.RequestManualWalk();Invoke(movement,"Update");
+            movement.CancelManualWalk();
+            Pose(-40,6);Invoke(movement,"Update");
+            Require(movement.CurrentSpeed==0&&!gyro.IsLookingDown,
+                "Parar pelo botão não retoma caminhada por inclinação no frame seguinte");
+            movement.ResetMovement();
 
             Pose(-55, 12);
             Require(!gyro.IsLookingDown && !gyro.IsWalkingGestureArmed, "Entrar já inclinado não inicia caminhada");
@@ -141,6 +164,20 @@ namespace MuseumModerna
             }
             Time.captureDeltaTime=1f/60f;
             yield return null;
+
+            int savedSpeed=HeadGazeMovement.SpeedSetting;
+            for(int i=0;i<3;i++)
+            {
+                rig.transform.position=new Vector3(200,0,200);
+                eye.localRotation=Quaternion.identity;gyro.ResumeFromCurrentPose();
+                Pose(0,4);Pose(-40,2);eye.localRotation=Quaternion.Euler(40,0,0);
+                Set(movement,"_currentSpeed",0f);
+                for(int frame=0;frame<60;frame++){Invoke(movement,"Update");yield return null;}
+                Require(Mathf.Abs(movement.CurrentSpeed-HeadGazeMovement.SelectedSpeed(false))<.02f,
+                    "Caminhada atinge velocidade selecionada: "+HeadGazeMovement.SpeedLabel);
+                HeadGazeMovement.CycleSpeed();
+            }
+            Require(HeadGazeMovement.SpeedSetting==savedSpeed,"Preferência preservada após ciclo de velocidades");
 
             // A proteção da obra não pode desarmar o gesto: virar deve liberar a saída.
             Pose(0, 4); Pose(-40, 2);

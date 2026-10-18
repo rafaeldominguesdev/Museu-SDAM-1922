@@ -12,7 +12,7 @@ namespace MuseumModerna
         private CanvasGroup group;
         private Image background;
         private Text title, author, technique, notice, description, relation, source;
-        private Text pinLabel, enabledLabel, sizeLabel, summaryLabel, contrastLabel, lingerLabel, motionLabel;
+        private Text pinLabel, enabledLabel, sizeLabel, summaryLabel, contrastLabel, lingerLabel, motionLabel, speedLabel, controlLabel, tapWalkLabel;
         private ScrollRect scroll;
         private Font font;
         private Sprite rounded;
@@ -21,9 +21,11 @@ namespace MuseumModerna
         private GazeDwellInteraction gaze;
         private bool visible, pinned, summary, contrast, linger, reducedMotion, panelsEnabled;
         private int textStep;
+        private bool settingsPausedVisitor;
         private Rect lastSafe;
         private Vector2 lastSize;
         public bool IsVisible => visible;
+        public bool SettingsOpen => settings != null && settings.gameObject.activeSelf;
         public bool PanelsEnabled => panelsEnabled;
         public bool Summary => summary;
         public bool HighContrast => contrast;
@@ -107,6 +109,7 @@ namespace MuseumModerna
             toggle.sizeDelta = new Vector2(210, MuseumGuideTheme.ButtonHeight);
             var trigger = Button(toggle, "Opções da visita", ToggleSettings);
             Stretch((RectTransform)trigger.transform.parent);
+            MuseumWalkButton.Build(safe,rounded);
 
             // Camada que captura o toque fora do painel de opções para fechá-lo.
             backdrop = Rect("VeuDeFundo", safe);
@@ -139,7 +142,24 @@ namespace MuseumModerna
             lingerLabel = Button(options, "", () => { linger = !linger; ApplyPreferences(); });
             motionLabel = Button(options, "", () => { reducedMotion = !reducedMotion; ApplyPreferences(); });
             var visitor = FindAnyObjectByType<PlayerController>();
+            speedLabel=Button(options,"Velocidade: "+HeadGazeMovement.SpeedLabel,()=>
+            {
+                HeadGazeMovement.CycleSpeed();
+                speedLabel.text="Velocidade: "+HeadGazeMovement.SpeedLabel;
+            });
             Button(options, "Calibrar câmera", () => visitor?.Calibrate());
+            controlLabel=Button(options,"",()=>{});
+            controlLabel.text="Caminhada: "+(HeadGazeMovement.TiltWalking?"inclinação":"botão");
+            controlLabel.GetComponentInParent<Button>().onClick.AddListener(()=>
+            {
+                HeadGazeMovement.SetTiltWalking(!HeadGazeMovement.TiltWalking);
+                controlLabel.text="Caminhada: "+(HeadGazeMovement.TiltWalking?"inclinação":"botão");
+            });
+            tapWalkLabel=Button(options,"",()=>
+            {
+                HeadGazeMovement.SetTapToWalk(!HeadGazeMovement.TapToWalk);
+                RefreshWalkingLabels();
+            });
             Button(options, "Voltar ao menu", () => MobileVrMode.Instance?.ShowMainMenu());
 #if UNITY_ANDROID && !UNITY_EDITOR
             Button(options, "Preparar visor VR", () => MobileVrMode.Instance?.ShowPreparation());
@@ -153,10 +173,25 @@ namespace MuseumModerna
         private void ToggleSettings()
         {
             bool open = !settings.gameObject.activeSelf;
+            var visitor=FindAnyObjectByType<PlayerController>();
+            if(open)
+            {
+                settingsPausedVisitor=visitor!=null&&visitor.State!=PlayerState.Paused;
+                if(settingsPausedVisitor)visitor.SetPaused(true);
+            }
+            else if(settingsPausedVisitor)
+            {
+                settingsPausedVisitor=false;
+                visitor?.SetPaused(false);
+            }
+            if(open) speedLabel.text="Velocidade: "+HeadGazeMovement.SpeedLabel;
+            if(open) RefreshWalkingLabels();
             settings.gameObject.SetActive(open);
             backdrop.gameObject.SetActive(open);
             if (open && EventSystem.current != null)
                 EventSystem.current.SetSelectedGameObject(enabledLabel.transform.parent.gameObject);
+            else if (EventSystem.current != null)
+                EventSystem.current.SetSelectedGameObject(null);
         }
         /// <summary>Abre o painel de opções (ex.: chamado pela tela de abertura). Não faz nada se já estiver aberto.</summary>
         public void OpenSettings()
@@ -219,6 +254,7 @@ namespace MuseumModerna
             SetToggleVisual(contrastLabel, contrast);
             SetToggleVisual(lingerLabel, linger);
             SetToggleVisual(motionLabel, reducedMotion);
+            RefreshWalkingLabels();
             background.color = contrast ? Color.black : MuseumGuideTheme.Surface;
             foreach (var label in new[] { title, author, technique, notice, description, relation, source })
             {
@@ -249,6 +285,15 @@ namespace MuseumModerna
             PlayerPrefs.SetInt(Pref + "motion", reducedMotion ? 1 : 0);
             PlayerPrefs.Save();
         }
+        private void RefreshWalkingLabels()
+        {
+            if(controlLabel!=null) controlLabel.text="Caminhada: "+(HeadGazeMovement.TiltWalking?"inclinação":"botão");
+            if(tapWalkLabel!=null)
+            {
+                tapWalkLabel.text="Botão: "+(HeadGazeMovement.TapToWalk?"toque para iniciar/parar":"segurar para caminhar");
+                SetToggleVisual(tapWalkLabel,HeadGazeMovement.TapToWalk);
+            }
+        }
         private void Update()
         {
             if (group == null) return;
@@ -256,7 +301,6 @@ namespace MuseumModerna
             group.alpha = reducedMotion ? (visible ? 1 : 0) :
                 Mathf.MoveTowards(group.alpha, visible ? 1 : 0, Time.unscaledDeltaTime / MuseumGuideTheme.Fade);
             if (!visible && group.alpha == 0 && panel.gameObject.activeSelf) panel.gameObject.SetActive(false);
-            if (settings.gameObject.activeSelf && Input.GetKeyDown(KeyCode.Escape)) ToggleSettings();
             if (visible && Input.GetKey(KeyCode.PageDown)) scroll.verticalNormalizedPosition -= Time.unscaledDeltaTime;
             if (visible && Input.GetKey(KeyCode.PageUp)) scroll.verticalNormalizedPosition += Time.unscaledDeltaTime;
         }

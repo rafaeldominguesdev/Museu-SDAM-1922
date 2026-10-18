@@ -23,6 +23,16 @@ namespace MuseumModerna
         public const float Width = 440, ButtonHeight = 48, Fade = .25f, Radius = 8;
         public const float SettingsMinWidth = 280, SettingsMaxWidth = 420, SettingsMaxHeight = 480;
         public const string FontResource = "LegacyRuntime.ttf";
+        public const float ExhibitDwell = .55f, ExhibitLinger = 1.5f;
+        public const float VrDwell = 1f, VrDistance = 2.4f, VrScale = .00155f;
+        public const float VrWidth = 900, VrHeight = 930, VrButtonHeight = 76, VrGap = 14;
+        public const int VrBody = 32, VrTitle = 40, VrButtonText = 28;
+        // Barra de ação no campo de visão inferior confortável: alcançável sem inclinar
+        // excessivamente o pescoço e grande o bastante para as lentes de um visor móvel.
+        public const float VrToolbarWidth = 860, VrToolbarHeight = 194, VrToolbarDistance = 1.82f, VrToolbarDrop = .76f;
+        public const int VrToolbarHint = 32;
+        public const float VrReticleDistance = 1.3f, VrReticleScale = .0008f, VrReticleSize = 42, VrReticleDot = 7;
+        public const float WalkButtonWidth = 230, WalkButtonHeight = 76;
 
         // A abertura usa o mesmo tema do guia, com dimensões próprias para toque em paisagem.
         public const int WelcomeTitle = 36, WelcomeCompactTitle = 30, WelcomeModeTitle = 22, WelcomeCaption = 14;

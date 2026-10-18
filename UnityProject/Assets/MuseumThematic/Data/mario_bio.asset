@@ -17,23 +17,25 @@ MonoBehaviour:
   year: 1922
   movement: Modernismo brasileiro
   periodo: "1893\u20131945"
-  tecnica: "Painel did\xE1tico"
+  tecnica: Fotografia documental
   categoria: biografia
   relacao_com_a_semana_de_1922: "Foi articulador e participante da Semana. Pauliceia
     desvairada, publicada em 1922, liga-se ao momento de ruptura; Macuna\xEDma e
     outros livros da sala mostram caminhos desenvolvidos depois do evento."
-  obra_historica_ou_reinterpretacao: "Painel did\xE1tico original do museu sobre
-    a obra ou assunto; n\xE3o \xE9 reprodu\xE7\xE3o de pintura nem de capa hist\xF3rica."
+  obra_historica_ou_reinterpretacao: "Reprodu\xE7\xE3o digital da obra. Fot\xF3grafo
+    desconhecido \xB7 1916 \xB7 dom\xEDnio p\xFAblico"
   resumo: "Literatura, m\xFAsica e pesquisa das culturas brasileiras atravessam sua
     trajet\xF3ria."
-  fontes: https://brasilianafotografica.bn.gov.br/?p=26620
+  fontes: 'https://commons.wikimedia.org/wiki/File:Mario_de_andrade_1916.jpg
+
+    https://brasilianafotografica.bn.gov.br/?p=26620'
   description: "Nascido em S\xE3o Paulo, M\xE1rio de Andrade foi poeta, romancista,
     cr\xEDtico e pesquisador de m\xFAsica e manifesta\xE7\xF5es populares. Sua escrita
     experimentou ritmos e modos de falar do Brasil. A produ\xE7\xE3o intelectual
     e sua atua\xE7\xE3o cultural ajudaram a ampliar o debate sobre o que merecia
     ser estudado, preservado e reconhecido como cultura."
   funFact: 
-  paintingTexture: {fileID: 0}
+  paintingTexture: {fileID: 2800000, guid: b2f45bf51a5d843598de84a638bd4298, type: 3}
   thumbnailSprite: {fileID: 0}
   audioGuide: {fileID: 0}
   audioDuration: 0

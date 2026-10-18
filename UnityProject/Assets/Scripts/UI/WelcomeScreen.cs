@@ -131,7 +131,7 @@ namespace MuseumModerna
 #if UNITY_EDITOR
             MobileVrMode.Instance.EnterEditorPreview();
 #else
-            MobileVrMode.Instance.ShowPreparation();
+            MobileVrMode.Instance.ShowPreparation(true);
 #endif
         }
 

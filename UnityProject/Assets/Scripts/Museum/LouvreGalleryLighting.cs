@@ -7,7 +7,25 @@ namespace MuseumModerna
     [DefaultExecutionOrder(-500)]
     public sealed class LouvreGalleryLighting : MonoBehaviour
     {
-        private void Awake() => ApplyDaylight();
+        private void Awake()
+        {
+            if (transform.Find("Planta_CincoSalas") != null) ApplyGallery();
+            else ApplyDaylight();
+        }
+
+        public static void ApplyGallery()
+        {
+            SetAmbient(new Color(.35f, .355f, .365f));
+            RenderSettings.fog = true;
+            RenderSettings.fogMode = FogMode.ExponentialSquared;
+            RenderSettings.fogColor = new Color(.17f, .20f, .25f);
+            RenderSettings.fogDensity = .005f;
+            QualitySettings.shadows = ShadowQuality.All;
+            QualitySettings.shadowDistance = 18f;
+            QualitySettings.shadowResolution = ShadowResolution.Medium;
+            QualitySettings.pixelLightCount = 4;
+            QualitySettings.antiAliasing = 2;
+        }
 
         public static void ApplyDaylight()
         {

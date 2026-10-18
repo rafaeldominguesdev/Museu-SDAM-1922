@@ -7,26 +7,31 @@ perfil de lentes compatível com Cardboard. A câmera possui rastreamento de rot
 ## Antes de encaixar o celular
 
 1. Abra o aplicativo com o celular na horizontal.
-2. Toque em **Ler QR das lentes** e escaneie o código de configuração do seu visor.
-   Esse código descreve as lentes; não é um QR de loja ou de download do aplicativo.
-3. Com o perfil salvo, toque em **Entrar em VR** e encaixe o celular no visor.
+2. Escolha **Modo VR** e aguarde a preparação do visor.
+3. Encaixe o celular no visor e olhe à frente.
 
-O app só libera a entrada quando há um perfil de lentes salvo. Não inventa um
-perfil para um modelo desconhecido. Se seu VR Box não veio com esse QR, obtenha
-o perfil do fabricante/modelo antes de usar o modo VR. **Prévia sem óculos**
-permite visitar em 2D. Nas opções dessa prévia, **Preparar visor VR** volta à preparação.
+O app usa o perfil de lentes salvo no Cardboard quando disponível e não exige QR
+para entrar. **Modo normal** permite visitar em 2D. Nas opções desse modo,
+**Preparar visor VR** volta à preparação.
 
 ## Dentro do visor — sem tocar na tela
 
 - Olhe para uma peça: sua ficha aparece em espaço 3D, visível pelos dois olhos.
-- Olhe para um botão por **1 segundo**: o círculo da mira se completa e aciona o botão.
+- Mova a cabeça para colocar a mira sobre um botão por **1 segundo**: o círculo
+  se completa e aciona o botão. O controle acompanha a cabeça, não os olhos.
   Manter o olhar não repete a ação. Desvie e volte para acioná-lo novamente.
 - **Anterior** e **Próxima** percorrem as páginas; não é necessário arrastar texto.
 - **Fixar**, **Liberar** e **Fechar** também funcionam pelo olhar.
-- **Opções** abre os ajustes. Sem ficha aberta, olhe para cima por **1,2 segundo**
-  e volte a olhar à frente para encontrar o menu.
-- Para caminhar, olhe para baixo; levante o olhar para parar. O ritmo em VR foi
-  limitado a 1,1 m/s. Menu aberto ou olhar sobre a ficha suspendem o caminhar.
+- Sem ficha aberta, baixe a cabeça para mostrar **Caminhar** e **Menu**. A barra
+  some ao olhar à frente e não acompanha o giro enquanto você mira nos botões.
+- No modo padrão, mire em **Caminhar** por 1 segundo e levante a cabeça para
+  iniciar o movimento. Baixe a cabeça para parar. O botão também funciona se a
+  preferência de caminhada por inclinação estiver ativada.
+- **Menu** (ou **Opções** na ficha) abre os ajustes. Olhar o céu não abre opções.
+  **Voltar** fecha as opções sem sair da visita.
+- A caminhada opcional por inclinação é ativada nas opções: olhe à frente para
+  armar o gesto, baixe para andar e levante para parar. O ritmo em VR é limitado
+  a 1,1 m/s. Menu aberto ou olhar sobre a ficha suspendem o caminhar.
 - O menu permite ampliar texto, resumir, mudar contraste, desativar fichas,
   reduzir animações, prolongar leitura, centralizar a visão e sair do VR.
 
@@ -55,16 +60,16 @@ ajuste às lentes, latência e conforto de leitura. Não há suporte iOS configu
 
 ## APK e testes
 
-APK com pinturas ampliadas, molduras de gala e ilhas de exposição, gerado e verificado em
-11 de setembro de 2026:
-[MuseudaSemanaArteModerna.apk](../artifacts/MuseumVR_Build/MuseudaSemanaArteModerna.apk)
-(36,4 MB). Transfira para o celular Android e abra o arquivo para instalar.
+APK com correções de caminhada, opções e retomada de fichas, gerado e verificado em
+5 de outubro de 2026:
+[Museu-Controles-VR-Corrigidos-2026-10-05.apk](../artifacts/controle-vr-2026-10-05/Museu-Controles-VR-Corrigidos-2026-10-05.apk)
+(133 MiB). Transfira para o celular Android e abra o arquivo para instalar.
 Se o Android solicitar, autorize a instalação pelo aplicativo usado para abrir o APK.
-Depois siga a preparação das lentes no início deste guia.
+Depois siga a preparação do visor no início deste guia.
 
-Os testes de interação no Editor e a regressão das 28 fichas passaram.
-Veja o [redesign e a validação atual](../artifacts/LOUVRE_REDESIGN.md), incluindo os limites
-dos testes sem aparelho físico.
+Passaram 226 verificações de VR, 148 de menus/toque, 43 de movimento e a regressão
+das 28 fichas. Veja o [relatório de correções](../artifacts/controle-vr-2026-10-05/LEIA-ME.md),
+incluindo os limites dos testes sem aparelho físico.
 
 No Unity: **Museum > VR Box > Gerar APK Android**.
 O resultado é gravado em `artifacts/MuseumVR_Build/MuseudaSemanaArteModerna.apk`

@@ -1,0 +1,43 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 14256d4cfae25415f84295e8fa960519, type: 3}
+  m_Name: abaporu
+  m_EditorClassIdentifier: 
+  title: Abaporu
+  artist: Tarsila do Amaral
+  year: 1928
+  movement: Modernismo brasileiro
+  periodo: "1928 \xB7 depois da Semana"
+  tecnica: Pintura
+  categoria: pintura
+  relacao_com_a_semana_de_1922: "Abaporu n\xE3o esteve na Semana de 1922: foi criado
+    seis anos depois e inspirou Oswald de Andrade na formula\xE7\xE3o do Manifesto
+    Antrop\xF3fago. Sua presen\xE7a na sala de Tarsila evidencia a autoria da obra
+    e seu di\xE1logo com os manifestos apresentados na sala ao fundo."
+  obra_historica_ou_reinterpretacao: "Reprodu\xE7\xE3o digital da obra. MALBA \xB7
+    \xA9 Tarsila do Amaral Licenciamentos"
+  resumo: "A figura de propor\xE7\xF5es ampliadas e o cacto deram impulso visual
+    ao movimento antropof\xE1gico."
+  fontes: 'https://coleccion.malba.org.ar/abaporu/
+
+    https://www.moma.org/calendar/exhibitions/3871'
+  description: "Tarsila do Amaral pintou Abaporu em 1928. A figura solit\xE1ria,
+    o p\xE9 e a m\xE3o ampliados, a cabe\xE7a pequena, o cacto e o sol organizam
+    uma imagem sint\xE9tica e inquietante. A obra pertence \xE0 cole\xE7\xE3o do
+    MALBA, em Buenos Aires."
+  funFact: 
+  paintingTexture: {fileID: 2800000, guid: ddb9dfa0dee4b4958b19c22adbaae074, type: 3}
+  thumbnailSprite: {fileID: 0}
+  audioGuide: {fileID: 0}
+  audioDuration: 0
+  uniqueId: abaporu
+  suggestedViewOffset: {x: 0, y: 0, z: 2}

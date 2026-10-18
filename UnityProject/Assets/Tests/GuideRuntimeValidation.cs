@@ -42,6 +42,10 @@ namespace MuseumModerna
             foreach (var anchor in FindObjectsByType<PlayerSpawnAnchor>(FindObjectsSortMode.None)) anchor.enabled = false;
             foreach (var locked in FindObjectsByType<LockPosition>(FindObjectsSortMode.None)) locked.enabled = false;
             Require(ui.Guide != null && ui.Guide.Group.alpha == 0, "Ficha começa oculta");
+            MobileVrMode.Instance.EnterNormalMode();
+            var preferenceFlags=System.Reflection.BindingFlags.Instance|System.Reflection.BindingFlags.NonPublic;
+            typeof(MuseumGuidePanel).GetField("linger",preferenceFlags).SetValue(ui.Guide,false);
+            typeof(MuseumGuidePanel).GetMethod("ApplyPreferences",preferenceFlags).Invoke(ui.Guide,new object[]{false});
             gaze.SetPanelsEnabled(true);
             var exhibits = FindObjectsByType<PaintingExhibit>(FindObjectsSortMode.None);
             Require(exhibits.Length == 28, "28 objetos associados, encontrados " + exhibits.Length);
@@ -58,15 +62,15 @@ namespace MuseumModerna
                 Require(hit == exhibit, "Raycast não alcançou " + exhibit.name + "; encontrado " + (hit != null ? hit.name : "sólido/nenhum"));
             }
             Debug.Log("[GuideValidation] Raycast nos 28 objetos: PASS");
-            var a = exhibits.First(e => e.PaintingData.uniqueId == "homem_amarelo");
+            var a = exhibits.First(e => e.PaintingData.uniqueId == "anita_homem");
             Position(a.transform.position + a.transform.forward * 3, a.transform.position);
-            yield return new WaitForSecondsRealtime(.6f);
+            yield return new WaitForSecondsRealtime(MuseumGuideTheme.ExhibitDwell+MuseumGuideTheme.Fade+.2f);
             Require(player.CurrentNearPainting == a.PaintingData && ui.Guide.Group.alpha == 1, "Olhar abre ficha");
             Require(player.State == PlayerState.Walking, "Mediação não bloqueia caminhar");
             gaze.TogglePin(); cameraView.transform.rotation = Quaternion.LookRotation(Vector3.up);
             yield return new WaitForSecondsRealtime(.6f);
             Require(ui.Guide.Group.alpha == 1 && gaze.Focus.Pinned, "Fixação permanece ao desviar");
-            gaze.TogglePin(); yield return new WaitForSecondsRealtime(.6f);
+            gaze.TogglePin(); yield return new WaitForSecondsRealtime(MuseumGuideTheme.ExhibitLinger+MuseumGuideTheme.Fade+.2f);
             Require(ui.Guide.Group.alpha == 0 && !ui.Guide.Panel.gameObject.activeSelf, "Fade-out desativa painel");
             Position(a.transform.position + a.transform.forward * 3, a.transform.position);
             yield return new WaitForSecondsRealtime(.6f);
@@ -137,7 +141,7 @@ namespace MuseumModerna
             var old = RenderTexture.active; RenderTexture.active = render;
             var texture = new Texture2D(width, height, TextureFormat.RGB24, false);
             texture.ReadPixels(new Rect(0, 0, width, height), 0, 0); texture.Apply();
-            string output = Path.GetFullPath(Path.Combine(Application.dataPath, "../../artifacts"));
+            string output = Path.GetFullPath(Environment.GetEnvironmentVariable("MUSEUM_CAPTURE_OUTPUT") ?? Path.Combine(Application.dataPath, "../../artifacts"));
             Directory.CreateDirectory(output); File.WriteAllBytes(Path.Combine(output, file), texture.EncodeToPNG());
             RenderTexture.active = old; cameraView.targetTexture = null;
             canvas.renderMode = original; canvas.worldCamera = previousCamera;

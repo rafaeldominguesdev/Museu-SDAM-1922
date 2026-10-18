@@ -1,0 +1,45 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 14256d4cfae25415f84295e8fa960519, type: 3}
+  m_Name: tarsila_bio
+  m_EditorClassIdentifier: 
+  title: Tarsila do Amaral
+  artist: Pintora e figura central da Antropofagia
+  year: 1928
+  movement: Modernismo brasileiro
+  periodo: "1886\u20131973"
+  tecnica: Fotografia documental
+  categoria: biografia
+  relacao_com_a_semana_de_1922: "Tarsila n\xE3o participou da Semana de 1922: estava
+    em Paris durante o evento. Abaporu, pintado em 1928, pertence ao desdobramento
+    posterior do Modernismo e inspirou o Manifesto Antrop\xF3fago."
+  obra_historica_ou_reinterpretacao: "Reprodu\xE7\xE3o digital da obra. Arquivo Nacional
+    \xB7 Fundo Correio da Manh\xE3 \xB7 fotografia documental de 1969 \xB7 dom\xEDnio
+    p\xFAblico"
+  resumo: "Sua pintura reuniu pesquisa de cor, paisagem e imagina\xE7\xE3o sobre
+    o Brasil moderno."
+  fontes: 'https://commons.wikimedia.org/wiki/File:Correio_da_Manh%C3%A3_AN_395.jpg
+
+    https://www.moma.org/calendar/exhibitions/3871'
+  description: "Tarsila do Amaral foi uma pintora brasileira cuja produ\xE7\xE3o
+    atravessou a fase Pau-Brasil e a Antropofagia. Depois de estudar em S\xE3o Paulo
+    e Paris, elaborou imagens de paisagens, figuras e cenas urbanas em di\xE1logo
+    com experi\xEAncias modernas. Sua rela\xE7\xE3o com Oswald de Andrade aproximou
+    sua pintura dos debates antropof\xE1gicos, sem reduzir sua trajet\xF3ria a esse
+    movimento."
+  funFact: 
+  paintingTexture: {fileID: 2800000, guid: 36ff50f3782d64293aa9fad44f765ad4, type: 3}
+  thumbnailSprite: {fileID: 0}
+  audioGuide: {fileID: 0}
+  audioDuration: 0
+  uniqueId: tarsila_bio
+  suggestedViewOffset: {x: 0, y: 0, z: 2}

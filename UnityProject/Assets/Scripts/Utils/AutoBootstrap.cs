@@ -188,7 +188,7 @@ namespace MuseumModerna
             {
                 if (architecture.GetComponent<PillarPhysicsRepair>() == null)
                     architecture.AddComponent<PillarPhysicsRepair>();
-                if (architecture.GetComponent<MuseumDayNightCycle>() == null)
+                if (architecture.transform.Find("Planta_CincoSalas")==null && architecture.GetComponent<MuseumDayNightCycle>() == null)
                     architecture.AddComponent<MuseumDayNightCycle>();
             }
         }

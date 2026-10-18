@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Linq;
 
 namespace MuseumModerna
 {
@@ -7,7 +8,7 @@ namespace MuseumModerna
     public sealed class MuseumPictureLighting : MonoBehaviour
     {
         public const float Intensity = 1.7f;
-        public const float ActivationDistance = 4.5f;
+        public const float ActivationDistance = 3.8f;
         private Light[] spots;
         private float[] distances;
         private bool[] selected;
@@ -15,7 +16,7 @@ namespace MuseumModerna
         private Camera eye;
         private void Awake()
         {
-            spots=GetComponentsInChildren<Light>(true);
+            spots=GetComponentsInChildren<Light>(true).Where(l=>l.type==LightType.Spot).ToArray();
             distances=new float[spots.Length]; selected=new bool[spots.Length];
             foreach(var spot in spots) { spot.intensity=0; spot.enabled=false; }
         }
@@ -31,7 +32,16 @@ namespace MuseumModerna
                 for(int i=0;i<spots.Length;i++)
                 {
                     selected[i]=false;
-                    distances[i]=(spots[i].transform.position-eye.transform.position).sqrMagnitude;
+                    var spot=spots[i];
+                    var exhibit=spot.GetComponentInParent<PaintingExhibit>();
+                    var center=exhibit!=null?exhibit.transform.position:spot.transform.position;
+                    var offset=eye.transform.position-center;
+                    offset.y=0;
+                    // Não acenda o quadro da sala vizinha através de uma parede.
+                    bool visible=exhibit==null || Vector3.Dot(offset,exhibit.transform.forward)>.1f;
+                    if(visible && exhibit!=null && Physics.Linecast(eye.transform.position,center,out var hit,~0,QueryTriggerInteraction.Ignore))
+                        visible=hit.collider.GetComponentInParent<PaintingExhibit>()==exhibit;
+                    distances[i]=visible?offset.sqrMagnitude:float.PositiveInfinity;
                 }
                 for(int slot=0;slot<3;slot++)
                 {

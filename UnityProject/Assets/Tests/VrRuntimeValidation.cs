@@ -19,15 +19,18 @@ namespace MuseumModerna
         private const BindingFlags Private = BindingFlags.Instance | BindingFlags.NonPublic;
         private IEnumerator Start()
         {
+            bool savedTilt=HeadGazeMovement.TiltWalking;
+            HeadGazeMovement.SetTiltWalking(false);
             yield return null; yield return null;
             var routine = Tests();
             while (true)
             {
                 object value;
                 try { if (!routine.MoveNext()) break; value = routine.Current; }
-                catch (Exception e) { Debug.LogException(e); UnityEditor.EditorApplication.Exit(1); yield break; }
+                catch (Exception e) { HeadGazeMovement.SetTiltWalking(savedTilt); Debug.LogException(e); UnityEditor.EditorApplication.Exit(1); yield break; }
                 yield return value;
             }
+            HeadGazeMovement.SetTiltWalking(savedTilt);
             Debug.Log($"[VrValidation] PASS: {checks} verificações de interação e recuperação VR (simulação no Editor; sem lentes físicas)");
             UnityEditor.EditorApplication.Exit(0);
         }
@@ -49,12 +52,84 @@ namespace MuseumModerna
             eye.transform.LookAt(original.transform.position);
             gaze.SetPanelsEnabled(true);
             mode.EnterEditorPreview();
+            Invoke(player.GetComponent<HeadGazeMovement>(),"OnApplicationFocus",true);
             Require(mode.IsActive && !guide.MenuOpen && !FindAnyObjectByType<UIManager>().GetComponent<Canvas>().enabled, "VR inicia a visita sem menu central");
             Require(guide.GetComponent<Canvas>().renderMode == RenderMode.WorldSpace, "Ficha em espaço3D para ambos os olhos");
             eye.transform.rotation = Quaternion.LookRotation(new Vector3(0, 1, .6f));
             yield return new WaitForSecondsRealtime(1.5f);
-            Require(guide.MenuOpen, "Olhar para cima abre opções sem controle");
+            Require(!guide.MenuOpen, "Observar a lua e o céu não abre opções");
+            eye.transform.rotation=Quaternion.identity;yield return null;
+            var toolbar=(RectTransform)typeof(VrWorldGuide).GetField("toolbar",Private).GetValue(guide);
+            Require(!toolbar.gameObject.activeSelf,"Controles não cobrem a visita ao olhar à frente");
+            Capture("vr-visita-sem-painel.png");
+            eye.transform.rotation=Quaternion.Euler(18,0,0);yield return null;
+            Require(toolbar.gameObject.activeSelf,"Baixar a cabeça revela os controles");
+            var toolbarHeading=toolbar.rotation;
+            PointAt(Button("Caminhar").transform);
+            Capture("vr-controles.png");
+            yield return new WaitForSecondsRealtime(1.3f);
+            var manualMovement=player.GetComponent<HeadGazeMovement>();
+            Require(Quaternion.Angle(toolbar.rotation,toolbarHeading)<.01f,"Controles não fogem ao mirar lateralmente");
+            Invoke(manualMovement,"UpdateHorizontalMovement");
+            Require(manualMovement.ManualWalkingRequested&&manualMovement.CurrentSpeed==0,"Caminhar aguarda olhar à frente e não é cancelado pelo botão");
+            eye.transform.rotation=Quaternion.identity;
+            Invoke(manualMovement,"UpdateHorizontalMovement");
+            Require(manualMovement.CurrentSpeed>0,"Olhar à frente inicia caminhada VR após comando explícito");
+            eye.transform.rotation=Quaternion.Euler(45,0,0);
+            Invoke(manualMovement,"UpdateHorizontalMovement");
+            Require(!manualMovement.ManualWalkingRequested&&manualMovement.CurrentSpeed==0,"Baixar a cabeça interrompe caminhada manual VR");
+            // The saved tilt preference used to turn the walk control into a menu launcher.
+            HeadGazeMovement.SetTiltWalking(true);
+            eye.transform.rotation=Quaternion.identity;yield return null;
+            eye.transform.rotation=Quaternion.Euler(18,0,0);yield return null;
+            PointAt(Button("Caminhar").transform);
+            yield return new WaitForSecondsRealtime(1.3f);
+            Require(!guide.MenuOpen&&manualMovement.ManualWalkingRequested,
+                "Caminhar funciona com inclinação salva e nunca abre opções");
+            Invoke(manualMovement,"UpdateHorizontalMovement");
+            Require(manualMovement.CurrentSpeed==0,"Caminhar por botão aguarda horizonte também com inclinação ativa");
+            eye.transform.rotation=Quaternion.identity;
+            Invoke(manualMovement,"UpdateHorizontalMovement");
+            Require(manualMovement.CurrentSpeed>0,"Botão inicia caminhada VR mesmo com preferência de inclinação");
+            manualMovement.CancelManualWalk();
+            HeadGazeMovement.SetTiltWalking(false);
+            // Exercise real Update/CharacterController frames, not just the speed field.
+            var savedPosition=player.transform.position;
+            var controller=player.GetComponent<CharacterController>();
+            controller.enabled=false;player.transform.position=new Vector3(200,0,200);controller.enabled=true;
+            manualMovement.ResetMovement();manualMovement.RequestManualWalk();manualMovement.enabled=true;
+            var beforeMove=player.transform.position;
+            yield return new WaitForSecondsRealtime(.4f);
+            Require(Vector2.Distance(new Vector2(beforeMove.x,beforeMove.z),new Vector2(player.transform.position.x,player.transform.position.z))>.1f,
+                "Comando VR desloca o CharacterController em frames reais");
+            eye.transform.rotation=Quaternion.Euler(45,0,0);
+            yield return null;yield return null;
+            Require(!manualMovement.ManualWalkingRequested&&manualMovement.CurrentSpeed==0,
+                "Baixar cabeça para o movimento real sem reativar caminhada");
+            manualMovement.enabled=false;
+            controller.enabled=false;player.transform.position=savedPosition;controller.enabled=true;
+            eye.transform.rotation=Quaternion.identity;yield return null;
+            eye.transform.rotation=Quaternion.Euler(18,0,0);yield return null;
+            PointAt(Button("Menu").transform);
+            yield return new WaitForSecondsRealtime(1.3f);
+            Require(guide.MenuOpen, "Botão Menu abre opções pelo olhar");
+            Require(!toolbar.gameObject.activeSelf,"Abrir opções oculta a barra de caminhada");
+            var menuPosition=guide.Board.position;
+            eye.transform.rotation=Quaternion.Euler(0,40,0);
+            guide.OpenMenu();
+            Require(Vector3.Distance(menuPosition,guide.Board.position)<.001f,
+                "Solicitação repetida de menu não reposiciona opções sobre o olhar");
             Require(Button("Sair do VR").interactable, "Sair do VR fica na primeira página de opções");
+            int initialSpeed=HeadGazeMovement.SpeedSetting;
+            for(int i=0;i<3;i++)
+            {
+                var speed=Button("Velocidade: "+HeadGazeMovement.SpeedLabel);
+                PointAt(speed.transform);
+                yield return new WaitForSecondsRealtime(1.3f);
+                Require(HeadGazeMovement.SpeedSetting==(initialSpeed+i+1)%3,"Velocidade VR alterada pelo olhar e salva");
+                PointAt(Button("Centralizar").transform);yield return null;
+            }
+            Capture("vr-velocidade.png");
             var initialPosition = guide.Board.position;
             PointAt(Button("Voltar à visita").transform);
             yield return new WaitForSecondsRealtime(.5f);
@@ -63,9 +138,37 @@ namespace MuseumModerna
             yield return new WaitForSecondsRealtime(.7f);
             Require(!guide.MenuOpen, "Voltar acionado apenas pelo olhar");
             eye.transform.LookAt(original.transform.position);
-            yield return new WaitForSecondsRealtime(.5f);
+            yield return new WaitForSecondsRealtime(.2f);
+            Require(gaze.Focus.Current==null,"Passar rapidamente pela obra não abre ficha");
+            player.SetPaused(true);
+            yield return new WaitForSecondsRealtime(.2f);
+            player.SetPaused(false);
+            yield return new WaitForSecondsRealtime(.4f);
+            Require(gaze.Focus.Current==null,"Retomar visita não abre ficha usando tempo de olhar anterior à pausa");
+            yield return new WaitForSecondsRealtime(.6f);
             Require(gaze.Focus.Current == original.PaintingData && guide.GetComponent<CanvasGroup>().alpha > .9f, "Obra abre ficha VR");
             Require(guide.PageCount > 1, "Ficha longa paginada sem toque");
+            var preferences=FindAnyObjectByType<UIManager>().Guide;
+            var bodyText=(Text)typeof(VrWorldGuide).GetField("body",Private).GetValue(guide);
+            var titleText=(Text)typeof(VrWorldGuide).GetField("title",Private).GetValue(guide);
+            var pageContents=(System.Collections.Generic.List<string>)typeof(VrWorldGuide).GetField("pages",Private).GetValue(guide);
+            for(int textSize=0;textSize<3;textSize++)
+            {
+                foreach(var exhibit in FindObjectsByType<PaintingExhibit>(FindObjectsSortMode.None))
+                {
+                    guide.Show(exhibit.PaintingData);Canvas.ForceUpdateCanvases();
+                    Require(titleText.preferredHeight<=titleText.rectTransform.rect.height+2,"Título completo: "+exhibit.PaintingData.uniqueId);
+                    bool fits=true;
+                    foreach(var content in pageContents)
+                    {
+                        bodyText.text=content;
+                        fits &= bodyText.preferredHeight<=bodyText.rectTransform.rect.height+2;
+                    }
+                    Require(fits,"Páginas sem corte no tamanho "+preferences.TextStep+": "+exhibit.PaintingData.uniqueId);
+                }
+                preferences.CycleTextSize();
+            }
+            guide.Show(original.PaintingData);
             PointAt(Button("Próxima").transform);
             yield return new WaitForSecondsRealtime(1.3f);
             Require(guide.PageIndex == 1 && gaze.Focus.Current == original.PaintingData, "Ler controles mantém ficha e avança página");
@@ -74,6 +177,7 @@ namespace MuseumModerna
             PointAt(Button("Fixar").transform);
             yield return new WaitForSecondsRealtime(1.3f);
             Require(gaze.Focus.Pinned, "Fixação pelo olhar");
+            Button("Anterior").onClick.Invoke();
             eye.transform.LookAt(original.transform.position);
             yield return new WaitForSecondsRealtime(.2f);
             Capture("museum-vr-guide-editor.png");
@@ -85,7 +189,11 @@ namespace MuseumModerna
             Require(gaze.Focus.Current == null && guide.GetComponent<CanvasGroup>().alpha == 0, "Fechar pelo olhar");
             eye.transform.rotation = Quaternion.LookRotation(new Vector3(0, 1, .6f));
             yield return new WaitForSecondsRealtime(1.5f);
-            Require(guide.MenuOpen, "Olhar para cima abre opções sem controle");
+            Require(!guide.MenuOpen, "Céu permanece livre depois de fechar ficha");
+            eye.transform.rotation=Quaternion.identity;yield return null;
+            eye.transform.rotation=Quaternion.Euler(18,0,0);yield return null;
+            PointAt(Button("Menu").transform);yield return new WaitForSecondsRealtime(1.3f);
+            Require(guide.MenuOpen,"Menu continua disponível após fechar ficha");
             PointAt(Button("Sair do VR").transform); yield return new WaitForSecondsRealtime(1.3f);
             var ui = FindAnyObjectByType<UIManager>();
             Require(!mode.IsActive && ui.GetComponent<Canvas>().enabled &&
@@ -93,10 +201,16 @@ namespace MuseumModerna
                 "Sair pelo olhar restaura a home e interrompe caminhada");
 
             // Recuperação conjunta: Android pode notificar foco e pausa em ordens diferentes.
-            eye.transform.localRotation = Quaternion.Euler(0, 35, 0);
+            eye.transform.localRotation = Quaternion.Euler(35, 125, 0);
             mode.EnterEditorPreview();
             Require(mode.IsActive && !guide.MenuOpen && player.State != PlayerState.Paused,
                 "Entrar novamente depois de sair libera a visita");
+            yield return null;
+            Require(Vector3.Angle(Vector3.ProjectOnPlane(eye.transform.forward,Vector3.up),toolbar.forward)<.01f,
+                "Entrar inclinado posiciona controles na direção atual, não na visita anterior");
+            guide.OpenMenu();
+            mode.HandleBack();
+            Require(mode.IsActive&&!guide.MenuOpen,"Voltar fecha opções VR sem sair do visor");
             guide.OpenMenu();
             PointAt(Button("Voltar à visita").transform);
             yield return new WaitForSecondsRealtime(.4f);
@@ -153,8 +267,17 @@ namespace MuseumModerna
             mode.EnterNormalMode();
             Require(!mode.IsPreparationVisible && player.State != PlayerState.Paused,
                 "Falha de tracking permite voltar à visita normal");
+            var speedButton=ui.GetComponentsInChildren<Button>(true).First(b=>b.GetComponentInChildren<Text>(true)?.text=="Velocidade: "+HeadGazeMovement.SpeedLabel);
+            for(int i=0;i<3;i++)
+            {
+                speedButton.onClick.Invoke();
+                Require(HeadGazeMovement.SpeedSetting==(initialSpeed+i+1)%3,"Velocidade normal alterada e compartilhada com VR");
+            }
+            Require(!ui.GetComponentsInChildren<Text>(true).Any(t=>t.text.Contains("QR")),"Interface sem opção ou solicitação de QR");
         }
-        private Button Button(string label) => guide.GetComponentsInChildren<Button>().First(b => b.GetComponentInChildren<Text>().text == label);
+        private Button Button(string label) => FindObjectsByType<Button>(FindObjectsSortMode.None).First(b =>
+            (b.transform.IsChildOf(guide.transform) || b.transform.root.name=="Controles_da_visita_VR" ||
+             b.GetComponentInParent<Canvas>().name=="Controles_da_visita_VR") && b.GetComponentInChildren<Text>().text == label);
         private void PointAt(Transform target)
         {
             Canvas.ForceUpdateCanvases();

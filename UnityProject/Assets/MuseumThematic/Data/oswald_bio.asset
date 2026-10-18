@@ -17,22 +17,24 @@ MonoBehaviour:
   year: 1922
   movement: Modernismo brasileiro
   periodo: "1890\u20131954"
-  tecnica: "Painel did\xE1tico"
+  tecnica: Fotografia documental
   categoria: biografia
   relacao_com_a_semana_de_1922: "Foi um dos articuladores da Semana e defensor da
     renova\xE7\xE3o art\xEDstica. Os manifestos Pau-Brasil e Antrop\xF3fago, apresentados
     na sala ao fundo, vieram depois de 1922."
-  obra_historica_ou_reinterpretacao: "Painel did\xE1tico original do museu sobre
-    a obra ou assunto; n\xE3o \xE9 reprodu\xE7\xE3o de pintura nem de capa hist\xF3rica."
+  obra_historica_ou_reinterpretacao: "Reprodu\xE7\xE3o digital da obra. Arquivo Nacional
+    \xB7 Correio da Manh\xE3 \xB7 sem data \xB7 dom\xEDnio p\xFAblico"
   resumo: "Humor, s\xEDntese e provoca\xE7\xE3o para questionar conven\xE7\xF5es
     liter\xE1rias e depend\xEAncias culturais."
-  fontes: https://bndigital.bn.gov.br/oswald-de-andrade/
+  fontes: "https://commons.wikimedia.org/wiki/File:Oswald_de_Andrade,_sem_data%E2%80%93AI_enhanced.tiff#filehistory\nVers\xE3o
+    original de 17/05/2018, anterior ao retoque: https://upload.wikimedia.org/wikipedia/commons/archive/3/3d/20201206223023%21Oswald_de_Andrade%2C_sem_data%E2%80%93AI_enhanced.tiff\nAcervo:
+    BR_RJANRIO_PH_0_FOT_08763_006\nhttps://bndigital.bn.gov.br/oswald-de-andrade/"
   description: "Nascido em S\xE3o Paulo, Oswald de Andrade atuou na imprensa, na
     literatura e no debate cultural. Viagens, conviv\xEAncia com artistas e experimenta\xE7\xE3o
     da linguagem marcaram seus romances e poemas. Seus manifestos propuseram maneiras
     diferentes de pensar a rela\xE7\xE3o entre o Brasil e a cultura estrangeira."
   funFact: 
-  paintingTexture: {fileID: 0}
+  paintingTexture: {fileID: 2800000, guid: 74c2964f1c1094c4eb4ebb2bf6357c70, type: 3}
   thumbnailSprite: {fileID: 0}
   audioGuide: {fileID: 0}
   audioDuration: 0

@@ -30,8 +30,8 @@ MonoBehaviour:
   description: "No Theatro Municipal, a Semana de Arte Moderna reuniu uma exposi\xE7\xE3o
     e tr\xEAs festivais realizados em 13, 15 e 17 de fevereiro. A recep\xE7\xE3o
     incluiu entusiasmo e contesta\xE7\xE3o. O evento tornou-se um marco, mas n\xE3o
-    resume toda a modernidade art\xEDstica brasileira. Neste percurso, quatro salas
-    apresentam artistas e uma quinta introduz manifestos publicados nos anos seguintes."
+    resume toda a modernidade art\xEDstica brasileira. Neste percurso, cinco salas
+    apresentam artistas e outra introduz manifestos publicados nos anos seguintes."
   funFact: 
   paintingTexture: {fileID: 0}
   thumbnailSprite: {fileID: 0}

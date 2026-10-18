@@ -7,9 +7,9 @@ namespace MuseumModerna
     [DefaultExecutionOrder(100)]
     public class GazeDwellInteraction : MonoBehaviour
     {
-        [SerializeField, Min(0)] private float dwellTime = 0.12f;
+        [SerializeField, Min(0)] private float dwellTime = MuseumGuideTheme.ExhibitDwell;
         [SerializeField, Min(0.1f)] private float maxRayDistance = 8f;
-        [SerializeField, Min(0)] private float autoCloseTimeout = 0.15f;
+        [SerializeField, Min(0)] private float autoCloseTimeout = MuseumGuideTheme.ExhibitLinger;
         [SerializeField] private LayerMask paintingLayer; // compatibilidade das cenas existentes
         [SerializeField] private PlayerController playerController;
         [SerializeField] private UIManager uiManager;
@@ -27,6 +27,9 @@ namespace MuseumModerna
 
         private void Awake()
         {
+            // Migrate the formerly near-instant serialized timings, preserving slower choices.
+            dwellTime=Mathf.Max(dwellTime,MuseumGuideTheme.ExhibitDwell);
+            autoCloseTimeout=Mathf.Max(autoCloseTimeout,MuseumGuideTheme.ExhibitLinger);
             vrCamera = vrCamera != null ? vrCamera : GetComponent<Camera>() ?? Camera.main;
             playerController = playerController != null ? playerController : FindAnyObjectByType<PlayerController>();
             uiManager = uiManager != null ? uiManager : FindAnyObjectByType<UIManager>();
@@ -51,7 +54,7 @@ namespace MuseumModerna
         private void Update()
         {
             if (vrCamera == null || playerController == null) return;
-            if (playerController.State == PlayerState.Paused) return;
+            if (playerController.State == PlayerState.Paused) { candidateTime = 0; return; }
             var vrMode = MobileVrMode.Instance;
             bool inVr = vrMode != null && vrMode.IsActive;
             if (inVr && (vrMode.WorldGuide.ConsumesGaze || vrMode.WorldGuide.MenuOpen))
@@ -64,9 +67,8 @@ namespace MuseumModerna
             if (candidate != data) { candidate = data; candidateTime = 0; }
             candidateTime += Time.unscaledDeltaTime;
             Focus.Observe(candidateTime >= dwellTime ? data : null, Time.unscaledDeltaTime,
-                LongerReading ? 5f : inVr ? 1.2f : autoCloseTimeout);
+                LongerReading ? 5f : autoCloseTimeout);
 
-            if (Input.GetKeyDown(KeyCode.Escape)) Close();
             if (Input.GetKeyDown(KeyCode.F)) TogglePin();
             if (!inVr && Input.touchCount > 0)
             {

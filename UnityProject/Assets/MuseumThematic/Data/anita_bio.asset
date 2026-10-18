@@ -17,25 +17,25 @@ MonoBehaviour:
   year: 1922
   movement: Modernismo brasileiro
   periodo: "1889\u20131964"
-  tecnica: "Painel did\xE1tico"
+  tecnica: Fotografia documental
   categoria: biografia
   relacao_com_a_semana_de_1922: "Participou da exposi\xE7\xE3o da Semana de 1922.
     Sua trajet\xF3ria deve ser compreendida por suas escolhas art\xEDsticas e atua\xE7\xE3o,
     al\xE9m da conhecida pol\xEAmica de 1917."
-  obra_historica_ou_reinterpretacao: "Painel did\xE1tico original do museu sobre
-    a obra ou assunto; n\xE3o \xE9 reprodu\xE7\xE3o de pintura nem de capa hist\xF3rica."
+  obra_historica_ou_reinterpretacao: "Reprodu\xE7\xE3o digital da obra. Arquivo Nacional
+    \xB7 Fundo Correio da Manh\xE3 \xB7 dom\xEDnio p\xFAblico"
   resumo: "Sua experimenta\xE7\xE3o com cor e forma foi decisiva para os debates
     que antecederam a Semana."
-  fontes: 'https://anitamalfatti.ieb.usp.br/1950-1954/
+  fontes: 'https://commons.wikimedia.org/wiki/File:Correio_da_Manh%C3%A3_AN_427.jpg
 
-    https://brasilianafotografica.bn.gov.br/?p=26620'
+    https://anitamalfatti.ieb.usp.br/1950-1954/'
   description: "Anita Malfatti nasceu em S\xE3o Paulo e estudou arte na Alemanha
     e nos Estados Unidos. Sua exposi\xE7\xE3o de 1917 provocou discuss\xF5es sobre
     pintura moderna e reuniu em sua defesa futuros integrantes do movimento. Cor
     expressiva, pincelada vis\xEDvel e deforma\xE7\xE3o afastaram parte de sua produ\xE7\xE3o
     dos padr\xF5es acad\xEAmicos."
   funFact: 
-  paintingTexture: {fileID: 0}
+  paintingTexture: {fileID: 2800000, guid: c82dd034392104d46bac1f3b99ac61be, type: 3}
   thumbnailSprite: {fileID: 0}
   audioGuide: {fileID: 0}
   audioDuration: 0

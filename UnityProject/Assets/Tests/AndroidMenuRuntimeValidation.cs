@@ -17,19 +17,31 @@ namespace MuseumModerna
         private UIManager ui;
         private Camera eye;
         private int checks;
+        private int savedTilt, savedTap;
+        private bool hadTilt, hadTap;
         private IEnumerator Start()
         {
+            hadTilt=PlayerPrefs.HasKey("MuseumTiltWalking");hadTap=PlayerPrefs.HasKey("MuseumTapToWalk");
+            savedTilt=PlayerPrefs.GetInt("MuseumTiltWalking",0);savedTap=PlayerPrefs.GetInt("MuseumTapToWalk",0);
+            HeadGazeMovement.SetTapToWalk(false);
             yield return null; yield return null;
             var routine = Tests();
             while (true)
             {
                 object next;
                 try { if (!routine.MoveNext()) break; next = routine.Current; }
-                catch (Exception e) { Debug.LogException(e); UnityEditor.EditorApplication.Exit(1); yield break; }
+                catch (Exception e) { RestorePreferences();Debug.LogException(e); UnityEditor.EditorApplication.Exit(1); yield break; }
                 yield return next;
             }
+            RestorePreferences();
             Debug.Log($"[AndroidMenuValidation] PASS: {checks} verificações de menu/visual; 7 capturas.");
             UnityEditor.EditorApplication.Exit(0);
+        }
+        private void RestorePreferences()
+        {
+            if(hadTilt)PlayerPrefs.SetInt("MuseumTiltWalking",savedTilt);else PlayerPrefs.DeleteKey("MuseumTiltWalking");
+            if(hadTap)PlayerPrefs.SetInt("MuseumTapToWalk",savedTap);else PlayerPrefs.DeleteKey("MuseumTapToWalk");
+            PlayerPrefs.Save();
         }
         private IEnumerator Tests()
         {
@@ -49,6 +61,66 @@ namespace MuseumModerna
                 Click(welcome.NormalButton);
                 Require(!welcome.IsVisible && !mode.IsActive && !mode.IsPreparationVisible && player.State == PlayerState.Walking,
                     "Modo normal entra sem inicializar visor e sem menu sobreposto");
+                bool savedTilt=HeadGazeMovement.TiltWalking;
+                HeadGazeMovement.SetTiltWalking(false);yield return null;
+                var walk=FindAnyObjectByType<MuseumWalkButton>();
+                Require(walk.GetComponentInChildren<Text>().text.Contains("CAMINHAR"),
+                    "Botão de caminhada mostra instrução desde a primeira visita");
+                var movement=player.GetComponent<HeadGazeMovement>();
+                typeof(HeadGazeMovement).GetMethod("OnApplicationFocus",BindingFlags.Instance|BindingFlags.NonPublic).Invoke(movement,new object[]{true});
+                var pointer=new PointerEventData(EventSystem.current){button=PointerEventData.InputButton.Left};
+                Canvas.ForceUpdateCanvases();
+                var walkRect=(RectTransform)walk.transform;
+                pointer.position=RectTransformUtility.WorldToScreenPoint(null,walkRect.TransformPoint(walkRect.rect.center));
+                var walkHits=new List<RaycastResult>();EventSystem.current.RaycastAll(pointer,walkHits);
+                Require(walkHits.Count>0&&ExecuteEvents.GetEventHandler<IPointerDownHandler>(walkHits[0].gameObject)==walk.gameObject,
+                    "Toque na tela alcança o botão de caminhada sem sobreposição");
+                ExecuteEvents.Execute(walk.gameObject,pointer,ExecuteEvents.pointerDownHandler);
+                Require(movement.ManualWalkingRequested,"Pressionar botão normal solicita caminhada");
+                var beforeWalk=player.transform.position;
+                yield return new WaitForSecondsRealtime(.4f);
+                Require(Vector2.Distance(new Vector2(beforeWalk.x,beforeWalk.z),new Vector2(player.transform.position.x,player.transform.position.z))>.1f,
+                    "Segurar o botão desloca o jogador real no Hall");
+                Require(walk.GetComponent<Image>().color==MuseumGuideTheme.Focus,"Feedback de pressão permanece durante a caminhada");
+                var otherFinger=new PointerEventData(EventSystem.current){pointerId=8,button=PointerEventData.InputButton.Left};
+                ExecuteEvents.Execute(walk.gameObject,otherFinger,ExecuteEvents.pointerUpHandler);
+                Require(movement.ManualWalkingRequested,"Soltar outro dedo não cancela a caminhada");
+                ExecuteEvents.Execute(walk.gameObject,pointer,ExecuteEvents.pointerUpHandler);
+                Require(!movement.ManualWalkingRequested&&movement.CurrentSpeed==0,"Soltar botão normal para sem inércia");
+                ExecuteEvents.Execute(walk.gameObject,pointer,ExecuteEvents.pointerDownHandler);
+                ExecuteEvents.Execute(walk.gameObject,pointer,ExecuteEvents.pointerExitHandler);
+                Require(!movement.ManualWalkingRequested,"Sair da área do botão também interrompe caminhada");
+                HeadGazeMovement.SetTapToWalk(true);yield return null;
+                ExecuteEvents.Execute(walk.gameObject,pointer,ExecuteEvents.pointerDownHandler);
+                ExecuteEvents.Execute(walk.gameObject,pointer,ExecuteEvents.pointerUpHandler);
+                Require(movement.ManualWalkingRequested,"Modo por toque inicia caminhada sem exigir pressão contínua");
+                yield return null;
+                Require(walk.GetComponentInChildren<Text>().text.Contains("Toque para parar"),"Modo por toque mostra como parar");
+                ExecuteEvents.Execute(walk.gameObject,pointer,ExecuteEvents.pointerDownHandler);
+                ExecuteEvents.Execute(walk.gameObject,pointer,ExecuteEvents.pointerUpHandler);
+                Require(!movement.ManualWalkingRequested,"Segundo toque interrompe caminhada");
+                ExecuteEvents.Execute(walk.gameObject,pointer,ExecuteEvents.pointerDownHandler);
+                ExecuteEvents.Execute(walk.gameObject,pointer,ExecuteEvents.pointerUpHandler);
+                walk.enabled=false;
+                Require(!movement.ManualWalkingRequested,"Desativar controle cancela caminhada por toque");
+                walk.enabled=true;
+                HeadGazeMovement.SetTapToWalk(false);
+                HeadGazeMovement.SetTiltWalking(true);yield return null;
+                Require(walk.GetComponent<CanvasGroup>().interactable,"Botão continua disponível quando inclinação está ativa");
+                ExecuteEvents.Execute(walk.gameObject,pointer,ExecuteEvents.pointerDownHandler);
+                Require(movement.ManualWalkingRequested,"Botão inicia caminhada mesmo com inclinação ativa");
+                ExecuteEvents.Execute(walk.gameObject,pointer,ExecuteEvents.pointerExitHandler);
+                Require(!movement.ManualWalkingRequested,"Botão interrompe caminhada auxiliar com inclinação ativa");
+                HeadGazeMovement.SetTiltWalking(false);
+                HeadGazeMovement.SetTiltWalking(savedTilt);
+                ui.Guide.OpenSettings();
+                Require(player.State==PlayerState.Paused,"Opções pausam a visita em qualquer modo de caminhada");
+                mode.HandleBack();
+                Require(!ui.Guide.SettingsOpen&&!welcome.IsVisible&&!mode.IsPreparationVisible,
+                    "Voltar fecha somente opções sem sair da visita normal");
+                Require(EventSystem.current.currentSelectedGameObject==null,
+                    "Fechar opções limpa seleção de botão oculto");
+                Require(player.State!=PlayerState.Paused&&!movement.ManualWalkingRequested,"Fechar opções retoma sem caminhar sozinho");
                 mode.ShowMainMenu();
                 yield return null;
                 Require(welcome.IsVisible && player.State == PlayerState.Paused, "Retornar ao menu interrompe visita");
@@ -111,7 +183,7 @@ namespace MuseumModerna
             var old = RenderTexture.active; RenderTexture.active = target;
             var texture = new Texture2D(width, height, TextureFormat.RGB24, false);
             texture.ReadPixels(new Rect(0,0,width,height),0,0); texture.Apply();
-            string folder = Path.GetFullPath(Path.Combine(Application.dataPath,"../../artifacts/bugfix-2026-09-21"));
+            string folder = Path.GetFullPath(Environment.GetEnvironmentVariable("MUSEUM_CAPTURE_OUTPUT") ?? Path.Combine(Application.dataPath,"../../artifacts/bugfix-2026-09-21"));
             Directory.CreateDirectory(folder);
             File.WriteAllBytes(Path.Combine(folder,$"menu-{width}x{height}.png"),texture.EncodeToPNG());
             RenderTexture.active = old; eye.targetTexture = null;
