@@ -1,6 +1,103 @@
 # Handoff — Museu da Semana de Arte Moderna
 
-Atualizado: 30/09/2026 — percurso com Hall e cinco salas.
+Atualizado: 05/10/2026 — controles explícitos, céu livre de gestos de menu e fichas VR laterais.
+
+## Estado vigente — 05/10/2026
+
+| Item | Estado | Observação |
+|---|---|---|
+| Acervo e ambiente | Preservados da etapa visual de 05/10 | 28 fichas; obras nas salas dos autores; cinco retratos documentais; Tarsila com Abaporu |
+| Lua e céu estrelado | Preservados | Shader direcional compartilhado por sete claraboias, lua com relevo, luz lunar e ambiente noturno |
+| Visita normal | Implementado | Segurar botão para caminhar; soltar/sair da área para parar; opções pausam a visita |
+| Visita VR | Implementado | Botões Caminhar/Menu abaixo do horizonte; olhar para cima não abre menu; olhar à frente após comando inicia marcha; baixar a cabeça para |
+| Modo antigo | Disponível | Caminhada por inclinação opcional, persistida em `MuseumTiltWalking`; padrão novo por botão |
+| Fichas | Implementado | Dwell mínimo 0,55 s; tolerância após sair do olhar 1,5 s ou 5 s; painel VR ao lado da obra; reposicionamento; seções e quebras por frases |
+| Menu VR | Simplificado | Duas páginas, seis ações por página e alvos maiores; velocidades disponíveis na primeira página |
+| Testes VR | Aprovados | 213 verificações de execução + seis cenários de dwell, incluindo as 28 fichas nos três tamanhos de texto |
+| Testes de movimento | Aprovados | 42 verificações, incluindo comando manual, parada, pausa, foco, inclinação legada e colisões |
+| Testes de menu | Aprovados | 134 verificações, sete resoluções, pressionar/soltar/sair do botão e pausa das opções |
+| Testes temáticos | Aprovados | 271 verificações de acervo, circulação, retratos, luzes, claraboias, lua e vitrines |
+| APK Android | Gerado e verificado | `artifacts/interacoes-2026-10-05/Museu-Interacoes-2026-10-05.apk`; 140.078.781 bytes; ZIP, alinhamento e assinatura v2 aprovados |
+| Aparelho físico | Pendente | Lentes, conforto, sensores, FPS e aquecimento não validados no Editor |
+
+### Execução e arquivos desta etapa
+
+- Scripts: `HeadGazeMovement`, `GazeDwellInteraction`, `MuseumGuideTheme`, `MuseumGuidePanel`, `MuseumWalkButton` (novo), `VrWorldGuide`, `MobileVrMode`.
+- Testes: `VrRuntimeValidation`, `MovementRuntimeValidation`, `AndroidMenuRuntimeValidation`.
+- Evidências: `artifacts/interacoes-2026-10-05/vr/` e `artifacts/interacoes-2026-10-05/menu/`.
+- Entrega visual anterior preservada: `artifacts/visual-noturno-2026-10-05/Museu-Lua-e-Ceu-Estrelado-2026-10-05.apk`.
+- APK atual: `artifacts/interacoes-2026-10-05/Museu-Interacoes-2026-10-05.apk`; SHA-256 `65313474d86adad098e3c9c7202fd482c676199214a93c4fa273165b57d752ca`.
+- Cópia na Mesa: `/Users/rafaeldomingues/Desktop/Museu-Interacoes-2026-10-05.apk`, com o mesmo SHA-256; versão anterior preservada.
+- O histórico de 02/10 abaixo descreve versões anteriores: a contagem de 31 fichas, Abaporu nos manifestos e quatro páginas de menu VR já não são o estado atual.
+
+### O que funcionou e o que foi corrigido
+
+- Separar o consumo do olhar pela barra de controles do bloqueio de caminhada pela ficha evita cancelar o comando antes de o visitante olhar à frente.
+- O teste VR por botão inicialmente falhou porque o Editor em batch estava sem foco; normalizada a notificação de foco no teste, preservando a proteção no aplicativo.
+- A primeira paginação deixava o fim de uma frase isolado; agora prioriza limites de frases/parágrafos quando ocupam pelo menos metade da página.
+- Skills de redesign/design-code sem os arquivos de apoio locais: aplicado o tema Unity existente; não foi executada nem alegada certificação WCAG/ARIA ou aprovação dos scripts ausentes.
+- Nenhum reset, limpeza ou commit: alterações anteriores do usuário preservadas.
+
+### Próximos passos vigentes
+
+1. Validar esta versão em Android/visor físico, especialmente descoberta dos controles abaixo do horizonte e conforto ao parar.
+2. Medir desempenho antes de ampliar sombras, resolução ou pós-processamento.
+3. Continuar a lista de melhorias visuais e interativas; esta etapa não representa conclusão de todo o levantamento.
+
+## Histórico — 02/10/2026
+
+- APK: `artifacts/ambiente-noturno-2026-10-02/Museu-Noite-Estrelada-2026-10-02.apk` e cópia idêntica na Mesa.
+- SHA-256: `15186b97b8735fff9cf33c2a6c73536527ac8ed72ba9c8ee29fcfaa848bd644b`.
+- 31 fichas ativas: 27 do catálogo e quatro reproduções complementares no foyer.
+- Abaporu original de 1928 incluído na sala de manifestos, com reprodução institucional do MALBA e contexto explícito de que é posterior à Semana.
+- A ficha biográfica vazia de Di Cavalcanti virou retrato documental de 1964 do Arquivo Nacional, em domínio público.
+- Seis cabeçalhos de sala redesenhados: placa escura, filetes dourados, número, título e subtítulo separados.
+- Placas das obras ganharam fundo próprio e hierarquia de título/período/crédito; a fonte é pré-carregada para estabilizar o atlas e evitar glitches.
+- Sala Di Cavalcanti possui quatro vasos, um em cada canto, sem bloquear porta, quadros ou cordões.
+- Sete claraboias mostram céu estrelado e lua; seis salas e o Hall recebem luz lunar fria com sombras, preservando a luz quente do lustre.
+- Spawn voltou ao centro do Hall. O mapa escuro do percurso foi retirado a pedido do usuário.
+- Focos das obras acendem por proximidade (3,8 m, seleção dos três mais próximos, sem ativação pelo verso ou através de parede).
+- Lustre ilumina de verdade; arquitetura projeta sombras; `LouvreGalleryLighting.ApplyGallery` mantém o ambiente e `AutoBootstrap` não adiciona o ciclo diurno na planta temática.
+- Três velocidades persistidas em `MuseumWalkSpeed`, disponíveis em opções normais e na página 4 do menu VR.
+- Entrada VR automática após preparo do XR, sem leitor QR. A recuperação de falha permanece manual para evitar um ciclo de reentrada sem tracking.
+- Validações: temática 277, VR 39 e movimento 38, todas com saída 0 no Editor.
+- APK de 112 MiB: ZIP íntegro, `zipalign -c 4` aprovado e assinatura Android v2 válida.
+- Teste em celular/visor físico permanece pendente, em particular sombras OpenGLES3, FPS e conforto.
+- Usada a skill handoff para registrar o resultado e preservar as decisões anteriores abaixo.
+
+## O que foi executado nesta etapa
+
+| Item | Estado | Resultado |
+|---|---|---|
+| Conteúdo | Feito | Abaporu correto e retrato de Di Cavalcanti adicionados com fonte e crédito |
+| Sinalização | Feito | Cabeçalhos e placas de obras redesenhados; fonte pré-carregada |
+| Ambientação | Feito | Quatro vasos nos cantos da sala Di Cavalcanti |
+| Claraboias | Feito | Vidro corrigido de opaco para transparente; estrelas, lua e luz fria visíveis |
+| Validações | Aprovado | 277 temática, 39 VR, 38 movimento |
+| APK Android | Gerado | 112 MiB, assinatura v2, alinhamento e integridade aprovados |
+| Aparelho físico | Pendente | Instalação, FPS, leitura e conforto em Android/visor |
+
+## Decisões desta etapa
+
+- O arquivo `texturas/abaporu.jpg` não foi usado: era uma releitura visualmente incorreta, não a obra de Tarsila.
+- A reprodução correta veio da página oficial da coleção MALBA; o retrato veio do Arquivo Nacional via Wikimedia Commons.
+- O céu é uma textura procedural local, evitando dependência de internet no aplicativo.
+- A iluminação lunar usa spots de teto com sombras suaves; o lustre continua quente para manter contraste e legibilidade.
+
+## Próximos passos vigentes
+
+1. Instalar `Museu-Noite-Estrelada-2026-10-02.apk` em Android ARM64.
+2. Conferir se céu, lua, sombras e 31 focos mantêm FPS aceitável no aparelho real.
+3. Testar legibilidade dos novos cabeçalhos e fichas em visita normal e no visor VR.
+
+## Estado anterior — 02/10/2026
+
+- Entrega anterior: `artifacts/visita-completa-2026-10-02/README.md`.
+- Essa versão tinha 30 fichas, antes da inclusão do Abaporu e do retrato documental.
+
+## Histórico — entrega de 30/09/2026
+
+Os registros abaixo descrevem a entrega anterior. Spawn no foyer, mapa e contagens de 26 fichas foram substituídos pelo estado vigente acima.
 
 ## Objetivo
 

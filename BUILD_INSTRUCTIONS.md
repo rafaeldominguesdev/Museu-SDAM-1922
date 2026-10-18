@@ -45,3 +45,4 @@ Se o passo anterior terminar com `BUILD SUCCESSFUL`, o seu arquivo APK estará l
 ## (Opcional) Adicionar as suas obras
 Abra a pasta `/Users/rafaeldomingues/SemanaArteModerna/app/src/main/res/drawable/`. 
 Você pode substituir o arquivo `obra_placeholder.xml` por arquivos de imagem reais (ex: `obra_abaporu.png`) e atualizar o código no `GalleryRenderer.kt` para carregar as texturas dessas imagens nos painéis 3D.
+∑
