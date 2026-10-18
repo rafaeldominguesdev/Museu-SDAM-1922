@@ -75,3 +75,11 @@ crashlytics-build.properties
 .Trashes
 ehthumbs.db
 Thumbs.db
+
+# Backups e arquivos locais (nao versionar)
+*.blend1
+*.apk.previous-*
+artifacts/**/*.log
+.claude/settings.local.json
+.grok/
+.devterm/
