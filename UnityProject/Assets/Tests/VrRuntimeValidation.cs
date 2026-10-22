@@ -213,10 +213,19 @@ namespace MuseumModerna
                         fits &= bodyText.preferredHeight<=bodyText.rectTransform.rect.height+2;
                     }
                     Require(fits,"Páginas sem corte no tamanho "+preferences.TextStep+": "+exhibit.PaintingData.uniqueId);
+                    var completeText = string.Concat(pageContents.Select(WithoutWhitespace));
+                    var data = exhibit.PaintingData;
+                    var fields = new[] { data.artist, data.Periodo, data.tecnica,
+                        preferences.Summary ? data.resumo : data.description,
+                        data.relacao_com_a_semana_de_1922, data.obra_historica_ou_reinterpretacao,
+                        preferences.Summary ? "" : data.fontes };
+                    Require(fields.All(field => completeText.Contains(WithoutWhitespace(field ?? ""))),
+                        "Paginação preserva conteúdo e fontes: " + data.uniqueId);
                 }
                 preferences.CycleTextSize();
             }
             guide.Show(original.PaintingData);
+            Require(pageContents[0].Contains("RELAÇÃO COM 1922"), "Primeira página aproveita espaço com a seção seguinte");
             PointAt(Button("Próxima página").transform);
             yield return new WaitForSecondsRealtime(1.3f);
             Require(guide.PageIndex == 1 && gaze.Focus.Current == original.PaintingData, "Ler controles mantém ficha e avança página");
@@ -342,6 +351,7 @@ namespace MuseumModerna
             Canvas.ForceUpdateCanvases();
             eye.transform.LookAt(target.position);
         }
+        private static string WithoutWhitespace(string value) => new string(value.Where(c => !char.IsWhiteSpace(c)).ToArray());
         private void Capture(string filename)
         {
             var target = new RenderTexture(1440, 900, 24);

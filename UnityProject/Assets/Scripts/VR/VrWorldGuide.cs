@@ -200,11 +200,11 @@ namespace MuseumModerna
             body.fontSize = MuseumGuideTheme.VrBody + preferences.TextStep * 4;
             var description = preferences.Summary ? current.resumo : current.description;
             Canvas.ForceUpdateCanvases();
-            var sections=new List<string>{"SOBRE A OBRA\n"+current.artist+" — "+current.Periodo+"\n"+current.tecnica+"\n\n"+description,
+            var sections=new List<string>{current.artist+" — "+current.Periodo+"\n"+current.tecnica+"\n\n"+description,
                 "RELAÇÃO COM 1922\n"+current.relacao_com_a_semana_de_1922,
                 "SOBRE ESTA REPRODUÇÃO\n"+current.obra_historica_ou_reinterpretacao};
             if(!preferences.Summary)sections.Add("FONTES\n"+current.fontes);
-            foreach(var section in sections){var split=new List<string>();Paginate(section,body,split);pages.AddRange(split);}
+            Paginate(string.Join("\n\n", sections), body, pages);
             page = Mathf.Clamp(page, 0, pages.Count - 1);
         }
         public static void Paginate(string text, Text target, List<string> output)
