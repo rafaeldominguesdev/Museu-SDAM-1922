@@ -27,11 +27,8 @@ namespace MuseumModerna
         private Button previous, next;
         private readonly Button[] actions = new Button[6];
         private RectTransform actionGrid, toolbar;
-        private Button walkControl, menuControl;
-        private Text toolbarHint;
-        private HeadGazeMovement movement;
+        private Button menuControl;
         private Quaternion toolbarRotation=Quaternion.identity;
-        private bool toolbarRevealed;
         private Button highlighted;
         private readonly List<string> pages = new List<string>();
         private readonly GazeActivation activation = new GazeActivation();
@@ -52,7 +49,6 @@ namespace MuseumModerna
         {
             eye = camera; preferences = settings; mode = owner;
             gaze = eye.GetComponent<GazeDwellInteraction>();
-            movement=eye.GetComponentInParent<HeadGazeMovement>();
             var shader = Resources.Load<Shader>("Shaders/VrGuideUI");
             if (shader == null) shader = Shader.Find("Museum/VR Guide UI");
             overlayMaterial = new Material(shader);
@@ -119,42 +115,29 @@ namespace MuseumModerna
             var canvas=go.GetComponent<Canvas>();canvas.renderMode=RenderMode.WorldSpace;canvas.worldCamera=eye;canvas.sortingOrder=110;
             go.GetComponent<Image>().color=MuseumGuideTheme.Surface;
             var column=go.GetComponent<VerticalLayoutGroup>();column.padding=new RectOffset(16,16,12,12);column.spacing=10;column.childForceExpandHeight=false;
-            toolbarHint=MakeText(toolbar,"",MuseumGuideTheme.VrToolbarHint,48);toolbarHint.alignment=TextAnchor.MiddleCenter;
-            var row=Row(toolbar,"Comandos");
-            walkControl=MakeButton(row,"Caminhar",()=>
-            {
-                if(movement==null)return;
-                if(movement.ManualWalkingRequested)movement.CancelManualWalk();else movement.RequestManualWalk();
-            });
-            menuControl=MakeButton(row,"Menu",OpenMenu);
+            menuControl=MakeButton(toolbar,"Menu",OpenMenu);
             foreach(var graphic in toolbar.GetComponentsInChildren<Graphic>())graphic.material=overlayMaterial;
             UpdateToolbar();
         }
         private void UpdateToolbar()
         {
-            bool available=IsEnabled&&!MenuOpen&&!visible&&!gaze.IsPaused;
-            // Reveal below the horizon, with hysteresis. Keep the heading stable
-            // until the visitor looks up again so the targets cannot chase the gaze.
-            if(eye.transform.forward.y>-.18f)
+            bool lookingDown=eye.transform.forward.y<-.26f;
+            bool available=IsEnabled&&!MenuOpen&&!visible&&!gaze.IsPaused&&!lookingDown;
+            // Refresh heading while walking; keep the lateral target still when looking up to select it.
+            if(lookingDown)
             {
-                toolbarRevealed=false;
                 var forward=Vector3.ProjectOnPlane(eye.transform.forward,Vector3.up);
                 if(forward.sqrMagnitude>.1f)toolbarRotation=Quaternion.LookRotation(forward);
             }
-            else if(eye.transform.forward.y<-.26f)toolbarRevealed=true;
-            if(!available)toolbarRevealed=false;
             toolbar.SetPositionAndRotation(eye.transform.position+toolbarRotation*
-                new Vector3(0,-MuseumGuideTheme.VrToolbarDrop,MuseumGuideTheme.VrToolbarDistance),toolbarRotation);
-            toolbar.gameObject.SetActive(available&&toolbarRevealed);
-            SetButton(walkControl,movement!=null&&movement.ManualWalkingRequested?"Parar":"Caminhar");
-            toolbarHint.text=movement!=null&&movement.ManualWalkingRequested?"Levante a cabeça para começar a andar":"Mova a cabeça: mire no botão por 1 segundo";
+                new Vector3(-1.2f,0,MuseumGuideTheme.VrToolbarDistance),toolbarRotation);
+            toolbar.gameObject.SetActive(available);
         }
         public void SetVrEnabled(bool enabled)
         {
             IsEnabled = enabled; visible = false; MenuOpen = false; ConsumesGaze = false;
             current = null; group.alpha = 0; ResetInteraction();
             reticle.gameObject.SetActive(enabled);
-            toolbarRevealed=false;
             if (enabled)
             {
                 var forward=Vector3.ProjectOnPlane(eye.transform.forward,Vector3.up);
@@ -306,8 +289,7 @@ namespace MuseumModerna
             heading.text = "VISITA / CONTROLES PELO OLHAR";
             title.text = "Opções do visor";
             body.fontSize = MuseumGuideTheme.VrBody;
-            body.text = HeadGazeMovement.TiltWalking?"Modo por inclinação: olhe à frente, abaixe a cabeça para andar e levante para parar.\n\nPara observar o chão sem andar, troque para caminhada por botão.":
-                "1. Baixe a cabeça para mostrar os controles.\n2. Mire em Caminhar por 1 segundo.\n3. Levante a cabeça para andar; baixe para parar.\n\nAs opções só abrem pelo botão Menu.";
+            body.text = "Olhe à frente para preparar a visita. Abaixe a cabeça para andar e levante para parar.\n\nPara abrir as opções, olhe por 1 segundo para o botão Menu ao lado esquerdo. A caminhada fica pausada durante as opções.";
             pageLabel.text = menuPage==0?"VISITA · 1 de 2":"LEITURA · 2 de 2";
             previous.interactable = menuPage > 0; next.interactable = menuPage < 1;
             SetActionCount(6);
@@ -316,8 +298,8 @@ namespace MuseumModerna
                 SetButton(actions[0], "Voltar à visita");
                 SetButton(actions[1], "Centralizar");
                 SetButton(actions[2], "Velocidade: "+HeadGazeMovement.SpeedLabel);
-                SetButton(actions[3], "Caminhada: "+(HeadGazeMovement.TiltWalking?"inclinação":"botão"));
-                SetButton(actions[4], "Ajustar leitura");SetButton(actions[5], "Sair do VR");
+                SetButton(actions[3], "Ajustar leitura");SetButton(actions[4], "Sair do VR");
+                SetActionCount(5);
             }
             else if (menuPage == 1)
             {
@@ -356,9 +338,8 @@ namespace MuseumModerna
                 if (index == 0) { CloseMenu(); return; }
                 if (index == 1) mode.Recenter();
                 else if(index==2){HeadGazeMovement.CycleSpeed();RenderMenu();}
-                else if(index==3){HeadGazeMovement.SetTiltWalking(!HeadGazeMovement.TiltWalking);RenderMenu();}
-                else if(index==4){menuPage=1;RenderMenu();}
-                else if(index==5)mode.ExitVR();
+                else if(index==3){menuPage=1;RenderMenu();}
+                else if(index==4)mode.ExitVR();
                 return;
             }
             else if (menuPage == 1)
@@ -398,8 +379,7 @@ namespace MuseumModerna
             }
             else if(overToolbar)
             {
-                if(HitRect((RectTransform)walkControl.transform,ray))selected=walkControl;
-                else if(HitRect((RectTransform)menuControl.transform,ray))selected=menuControl;
+                if(HitRect((RectTransform)menuControl.transform,ray))selected=menuControl;
             }
             if(highlighted!=selected)
             {

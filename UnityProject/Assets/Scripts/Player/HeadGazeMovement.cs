@@ -24,8 +24,8 @@ namespace MuseumModerna
         public static int SpeedSetting => Mathf.Clamp(PlayerPrefs.GetInt("MuseumWalkSpeed",1),0,2);
         public static string SpeedLabel => new[]{"Lenta","Normal","Rápida"}[SpeedSetting];
         public static void CycleSpeed() { PlayerPrefs.SetInt("MuseumWalkSpeed",(SpeedSetting+1)%3); PlayerPrefs.Save(); }
-        public static float SelectedSpeed(bool vr) => SpeedSetting==0 ? (vr?.6f:.8f)
-            : SpeedSetting==2 ? (vr?1.1f:1.8f) : (vr?.9f:1.25f);
+        public static float SelectedSpeed(bool vr) => SpeedSetting==0 ? .8f
+            : SpeedSetting==2 ? (vr?1.6f:1.8f) : 1.25f;
         public static bool TiltWalking => PlayerPrefs.GetInt("MuseumTiltWalking",0)!=0;
         public static bool TapToWalk => PlayerPrefs.GetInt("MuseumTapToWalk",0)!=0;
         public static void SetTiltWalking(bool enabled)
@@ -39,22 +39,21 @@ namespace MuseumModerna
             foreach(var movement in FindObjectsByType<HeadGazeMovement>(FindObjectsSortMode.None))movement.ResetMovement();
         }
         public bool ManualWalkingRequested { get; private set; }
-        private bool manualAwaitingForward;
         public void RequestManualWalk()
         {
             // No modo normal, o botão é sempre uma alternativa confiável ao sensor.
             // Uma preferência de inclinação anterior não pode ocultar ou inutilizar
             // o único controle de caminhada do visitante.
-            if(!_movementEnabled||_applicationPaused||_applicationUnfocused)return;
+            if(!_movementEnabled||_applicationPaused||_applicationUnfocused||
+                (MobileVrMode.Instance!=null&&MobileVrMode.Instance.IsActive))return;
             ManualWalkingRequested=true;
-            manualAwaitingForward=MobileVrMode.Instance!=null&&MobileVrMode.Instance.IsActive;
         }
         public void CancelManualWalk()
         {
             // An explicit stop wins over a tilt that is already held down. Require
             // a fresh neutral pose before the sensor may restart walking.
             if(ManualWalkingRequested)gyroController?.ResetWalkingGesture();
-            ManualWalkingRequested=false;manualAwaitingForward=false;_currentSpeed=0;
+            ManualWalkingRequested=false;_currentSpeed=0;
         }
 
         [Tooltip("Fator de desaceleração ao parar de olhar para baixo (maior = para mais rápido)")]
@@ -213,19 +212,11 @@ namespace MuseumModerna
             // Ler uma ficha suspende o avanço, mas não exige rearmar o gesto
             // quando o olhar sai dela. Menus e pausas continuam exigindo olhar neutro.
             if (gazeBlocked) { CancelManualWalk(); return; }
-            if(inVr && TiltWalking && !ManualWalkingRequested && vr.WorldGuide != null && vr.WorldGuide.ConsumesGaze)
+            if(inVr && vr.WorldGuide != null && vr.WorldGuide.ConsumesGaze)
             { _currentSpeed=0; return; }
-            bool isWalking = ManualWalkingRequested || (TiltWalking && gyroController.IsLookingDown);
-            if(inVr&&ManualWalkingRequested)
-            {
-                float pitch=Mathf.Asin(Mathf.Clamp(cameraTransform.forward.y,-1,1))*Mathf.Rad2Deg;
-                if(manualAwaitingForward)
-                {
-                    if(Mathf.Abs(pitch)<20)manualAwaitingForward=false;
-                    else isWalking=false;
-                }
-                else if(pitch < -24 || pitch > 45){CancelManualWalk();isWalking=false;}
-            }
+            // VR always uses tilt, including installations with the old button preference saved.
+            bool isWalking = inVr ? gyroController.IsLookingDown :
+                ManualWalkingRequested || (TiltWalking && gyroController.IsLookingDown);
             float speed = SelectedSpeed(inVr);
 
             if (isWalking)

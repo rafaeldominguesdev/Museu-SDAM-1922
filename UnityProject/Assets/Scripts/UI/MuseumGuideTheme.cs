@@ -27,10 +27,8 @@ namespace MuseumModerna
         public const float VrDwell = 1f, VrDistance = 2.4f, VrScale = .00155f;
         public const float VrWidth = 900, VrHeight = 930, VrButtonHeight = 76, VrGap = 14;
         public const int VrBody = 32, VrTitle = 40, VrButtonText = 28;
-        // Barra de ação no campo de visão inferior confortável: alcançável sem inclinar
-        // excessivamente o pescoço e grande o bastante para as lentes de um visor móvel.
-        public const float VrToolbarWidth = 860, VrToolbarHeight = 194, VrToolbarDistance = 1.82f, VrToolbarDrop = .76f;
-        public const int VrToolbarHint = 32;
+        // Opções laterais deixam livre o gesto de olhar para baixo para caminhar.
+        public const float VrToolbarWidth = 280, VrToolbarHeight = 100, VrToolbarDistance = 1.82f;
         public const float VrReticleDistance = 1.3f, VrReticleScale = .0008f, VrReticleSize = 42, VrReticleDot = 7;
         public const float WalkButtonWidth = 230, WalkButtonHeight = 76;
 

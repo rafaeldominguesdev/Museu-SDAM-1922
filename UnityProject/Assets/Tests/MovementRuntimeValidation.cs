@@ -236,7 +236,8 @@ namespace MuseumModerna
             float walked = rig.transform.position.z - before.z;
             Require(walked > .3f && walked < 1f && Mathf.Abs(rig.transform.position.y - before.y) < .025f,
                 "CharacterController caminha, colide com parede e mantém altura");
-            Require(movement.CurrentSpeed <= 1.101f, "VR respeita limite de caminhada de 1,1 m/s");
+            Require(Mathf.Abs(movement.CurrentSpeed-HeadGazeMovement.SelectedSpeed(true))<.02f && movement.CurrentSpeed<=1.601f,
+                "VR atinge a velocidade escolhida e respeita o limite de 1,6 m/s");
             Pose(0, 1);
             before = rig.transform.position;
             Invoke(movement, "Update");

@@ -41,7 +41,7 @@ namespace MuseumModerna
             guide = mode.WorldGuide;
             eye = FindAnyObjectByType<GazeDwellInteraction>().GetComponent<Camera>();
             foreach (var gyro in FindObjectsByType<GyroscopeController>(FindObjectsSortMode.None)) gyro.enabled = false;
-            foreach (var movement in FindObjectsByType<HeadGazeMovement>(FindObjectsSortMode.None)) movement.enabled = false;
+            foreach (var existingMovement in FindObjectsByType<HeadGazeMovement>(FindObjectsSortMode.None)) existingMovement.enabled = false;
             foreach (var anchor in FindObjectsByType<PlayerSpawnAnchor>(FindObjectsSortMode.None)) anchor.enabled = false;
             foreach (var locked in FindObjectsByType<LockPosition>(FindObjectsSortMode.None)) locked.enabled = false;
             var player = FindAnyObjectByType<PlayerController>();
@@ -64,60 +64,71 @@ namespace MuseumModerna
             Require(!guide.MenuOpen, "Observar a lua e o céu não abre opções");
             eye.transform.rotation=Quaternion.identity;yield return null;
             var toolbar=(RectTransform)typeof(VrWorldGuide).GetField("toolbar",Private).GetValue(guide);
-            Require(!toolbar.gameObject.activeSelf,"Controles não cobrem a visita ao olhar à frente");
+            Require(toolbar.gameObject.activeSelf && !VrWorldGuide.HitRect(toolbar, new Ray(eye.transform.position, eye.transform.forward)),
+                "Menu fica lateral e deixa livre o centro da visita");
+            Require(!toolbar.GetComponentsInChildren<Button>(true).Any(b=>b.GetComponentInChildren<Text>().text=="Caminhar"),
+                "VR n?o solicita comando Caminhar");
             Capture("vr-visita-sem-painel.png");
-            eye.transform.rotation=Quaternion.Euler(18,0,0);yield return null;
-            Require(toolbar.gameObject.activeSelf,"Baixar a cabeça revela os controles");
-            var toolbarHeading=toolbar.rotation;
-            PointAt(Button("Caminhar").transform);
-            Capture("vr-controles.png");
-            yield return new WaitForSecondsRealtime(1.3f);
-            var manualMovement=player.GetComponent<HeadGazeMovement>();
-            Require(Quaternion.Angle(toolbar.rotation,toolbarHeading)<.01f,"Controles não fogem ao mirar lateralmente");
-            Invoke(manualMovement,"UpdateHorizontalMovement");
-            Require(manualMovement.ManualWalkingRequested&&manualMovement.CurrentSpeed==0,"Caminhar aguarda olhar à frente e não é cancelado pelo botão");
-            eye.transform.rotation=Quaternion.identity;
-            Invoke(manualMovement,"UpdateHorizontalMovement");
-            Require(manualMovement.CurrentSpeed>0,"Olhar à frente inicia caminhada VR após comando explícito");
-            eye.transform.rotation=Quaternion.Euler(45,0,0);
-            Invoke(manualMovement,"UpdateHorizontalMovement");
-            Require(!manualMovement.ManualWalkingRequested&&manualMovement.CurrentSpeed==0,"Baixar a cabeça interrompe caminhada manual VR");
-            // The saved tilt preference used to turn the walk control into a menu launcher.
-            HeadGazeMovement.SetTiltWalking(true);
-            eye.transform.rotation=Quaternion.identity;yield return null;
-            eye.transform.rotation=Quaternion.Euler(18,0,0);yield return null;
-            PointAt(Button("Caminhar").transform);
-            yield return new WaitForSecondsRealtime(1.3f);
-            Require(!guide.MenuOpen&&manualMovement.ManualWalkingRequested,
-                "Caminhar funciona com inclinação salva e nunca abre opções");
-            Invoke(manualMovement,"UpdateHorizontalMovement");
-            Require(manualMovement.CurrentSpeed==0,"Caminhar por botão aguarda horizonte também com inclinação ativa");
-            eye.transform.rotation=Quaternion.identity;
-            Invoke(manualMovement,"UpdateHorizontalMovement");
-            Require(manualMovement.CurrentSpeed>0,"Botão inicia caminhada VR mesmo com preferência de inclinação");
-            manualMovement.CancelManualWalk();
+            var movement=player.GetComponent<HeadGazeMovement>();
+            var sensor=eye.GetComponent<GyroscopeController>();
+            foreach(bool legacyPreference in new[]{false,true})
+            {
+                HeadGazeMovement.SetTiltWalking(legacyPreference);
+                eye.transform.rotation=Quaternion.Euler(40,0,0);yield return null;
+                for(int i=0;i<8;i++)Invoke(sensor,"UpdateLookDownState",-40f,.1f);
+                Invoke(movement,"UpdateHorizontalMovement");
+                Require(movement.CurrentSpeed==0,"Entrar inclinado exige postura neutra antes de caminhar");
+                for(int i=0;i<4;i++)Invoke(sensor,"UpdateLookDownState",0f,.1f);
+                for(int i=0;i<8;i++)Invoke(sensor,"UpdateLookDownState",-40f,.1f);
+                Invoke(movement,"UpdateHorizontalMovement");
+                Require(movement.CurrentSpeed>0&&!movement.ManualWalkingRequested&&!guide.MenuOpen,
+                    "Olhar para baixo caminha sem bot?o com prefer?ncia antiga "+legacyPreference);
+                Require(!toolbar.gameObject.activeSelf,"Menu n?o disputa o gesto de caminhada");
+                Invoke(sensor,"UpdateLookDownState",0f,.1f);
+                Invoke(movement,"UpdateHorizontalMovement");
+                Require(movement.CurrentSpeed==0,"Levantar a cabe?a para imediatamente no VR");
+            }
+            int savedSpeed=HeadGazeMovement.SpeedSetting;
+            foreach(var expected in new[]{.8f,1.25f,1.6f})
+            {
+                int setting=Array.IndexOf(new[]{.8f,1.25f,1.6f},expected);
+                PlayerPrefs.SetInt("MuseumWalkSpeed",setting);
+                Require(Mathf.Approximately(HeadGazeMovement.SelectedSpeed(true),expected),"Velocidade VR: "+expected);
+            }
+            PlayerPrefs.SetInt("MuseumWalkSpeed",savedSpeed);
             HeadGazeMovement.SetTiltWalking(false);
-            // Exercise real Update/CharacterController frames, not just the speed field.
             var savedPosition=player.transform.position;
             var controller=player.GetComponent<CharacterController>();
+            var floor=GameObject.CreatePrimitive(PrimitiveType.Cube);
+            floor.transform.position=new Vector3(200,-.1f,200);floor.transform.localScale=new Vector3(20,.2f,20);
             controller.enabled=false;player.transform.position=new Vector3(200,0,200);controller.enabled=true;
-            manualMovement.ResetMovement();manualMovement.RequestManualWalk();manualMovement.enabled=true;
+            Physics.SyncTransforms();
+            movement.ResetMovement();
+            eye.transform.rotation=Quaternion.Euler(40,0,0);yield return null;
+            for(int i=0;i<4;i++)Invoke(sensor,"UpdateLookDownState",0f,.1f);
+            for(int i=0;i<8;i++)Invoke(sensor,"UpdateLookDownState",-40f,.1f);
+            movement.enabled=true;
             var beforeMove=player.transform.position;
             yield return new WaitForSecondsRealtime(.4f);
             Require(Vector2.Distance(new Vector2(beforeMove.x,beforeMove.z),new Vector2(player.transform.position.x,player.transform.position.z))>.1f,
-                "Comando VR desloca o CharacterController em frames reais");
-            eye.transform.rotation=Quaternion.Euler(45,0,0);
+                "Inclina??o desloca o CharacterController em frames reais");
+            eye.transform.rotation=Quaternion.identity;
+            Invoke(sensor,"UpdateLookDownState",0f,.1f);
             yield return null;yield return null;
-            Require(!manualMovement.ManualWalkingRequested&&manualMovement.CurrentSpeed==0,
-                "Baixar cabeça para o movimento real sem reativar caminhada");
-            manualMovement.enabled=false;
+            Require(movement.CurrentSpeed==0,"Levantar cabe?a interrompe deslocamento real");
+            movement.enabled=false;Destroy(floor);
             controller.enabled=false;player.transform.position=savedPosition;controller.enabled=true;
-            eye.transform.rotation=Quaternion.identity;yield return null;
-            eye.transform.rotation=Quaternion.Euler(18,0,0);yield return null;
+            yield return null;
+            var toolbarHeading=toolbar.rotation;
             PointAt(Button("Menu").transform);
-            yield return new WaitForSecondsRealtime(1.3f);
-            Require(guide.MenuOpen, "Botão Menu abre opções pelo olhar");
-            Require(!toolbar.gameObject.activeSelf,"Abrir opções oculta a barra de caminhada");
+            Capture("vr-controles.png");
+            yield return new WaitForSecondsRealtime(.4f);
+            Require(Quaternion.Angle(toolbarHeading,toolbar.rotation)<.01f,"Menu lateral n?o foge ao mirar nele");
+            yield return new WaitForSecondsRealtime(.9f);
+            Require(guide.MenuOpen, "Bot?o Menu abre op??es pelo olhar");
+            Require(!toolbar.gameObject.activeSelf,"Abrir op??es oculta o bot?o lateral");
+            Invoke(movement,"UpdateHorizontalMovement");
+            Require(movement.CurrentSpeed==0&&!sensor.IsWalkingGestureArmed,"Menu pausa caminhada e desarma o gesto");
             var menuPosition=guide.Board.position;
             eye.transform.rotation=Quaternion.Euler(0,40,0);
             guide.OpenMenu();
@@ -209,7 +220,6 @@ namespace MuseumModerna
             yield return new WaitForSecondsRealtime(1.5f);
             Require(!guide.MenuOpen, "Céu permanece livre depois de fechar ficha");
             eye.transform.rotation=Quaternion.identity;yield return null;
-            eye.transform.rotation=Quaternion.Euler(18,0,0);yield return null;
             PointAt(Button("Menu").transform);yield return new WaitForSecondsRealtime(1.3f);
             Require(guide.MenuOpen,"Menu continua disponível após fechar ficha");
             PointAt(Button("Sair do VR").transform); yield return new WaitForSecondsRealtime(1.3f);

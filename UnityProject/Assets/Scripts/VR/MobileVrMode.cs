@@ -185,7 +185,7 @@ namespace MuseumModerna
             ResetWalkingGesture();
             player.SetPaused(false);
             // Entrar no visor deve começar a visita, não cobrir a imagem com o
-            // menu central. Os controles Caminhar e Menu ficam abaixo da linha de visão.
+            // menu central. O menu lateral deixa livre o gesto de caminhada.
             WorldGuide.CloseMenu();
         }
         public void ResetWalkingGesture()
@@ -365,7 +365,7 @@ namespace MuseumModerna
             status = VrWorldGuide.MakeText(content, "Preparando o visor…", MuseumGuideTheme.Body, 54);
             enterButton = VrWorldGuide.MakeButton(content, "Entrar em VR", EnterVR);
             enterButton.interactable = false;
-            VrWorldGuide.MakeText(content, "Encaixe o celular na horizontal. Baixe a cabeça para mostrar Caminhar e Menu. Mire em Caminhar por 1 segundo e levante a cabeça para andar.", MuseumGuideTheme.Label, 58);
+            VrWorldGuide.MakeText(content, "Encaixe o celular na horizontal. Olhe à frente, abaixe a cabeça para andar e levante para parar. O botão Menu fica à esquerda.", MuseumGuideTheme.Label, 58);
             VrWorldGuide.MakeButton(content, "Voltar ao menu", ShowMainMenu);
             UpdateSafeArea();
         }
