@@ -1,8 +1,20 @@
 # Handoff — Museu da Semana de Arte Moderna
 
-Atualizado: 05/10/2026 — controles explícitos, céu livre de gestos de menu e fichas VR laterais.
+Atualizado: 22/10/2026 — acervo reorganizado, fichas VR por proximidade e caminhada por inclinação.
 
-## Estado vigente — 05/10/2026
+## Estado vigente — 22/10/2026
+
+- Cena regenerada no Unity 2022.3.62f1: 31 fichas, 12 pinturas e cinco retratos documentais.
+- Sala lateral de Oswald convertida em Sala dos Manifestos; os quatro livros e a biografia de Oswald estão na sala ao fundo.
+- Tarsila reúne A Negra, A Cuca, Abaporu e Operários. Pescadores corresponde à pintura de 1951 do MAC-USP, com reprodução da Revista USP.
+- VR caminha ao olhar para baixo e para ao levantar a cabeça. Velocidades: 0,8 / 1,25 / 1,6 m/s. O botão Menu é lateral e não disputa o gesto de caminhada. Preferências antigas não restauram o comando Caminhar no VR.
+- Fichas VR abrem até 3 m, após permanência do olhar; acompanham deslocamento sem perder página/fixação e ficam estáveis ao girar apenas a cabeça.
+- Editor: 360 verificações de acervo/circulação, 254 de VR, seis cenários de dwell, 43 de movimento e 148 de menu normal aprovados.
+- APK: `artifacts/curadoria-2026-10-21/Museu-Curadoria-VR.apk`, 149,38 MiB; build, CRC ZIP, alinhamento e assinatura v2 aprovados. SHA-256 no relatório da entrega.
+- Fontes, análise das obras e capturas: [curadoria de 21/10](artifacts/curadoria-2026-10-21/FONTES.md). Resultado da entrega: [relatório](artifacts/curadoria-2026-10-21/README.md).
+- Aparelho físico: lentes, sensores, conforto, FPS e aquecimento continuam pendentes de validação.
+
+## Histórico — 05/10/2026
 
 | Item | Estado | Observação |
 |---|---|---|

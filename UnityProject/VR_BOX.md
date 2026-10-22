@@ -16,27 +16,29 @@ para entrar. **Modo normal** permite visitar em 2D. Nas opções desse modo,
 
 ## Dentro do visor — sem tocar na tela
 
-- Olhe para uma peça: sua ficha aparece em espaço 3D, visível pelos dois olhos.
+- Aproxime-se até 3 metros e olhe para uma peça por pelo menos 0,55 segundo:
+  sua ficha aparece em espaço 3D, visível pelos dois olhos.
 - Mova a cabeça para colocar a mira sobre um botão por **1 segundo**: o círculo
   se completa e aciona o botão. O controle acompanha a cabeça, não os olhos.
   Manter o olhar não repete a ação. Desvie e volte para acioná-lo novamente.
 - **Anterior** e **Próxima** percorrem as páginas; não é necessário arrastar texto.
 - **Fixar**, **Liberar** e **Fechar** também funcionam pelo olhar.
-- Sem ficha aberta, baixe a cabeça para mostrar **Caminhar** e **Menu**. A barra
-  some ao olhar à frente e não acompanha o giro enquanto você mira nos botões.
-- No modo padrão, mire em **Caminhar** por 1 segundo e levante a cabeça para
-  iniciar o movimento. Baixe a cabeça para parar. O botão também funciona se a
-  preferência de caminhada por inclinação estiver ativada.
+- Olhe à frente para preparar o gesto; baixe a cabeça para caminhar e levante
+  para parar imediatamente. Não é necessário solicitar a caminhada por botão.
+- Sem ficha aberta, **Menu** fica ao lado esquerdo. Ele permanece estável ao
+  mirar nos controles e desaparece ao olhar para baixo para caminhar.
 - **Menu** (ou **Opções** na ficha) abre os ajustes. Olhar o céu não abre opções.
   **Voltar** fecha as opções sem sair da visita.
-- A caminhada opcional por inclinação é ativada nas opções: olhe à frente para
-  armar o gesto, baixe para andar e levante para parar. O ritmo em VR é limitado
-  a 1,1 m/s. Menu aberto ou olhar sobre a ficha suspendem o caminhar.
+- A caminhada por inclinação é sempre usada no VR, inclusive com preferências
+  antigas salvas. Velocidades: lenta 0,8 m/s, normal 1,25 m/s e rápida 1,6 m/s.
+  Menu aberto ou olhar sobre a ficha suspendem o caminhar. Após pausa ou opções,
+  olhe à frente antes de iniciar outro gesto.
 - O menu permite ampliar texto, resumir, mudar contraste, desativar fichas,
   reduzir animações, prolongar leitura, centralizar a visão e sair do VR.
 
-A ficha fica no lugar ao girar a cabeça: seus controles podem ser alcançados pela
-mira. Há 1,2 segundo de tolerância ao desviar de uma obra para alcançar a ficha
+A ficha acompanha o deslocamento do visitante e fica no lugar ao girar apenas a
+cabeça: seus controles podem ser alcançados pela mira. Aproximar-se da mesma obra
+preserva página e fixação. Há 1,5 segundo de tolerância ao desviar para alcançar a ficha
 (ou 5 segundos com leitura longa). A interface funciona como sobreposição em 3D;
 as paredes continuam bloqueando a detecção das obras.
 
@@ -60,16 +62,17 @@ ajuste às lentes, latência e conforto de leitura. Não há suporte iOS configu
 
 ## APK e testes
 
-APK com correções de caminhada, opções e retomada de fichas, gerado e verificado em
-5 de outubro de 2026:
-[Museu-Controles-VR-Corrigidos-2026-10-05.apk](../artifacts/controle-vr-2026-10-05/Museu-Controles-VR-Corrigidos-2026-10-05.apk)
-(133 MiB). Transfira para o celular Android e abra o arquivo para instalar.
+APK com acervo reorganizado, fichas por proximidade e caminhada por inclinação,
+gerado e verificado em 22 de outubro de 2026:
+[Museu-Curadoria-VR.apk](../artifacts/curadoria-2026-10-21/Museu-Curadoria-VR.apk)
+(149,38 MiB). Transfira para o celular Android e abra o arquivo para instalar.
 Se o Android solicitar, autorize a instalação pelo aplicativo usado para abrir o APK.
 Depois siga a preparação do visor no início deste guia.
 
-Passaram 226 verificações de VR, 148 de menus/toque, 43 de movimento e a regressão
-das 28 fichas. Veja o [relatório de correções](../artifacts/controle-vr-2026-10-05/LEIA-ME.md),
-incluindo os limites dos testes sem aparelho físico.
+Passaram 360 verificações de acervo, 254 de VR, 148 de menus/toque, 43 de movimento
+e seis cenários de seleção pelo olhar. As 31 fichas foram verificadas nos três
+tamanhos de texto. Veja o [relatório da entrega](../artifacts/curadoria-2026-10-21/README.md),
+incluindo a assinatura e integridade do APK e os limites sem aparelho físico.
 
 No Unity: **Museum > VR Box > Gerar APK Android**.
 O resultado é gravado em `artifacts/MuseumVR_Build/MuseudaSemanaArteModerna.apk`
