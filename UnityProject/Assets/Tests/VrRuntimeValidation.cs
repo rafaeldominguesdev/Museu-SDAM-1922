@@ -59,11 +59,27 @@ namespace MuseumModerna
             var farRay = new Ray(original.transform.position + original.transform.forward * 5f, -original.transform.forward);
             Require(gaze.RaycastExhibit(farRay) == null, "Obra distante não abre ficha VR");
             Require(gaze.RaycastExhibit(nearRay) == original, "Obra próxima continua acessível pelo olhar");
+            var toolbar=(RectTransform)typeof(VrWorldGuide).GetField("toolbar",Private).GetValue(guide);
+            foreach (var exhibit in FindObjectsByType<PaintingExhibit>(FindObjectsSortMode.None))
+            {
+                player.transform.position += exhibit.transform.position + exhibit.transform.forward * 2.5f - eye.transform.position;
+                eye.transform.rotation = Quaternion.LookRotation(exhibit.transform.forward);
+                Physics.SyncTransforms();
+                yield return null;
+                Require(!toolbar.gameObject.activeSelf, "Menu oculto perto da obra mesmo olhando para longe: " + exhibit.PaintingData.uniqueId);
+                guide.OpenMenu();
+                Require(!guide.MenuOpen, "Atalho de opções respeita distância da obra: " + exhibit.PaintingData.uniqueId);
+            }
+            player.transform.position += new Vector3(0, 1.65f, 16) - eye.transform.position;
+            eye.transform.rotation = Quaternion.identity;
+            Physics.SyncTransforms(); yield return null;
+            Require(toolbar.gameObject.activeSelf, "Menu disponível no ponto livre central da sala ao fundo");
+            player.transform.position += new Vector3(0, 1.65f, 0) - eye.transform.position;
+            Physics.SyncTransforms();
             eye.transform.rotation = Quaternion.LookRotation(new Vector3(0, 1, .6f));
             yield return new WaitForSecondsRealtime(1.5f);
             Require(!guide.MenuOpen, "Observar a lua e o céu não abre opções");
             eye.transform.rotation=Quaternion.identity;yield return null;
-            var toolbar=(RectTransform)typeof(VrWorldGuide).GetField("toolbar",Private).GetValue(guide);
             Require(toolbar.gameObject.activeSelf && !VrWorldGuide.HitRect(toolbar, new Ray(eye.transform.position, eye.transform.forward)),
                 "Menu fica lateral e deixa livre o centro da visita");
             Require(!toolbar.GetComponentsInChildren<Button>(true).Any(b=>b.GetComponentInChildren<Text>().text=="Caminhar"),
@@ -152,6 +168,8 @@ namespace MuseumModerna
             Require(Vector3.Distance(initialPosition, guide.Board.position) < .001f, "Painel não foge ao girar cabeça");
             yield return new WaitForSecondsRealtime(.7f);
             Require(!guide.MenuOpen, "Voltar acionado apenas pelo olhar");
+            player.transform.position += original.transform.position + original.transform.forward * 3f - eye.transform.position;
+            Physics.SyncTransforms();
             eye.transform.LookAt(original.transform.position);
             yield return new WaitForSecondsRealtime(.2f);
             Require(gaze.Focus.Current==null,"Passar rapidamente pela obra não abre ficha");
@@ -219,6 +237,8 @@ namespace MuseumModerna
             eye.transform.rotation = Quaternion.LookRotation(new Vector3(0, 1, .6f));
             yield return new WaitForSecondsRealtime(1.5f);
             Require(!guide.MenuOpen, "Céu permanece livre depois de fechar ficha");
+            player.transform.position += new Vector3(0, 1.65f, 0) - eye.transform.position;
+            Physics.SyncTransforms();
             eye.transform.rotation=Quaternion.identity;yield return null;
             PointAt(Button("Menu").transform);yield return new WaitForSecondsRealtime(1.3f);
             Require(guide.MenuOpen,"Menu continua disponível após fechar ficha");

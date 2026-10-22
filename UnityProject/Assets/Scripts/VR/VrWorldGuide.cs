@@ -122,7 +122,7 @@ namespace MuseumModerna
         private void UpdateToolbar()
         {
             bool lookingDown=eye.transform.forward.y<-.26f;
-            bool available=IsEnabled&&!MenuOpen&&!visible&&!gaze.IsPaused&&!lookingDown;
+            bool available=IsEnabled&&!MenuOpen&&!visible&&!gaze.IsPaused&&!lookingDown&&AwayFromExhibits();
             // Refresh heading while walking; keep the lateral target still when looking up to select it.
             if(lookingDown)
             {
@@ -167,11 +167,13 @@ namespace MuseumModerna
         }
         public void OpenMenu()
         {
-            if (!IsEnabled || MenuOpen || gaze.IsPaused) return;
+            if (!IsEnabled || MenuOpen || gaze.IsPaused || !AwayFromExhibits()) return;
             MenuOpen = true; visible = true; menuPage = 0;
             mode.ResetWalkingGesture();
             PlaceBoard(true); RenderMenu();
         }
+        private bool AwayFromExhibits() => !Physics.CheckSphere(eye.transform.position, 4f,
+            LayerMask.GetMask("Painting"), QueryTriggerInteraction.Ignore);
         public void CloseMenu()
         {
             MenuOpen = false; ConsumesGaze = false;
