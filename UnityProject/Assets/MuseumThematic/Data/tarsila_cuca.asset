@@ -1,0 +1,43 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 14256d4cfae25415f84295e8fa960519, type: 3}
+  m_Name: tarsila_cuca
+  m_EditorClassIdentifier: 
+  title: A Cuca
+  artist: Tarsila do Amaral
+  year: 1924
+  movement: Modernismo brasileiro
+  periodo: 1924 ? depois da Semana
+  tecnica: ?leo sobre tela ? 60,5 ? 72,5 cm
+  categoria: pintura
+  relacao_com_a_semana_de_1922: Criada em 1924, dialoga com a busca modernista de
+    novas imagens do Brasil. Compare seu imagin?rio com Abaporu e com os debates
+    da sala dos manifestos.
+  obra_historica_ou_reinterpretacao: "Reprodu\xE7\xE3o digital da obra. Mus?e de
+    Grenoble ? Foto: J.-L. Lacroix ? ? Tarsila do Amaral"
+  resumo: Criaturas imagin?rias e vegeta??o estilizada constroem uma paisagem de
+    cores vivas.
+  fontes: 'https://www.museedegrenoble.fr/oeuvre/5/1922-a-cuca.htm
+
+    https://www.moma.org/audio/playlist/48/731'
+  description: Animais fant?sticos aparecem entre folhas e ?rvores de formas simplificadas.
+    Cores vivas, contornos definidos e volumes arredondados aproximam a imagina??o
+    popular de uma pesquisa moderna de composi??o. A pintura foi doada pela artista
+    ao Estado franc?s e est? depositada no Mus?e de Grenoble. A fotografia exibida
+    inclui a moldura hist?rica da obra.
+  funFact: 
+  paintingTexture: {fileID: 2800000, guid: a2c48e56423f6a84eb63f51f104cb14c, type: 3}
+  thumbnailSprite: {fileID: 0}
+  audioGuide: {fileID: 0}
+  audioDuration: 0
+  uniqueId: tarsila_cuca
+  suggestedViewOffset: {x: 0, y: 0, z: 2}

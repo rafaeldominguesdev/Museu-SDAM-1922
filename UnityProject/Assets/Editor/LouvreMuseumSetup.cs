@@ -48,10 +48,10 @@ namespace MuseumModerna
             }
             Dome(); HallNightSky(); Chandelier(new Vector3(0,5.5f,0));
             Room("Tematico_Mario",new Vector3(-17,0,-5),14,10,5.2f,false,false,true,false);
-            Room("Tematico_Oswald",new Vector3(-17,0,5),14,10,5.2f,false,false,true,false);
+            Room("Tematico_Manifestos",new Vector3(-17,0,5),14,10,5.2f,false,false,true,false);
             Room("Tematico_Anita",new Vector3(17,0,5),14,10,5.2f,false,false,false,true);
             Room("Tematico_Di",new Vector3(17,0,-5),14,10,5.2f,false,false,false,true);
-            Room("Tematico_Manifestos",new Vector3(0,0,17),16,14,5.2f,false,true,false,false);
+            Room("Tematico_Oswald",new Vector3(0,0,17),16,14,5.2f,false,true,false,false);
             Room("Tematico_Entrada",new Vector3(0,0,-15),10,10,5.2f,true,false,false,false);
             FinishMeshes();
             MuseumVisitRepair.BuildMedallion(root);

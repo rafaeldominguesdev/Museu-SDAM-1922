@@ -14,26 +14,28 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   title: Pescadores
   artist: Di Cavalcanti
-  year: 1946
+  year: 1951
   movement: Modernismo brasileiro
-  periodo: "1946 \xB7 depois da Semana"
-  tecnica: Pintura
+  periodo: 1951 ? depois da Semana
+  tecnica: ?leo sobre tela ? 114,5 ? 162 cm
   categoria: pintura
-  relacao_com_a_semana_de_1922: Obra produzida depois da Semana. O interesse pelo
-    trabalho e pela vida popular mostra a continuidade da carreira de um dos organizadores
-    do evento.
-  obra_historica_ou_reinterpretacao: "Reprodu\xE7\xE3o digital da obra. Cole\xE7\xE3o
-    particular \xB7 Cat\xE1logo Almeida & Dale"
-  resumo: "Figuras junto aos barcos e aos peixes aproximam a pintura do trabalho
-    e da vida \xE0 beira-mar."
-  fontes: https://almeidaedale.com.br/wp-content/uploads/2025/04/2016_emiliano_di_cavalcanti_conquistador-de-lirismo.pdf#page=89
-  description: "Nesta vers\xE3o de Pescadores, figuras humanas, embarca\xE7\xF5es
-    e peixes comp\xF5em uma cena do cotidiano litor\xE2neo. O t\xEDtulo aparece em
-    diferentes obras de Di Cavalcanti. Esta sele\xE7\xE3o corresponde ao \xF3leo
-    sobre tela de 1946, 33 \xD7 46 cm, reproduzido na p\xE1gina 176 do cat\xE1logo
-    Conquistador de lirismos, da Almeida & Dale."
+  relacao_com_a_semana_de_1922: Produzida d?cadas depois da Semana, acompanha a continuidade
+    da pintura figurativa de um dos organizadores do evento e seu interesse por temas
+    do cotidiano brasileiro.
+  obra_historica_ou_reinterpretacao: "Reprodu\xE7\xE3o digital da obra. MAC-USP ?
+    Reprodu??o: Revista USP, n. 94, p. 17"
+  resumo: Figuras, peixes, embarca??es e redes aproximam a pintura do trabalho e
+    da vida no litoral.
+  fontes: 'https://acervo.mac.usp.br/acervo/index.php/Detail/objects/17893
+
+    https://revistas.usp.br/revusp/article/download/45021/48633'
+  description: Duas figuras ocupam o primeiro plano, entre peixes e frutos. Redes,
+    embarca??es e a paisagem ao fundo articulam o espa?o em planos de cor e linhas.
+    Esta ? a pintura Pescadores de 1951, do MAC-USP, registro 1963.3.1129. O t?tulo
+    foi usado pelo artista em outras obras; esta reprodu??o corresponde ? vers?o
+    de 114,5 ? 162 cm, documentada tamb?m na Revista USP, n?mero 94, p?gina 17.
   funFact: 
-  paintingTexture: {fileID: 2800000, guid: 9792bd464da644889b678a243e473e09, type: 3}
+  paintingTexture: {fileID: 2800000, guid: 2661f7d2dd270da428e52846472b2137, type: 3}
   thumbnailSprite: {fileID: 0}
   audioGuide: {fileID: 0}
   audioDuration: 0

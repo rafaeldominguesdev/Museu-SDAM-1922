@@ -37,20 +37,41 @@ namespace MuseumModerna
             player.GetComponent<PlayerBodyVisual>().enabled=false;
             var gaze=eye.GetComponent<GazeDwellInteraction>();gaze.enabled=false;
             var exhibits=FindObjectsByType<PaintingExhibit>(FindObjectsSortMode.None);
-            Require(exhibits.Length==28&&exhibits.Select(e=>e.PaintingData.uniqueId).Distinct().Count()==28,"28 fichas com IDs únicos");
-            foreach(var room in new[]{"Mario","Oswald","Anita","Di"})
+            Require(exhibits.Length==31&&exhibits.Select(e=>e.PaintingData.uniqueId).Distinct().Count()==31,"31 fichas com IDs únicos");
+            foreach(var room in new[]{"Mario","Oswald","Anita","Di","Tarsila"})
             {
                 var pieces=GameObject.Find("Sala_"+room).GetComponentsInChildren<PaintingExhibit>();
                 Require(pieces.Length==5&&pieces.Count(e=>e.PaintingData.categoria=="biografia")==1,room+": biografia e quatro obras");
             }
             var tarsila=GameObject.Find("Sala_Tarsila").GetComponentsInChildren<PaintingExhibit>();
-            Require(tarsila.Length==2&&tarsila.Any(e=>e.PaintingData.uniqueId=="tarsila_bio")&&
-                tarsila.Single(e=>e.PaintingData.uniqueId=="abaporu").PaintingData.artist=="Tarsila do Amaral",
-                "Sala de Tarsila reúne retrato e Abaporu, ambos da autora correspondente");
+            var tarsilaWorks=tarsila.Where(e=>e.PaintingData.categoria=="pintura").ToArray();
+            Require(tarsilaWorks.Select(e=>e.PaintingData.uniqueId).OrderBy(id=>id).SequenceEqual(
+                new[]{"abaporu","tarsila_cuca","tarsila_negra","tarsila_operarios"})&&
+                tarsilaWorks.All(e=>e.PaintingData.artist=="Tarsila do Amaral"&&e.PaintingData.paintingTexture!=null),
+                "Tarsila reúne as quatro pinturas solicitadas com reproduções e autoria corretas");
             Require(GameObject.Find("Sala_Hall").GetComponentsInChildren<PaintingExhibit>().All(e=>e.PaintingData.categoria=="contexto"),"Hall dedicado ao contexto e introdução");
             var manifestos=GameObject.Find("Sala_Manifestos").GetComponentsInChildren<PaintingExhibit>();
             Require(manifestos.Length==3&&manifestos.All(e=>e.PaintingData.categoria=="manifesto"),
                 "Sala dos manifestos reservada aos três textos posteriores à Semana");
+            Require(manifestos.All(e=>e.transform.position.x < -10 && e.transform.position.z > 0),
+                "Manifestos ocupam a antiga sala de Oswald");
+            Require(GameObject.Find("Sala_Oswald").GetComponentsInChildren<PaintingExhibit>().All(e=>e.transform.position.z>10),
+                "Literatura de Oswald preservada na sala ao fundo");
+            var pescadores=exhibits.Single(e=>e.PaintingData.uniqueId=="di_pescadores").PaintingData;
+            Require(pescadores.year==1951&&pescadores.paintingTexture.name=="di_pescadores_1951"&&pescadores.fontes.Contains("17893"),
+                "Pescadores usa a reprodução de 1951 identificada pelo MAC-USP");
+            foreach(var room in new[]{"Mario","Oswald","Anita","Di","Tarsila","Manifestos"})
+            {
+                var pieces=GameObject.Find("Sala_"+room).GetComponentsInChildren<PaintingExhibit>();
+                var years=pieces.Where(e=>e.PaintingData.categoria!="biografia").Select(e=>e.PaintingData.year).ToArray();
+                Require(years.SequenceEqual(years.OrderBy(y=>y)),"Percurso cronológico: "+room);
+                for(int i=0;i<pieces.Length;i++)for(int j=i+1;j<pieces.Length;j++)
+                {
+                    var a=pieces[i].GetComponent<BoxCollider>();var b=pieces[j].GetComponent<BoxCollider>();
+                    Require(!Physics.ComputePenetration(a,a.transform.position,a.transform.rotation,b,b.transform.position,b.transform.rotation,out _,out _),
+                        "Obras sem sobreposição: "+pieces[i].name+" / "+pieces[j].name);
+                }
+            }
             var abaporu=tarsila.Single(e=>e.PaintingData.uniqueId=="abaporu");
             Require(abaporu.PaintingData.paintingTexture!=null&&abaporu.PaintingData.year==1928&&
                 abaporu.PaintingData.obra_historica_ou_reinterpretacao.Contains("MALBA"),"Abaporu institucional, creditado e datado");
@@ -96,7 +117,7 @@ namespace MuseumModerna
                 var fromBehind=exhibit.transform.position-exhibit.transform.forward*1;
                 Require(gaze.RaycastExhibit(new Ray(fromBehind,exhibit.transform.forward))!=exhibit,"Parede bloqueia olhar por trás: "+data.uniqueId);
             }
-            Require(exhibits.Count(e=>e.PaintingData.paintingTexture!=null)==14,"Quatorze imagens, incluindo obras e cinco retratos documentais");
+            Require(exhibits.Count(e=>e.PaintingData.paintingTexture!=null)==17,"Dezessete imagens: doze pinturas e cinco retratos documentais");
             foreach(var exhibit in exhibits.Where(e=>e.PaintingData.paintingTexture!=null &&
                 e.PaintingData.paintingTexture.height>e.PaintingData.paintingTexture.width))
             {
@@ -107,8 +128,8 @@ namespace MuseumModerna
             }
             var dramaticSpots=FindObjectsByType<Light>(FindObjectsSortMode.None)
                 .Where(l=>l.name.StartsWith("Spotlight_")).ToArray();
-            Require(dramaticSpots.Length==28&&dramaticSpots.All(l=>l.shadows==LightShadows.Soft),
-                "28 focos de obra preparados para sombras e proximidade");
+            Require(dramaticSpots.Length==31&&dramaticSpots.All(l=>l.shadows==LightShadows.Soft),
+                "31 focos de obra preparados para sombras e proximidade");
             Position(new Vector3(0,.02f,0));RefreshLights();
             Require(dramaticSpots.All(l=>!l.enabled),"Focos das obras apagados no centro distante");
             foreach(var exhibit in exhibits)
@@ -163,10 +184,10 @@ namespace MuseumModerna
             Directory.CreateDirectory(folder);
             Shot("hall",new Vector3(0,1.65f,-8),new Vector3(0,2.7f,10));
             Shot("mario",new Vector3(-11,1.65f,-5),new Vector3(-20,2.3f,-6));
-            Shot("oswald",new Vector3(-11,1.65f,5),new Vector3(-20,2.3f,6));
+            Shot("manifestos",new Vector3(-11,1.65f,5),new Vector3(-20,2.3f,3));
             Shot("anita",new Vector3(11,1.65f,5),new Vector3(20,2.3f,6));
             Shot("di-cavalcanti",new Vector3(11,1.65f,-5),new Vector3(20,2.3f,-6));
-            Shot("manifestos",new Vector3(0,1.65f,17),new Vector3(0,2.45f,23.65f));
+            Shot("oswald",new Vector3(0,1.65f,11),new Vector3(-3,2.45f,20));
             Require(GameObject.Find("Mapa_do_percurso")==null,"Painel de percurso retirado do Hall");
             Shot("hall-sem-painel",new Vector3(0,1.65f,0),new Vector3(3,3,-10));
             Shot("anita-detalhe",new Vector3(14,2.35f,2.5f),new Vector3(14,2.4f,.35f));

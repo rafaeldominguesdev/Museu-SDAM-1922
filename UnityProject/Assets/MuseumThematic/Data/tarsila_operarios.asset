@@ -1,0 +1,40 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 14256d4cfae25415f84295e8fa960519, type: 3}
+  m_Name: tarsila_operarios
+  m_EditorClassIdentifier: 
+  title: Oper?rios
+  artist: Tarsila do Amaral
+  year: 1933
+  movement: Modernismo brasileiro
+  periodo: 1933 ? depois da Semana
+  tecnica: Pintura
+  categoria: pintura
+  relacao_com_a_semana_de_1922: Realizada onze anos depois da Semana, amplia o percurso
+    para os temas sociais da d?cada de 1930. Sua presen?a evita limitar a trajet?ria
+    de Tarsila ? Antropofagia.
+  obra_historica_ou_reinterpretacao: "Reprodu\xE7\xE3o digital da obra. Acervo dos
+    Pal?cios ? Governo do Estado de S?o Paulo"
+  resumo: Rostos reunidos diante das f?bricas aproximam a pintura da sociedade industrial.
+  fontes: https://www.acervo.sp.gov.br/ObrasAudioteca/TarsilaAmaral
+  description: Uma concentra??o de rostos ocupa o primeiro plano, enquanto f?bricas
+    e chamin?s aparecem ao fundo. A repeti??o das figuras forma um conjunto, mas
+    as diferen?as entre elas permanecem vis?veis. Pintada em 1933, a obra pertence
+    ao Acervo dos Pal?cios do Governo do Estado de S?o Paulo e expressa o interesse
+    da artista por quest?es sociais e pelo trabalho.
+  funFact: 
+  paintingTexture: {fileID: 2800000, guid: f0c2bbc31ee399643888b5078caf83c5, type: 3}
+  thumbnailSprite: {fileID: 0}
+  audioGuide: {fileID: 0}
+  audioDuration: 0
+  uniqueId: tarsila_operarios
+  suggestedViewOffset: {x: 0, y: 0, z: 2}

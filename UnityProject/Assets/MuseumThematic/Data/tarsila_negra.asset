@@ -1,0 +1,42 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 14256d4cfae25415f84295e8fa960519, type: 3}
+  m_Name: tarsila_negra
+  m_EditorClassIdentifier: 
+  title: A Negra
+  artist: Tarsila do Amaral
+  year: 1923
+  movement: Modernismo brasileiro
+  periodo: 1923 ? depois da Semana
+  tecnica: ?leo sobre tela ? 100 ? 81,3 cm
+  categoria: pintura
+  relacao_com_a_semana_de_1922: Tarsila n?o participou da Semana de 1922. A pintura
+    mostra a continuidade das experi?ncias modernistas no ano seguinte e antecede
+    Abaporu.
+  obra_historica_ou_reinterpretacao: "Reprodu\xE7\xE3o digital da obra. MAC-USP ?
+    Reprodu??o: MoMA ? ? Tarsila do Amaral Licenciamentos"
+  resumo: Uma figura monumental contrasta com faixas geom?tricas e uma folha de bananeira.
+  fontes: 'https://acervo.mac.usp.br/acervo/index.php/Detail/objects/17156
+
+    https://www.moma.org/audio/playlist/48/733'
+  description: A figura sentada ocupa quase toda a tela. O volume do corpo contrasta
+    com as faixas horizontais do fundo e com a grande folha de bananeira. Pintada
+    em 1923, a obra pertence ao MAC-USP. A estiliza??o convida a discutir como a
+    artista representou a mulher negra e as rela??es entre mem?ria, ra?a e modernidade,
+    sem reduzir a pessoa retratada a um s?mbolo gen?rico do Brasil.
+  funFact: 
+  paintingTexture: {fileID: 2800000, guid: fe2a67f5c52feca4cb666d4addddfdad, type: 3}
+  thumbnailSprite: {fileID: 0}
+  audioGuide: {fileID: 0}
+  audioDuration: 0
+  uniqueId: tarsila_negra
+  suggestedViewOffset: {x: 0, y: 0, z: 2}

@@ -14,7 +14,7 @@ namespace MuseumModerna
     {
         [Serializable] public class Entry
         {
-            public string id, room, kind, title, author, period, summary, body, relation, source, imagePath, credit;
+            public string id, room, kind, title, author, period, summary, body, relation, source, imagePath, credit, technique;
             public int year;
         }
         [Serializable] private class Catalog { public Entry[] items; }
@@ -31,8 +31,8 @@ namespace MuseumModerna
         {
             if (!Application.isBatchMode && !EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo()) return;
             var entries = Read();
-            if (entries.Length != 28 || entries.Select(e=>e.id).Distinct().Count()!=28)
-                throw new InvalidOperationException("O catálogo deve conter 28 fichas únicas.");
+            if (entries.Length != 31 || entries.Select(e=>e.id).Distinct().Count()!=31)
+                throw new InvalidOperationException("O catálogo deve conter 31 fichas únicas.");
             var scene = EditorSceneManager.OpenScene("Assets/Scenes/MuseumScene.unity");
             Directory.CreateDirectory(Folder + "/Data");
             Directory.CreateDirectory(Folder + "/Materials");
@@ -87,7 +87,7 @@ namespace MuseumModerna
                 var group=new GameObject("Sala_"+room).transform;
                 group.SetParent(exhibition,false);
                 int work=0;
-                foreach(var entry in entries.Where(e=>e.room==room))
+                foreach(var entry in entries.Where(e=>e.room==room).OrderBy(e=>e.kind=="biografia"?0:1).ThenBy(e=>e.year))
                 {
                     Position(entry,work,out var position,out var yaw);
                     Panel(group,entry,position,yaw);
@@ -95,11 +95,11 @@ namespace MuseumModerna
                 }
             }
             RoomSign(exhibition,"01","MÁRIO DE ANDRADE","LITERATURA E PESQUISA",new Vector3(-9.25f,5.05f,-5),90);
-            RoomSign(exhibition,"02","OSWALD DE ANDRADE","POESIA, PROSA E PROVOCAÇÃO",new Vector3(-9.25f,5.05f,5),90);
+            RoomSign(exhibition,"02","SALA DOS MANIFESTOS","PAU-BRASIL, ANTROPOFAGIA E VERDE-AMARELISMO",new Vector3(-9.25f,5.05f,5),90);
             RoomSign(exhibition,"03","ANITA MALFATTI","COR, FORMA E RUPTURA",new Vector3(9.25f,5.05f,5),-90);
             RoomSign(exhibition,"04","DI CAVALCANTI","ARTE, CIDADE E VIDA POPULAR",new Vector3(9.25f,5.05f,-5),-90);
-            RoomSign(exhibition,"05","ANTROPOFAGIA E MANIFESTOS","IDEIAS DEPOIS DE 1922",new Vector3(0,5.05f,9.25f),180);
-            RoomSign(exhibition,"06","TARSILA DO AMARAL","ANTROPOFAGIA EM DIÁLOGO",new Vector3(0,5.05f,-9.25f),0);
+            RoomSign(exhibition,"05","OSWALD DE ANDRADE","POESIA, PROSA E PROVOCAÇÃO",new Vector3(0,5.05f,9.25f),180);
+            RoomSign(exhibition,"06","TARSILA DO AMARAL","COR, IMAGINAÇÃO E TRABALHO",new Vector3(0,5.05f,-9.25f),0);
             foreach(var center in new[]{new Vector3(-17,0,-5),new Vector3(-17,0,5),new Vector3(17,0,5),new Vector3(17,0,-5)})
             {
                 bool west=center.x<0;
@@ -129,11 +129,11 @@ namespace MuseumModerna
                 camera.useOcclusionCulling=false; // o bake antigo corresponde à planta anterior
             RenderSettings.sun=architecture.Find("Luz_diurna").GetComponent<Light>();
             var active=UnityEngine.Object.FindObjectsByType<PaintingExhibit>(FindObjectsSortMode.None);
-            if(active.Length!=28) throw new InvalidOperationException("Quantidade incorreta de fichas ativas: "+active.Length);
+            if(active.Length!=entries.Length) throw new InvalidOperationException("Quantidade incorreta de fichas ativas: "+active.Length);
             AssetDatabase.SaveAssets();
             EditorSceneManager.MarkSceneDirty(scene);
             if(!EditorSceneManager.SaveScene(scene)) throw new InvalidOperationException("Falha ao salvar percurso temático.");
-            Debug.Log("[Thematic] Hall, seis salas de artistas e manifestos, 28 fichas. Spawn no centro.");
+            Debug.Log("[Thematic] Hall, seis salas de artistas e manifestos, 31 fichas. Spawn no centro.");
         }
 
         private static void Position(Entry e,int index,out Vector3 p,out float yaw)
@@ -143,18 +143,24 @@ namespace MuseumModerna
                 p=index==0?new Vector3(-5.5f,2.45f,-9.65f):new Vector3(index==1?-5.5f:5.5f,2.45f,9.65f);
                 yaw=index==0?0:180; return;
             }
+            if(e.room=="Oswald")
+            {
+                if(e.kind=="biografia") {p=new Vector3(0,2.45f,23.65f);yaw=180;return;}
+                bool left=index<2;
+                p=new Vector3(left?-7.65f:7.65f,2.45f,index%2==0?14:20);yaw=left?90:-90;return;
+            }
             if(e.room=="Manifestos")
             {
-                p=new Vector3(-3.6f+index*3.6f,2.45f,23.65f); yaw=180; return;
+                p=index==2?new Vector3(-23.65f,2.45f,5):new Vector3(index==0?-14:-20,2.45f,.35f);
+                yaw=index==2?90:0;return;
             }
             if(e.room=="Tarsila")
             {
-                // A antiga sala de entrada acolhe somente Tarsila: retrato e obra
-                // em paredes laterais, com a passagem central livre.
-                bool bio=e.kind=="biografia";
-                p=new Vector3(bio?-4.65f:4.65f,2.45f,-15); yaw=bio?90:-90; return;
+                if(e.kind=="biografia") {p=new Vector3(-3,2.45f,-19.65f);yaw=0;return;}
+                bool left=index<2;
+                p=new Vector3(left?-4.65f:4.65f,2.45f,index%2==0?-12.3f:-17.7f);yaw=left?90:-90;return;
             }
-            bool west=e.room=="Mario"||e.room=="Oswald";
+            bool west=e.room=="Mario";
             float z=e.room=="Mario"||e.room=="Di"?-5:5;
             if(e.kind=="biografia") {p=new Vector3(west?-23.65f:23.65f,2.45f,z);yaw=west?90:-90;return;}
             p=new Vector3((west?-1:1)*(index%2==0?14:20),2.45f,z+(index<2?-4.65f:4.65f));
@@ -173,7 +179,8 @@ namespace MuseumModerna
             data.paintingTexture=string.IsNullOrEmpty(entry.imagePath)?null:AssetDatabase.LoadAssetAtPath<Texture2D>(entry.imagePath);
             if(!string.IsNullOrEmpty(entry.imagePath)&&data.paintingTexture==null) throw new InvalidOperationException("Imagem ausente: "+entry.imagePath);
             bool image=data.paintingTexture!=null;
-            data.tecnica=entry.kind=="pintura"?"Pintura":entry.kind=="biografia"&&image?"Fotografia documental":"Painel didático";
+            data.tecnica=!string.IsNullOrWhiteSpace(entry.technique)?entry.technique:
+                entry.kind=="pintura"?"Pintura":entry.kind=="biografia"&&image?"Fotografia documental":"Painel didático";
             data.obra_historica_ou_reinterpretacao=image?"Reprodução digital da obra. "+entry.credit:
                 "Painel didático original do museu sobre a obra ou assunto; não é reprodução de pintura nem de capa histórica.";
             EditorUtility.SetDirty(data);

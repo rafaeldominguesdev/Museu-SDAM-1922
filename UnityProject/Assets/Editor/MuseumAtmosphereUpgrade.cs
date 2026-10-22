@@ -141,7 +141,7 @@ namespace MuseumModerna
             var glass=Standard("Vidro_das_vitrines",new Color(.32f,.46f,.52f,.10f),0,.48f);
             glass.SetFloat("_Mode",2);glass.SetInt("_SrcBlend",(int)BlendMode.SrcAlpha);glass.SetInt("_DstBlend",(int)BlendMode.OneMinusSrcAlpha);
             glass.SetInt("_ZWrite",0);glass.EnableKeyword("_ALPHABLEND_ON");glass.renderQueue=3000;
-            string[] titles={"MÁRIO DE ANDRADE","OSWALD DE ANDRADE","IDEIAS EM CIRCULAÇÃO"};
+            string[] titles={"MÁRIO DE ANDRADE","IDEIAS EM CIRCULAÇÃO","OSWALD DE ANDRADE"};
             Vector3[] positions={new Vector3(-17,0,-8.15f),new Vector3(-17,0,8.15f),new Vector3(6.55f,0,17)};
             for(int i=0;i<3;i++)
             {
@@ -169,12 +169,12 @@ namespace MuseumModerna
                 MuseumThematicSetup.Text(table,"LIVRO CENOGRÁFICO\nNão é um exemplar histórico.",new Vector3(0,.61f,.305f),.068f,new Color(.83f,.82f,.75f),32,1.25f);
                 var col=table.gameObject.AddComponent<BoxCollider>();col.center=new Vector3(0,.68f,0);col.size=new Vector3(1.60f,1.36f,.78f);
             }
-            var title=new GameObject("Ensaio_curatorial_Tarsila").transform;title.SetParent(architecture,false);title.position=new Vector3(0,3.15f,-19.7f);
+            var title=new GameObject("Ensaio_curatorial_Tarsila").transform;title.SetParent(architecture,false);title.position=new Vector3(1.2f,3.15f,-19.7f);
             Box(title,"Fundo_curatorial",new Vector3(0,-.52f,-.065f),new Vector3(4.4f,2.15f,.07f),green);
             foreach(int side in new[]{-1,1})Box(title,"Filete_curatorial",new Vector3(0,-.52f+side*1.045f,-.02f),new Vector3(4.34f,.018f,.015f),gold);
             MuseumThematicSetup.Text(title,"TARSILA",Vector3.zero,.58f,new Color(.91f,.78f,.50f),20,3.8f,true);
-            MuseumThematicSetup.Text(title,"COR E IMAGINAÇÃO",Vector3.down*.54f,.17f,new Color(.94f,.92f,.84f),30,3.8f);
-            MuseumThematicSetup.Text(title,"Do retrato ao Abaporu:\num encontro com a artista e sua obra.",Vector3.down*1.03f,.15f,new Color(.85f,.86f,.81f),40,3.8f);
+            MuseumThematicSetup.Text(title,"COR, IMAGINAÇÃO E TRABALHO",Vector3.down*.54f,.17f,new Color(.94f,.92f,.84f),30,3.8f);
+            MuseumThematicSetup.Text(title,"1923–1933: formas, memórias\ne a vida na cidade industrial.",Vector3.down*1.03f,.15f,new Color(.85f,.86f,.81f),40,3.8f);
         }
 
         private static Transform Box(Transform parent,string name,Vector3 p,Vector3 size,Material material)
