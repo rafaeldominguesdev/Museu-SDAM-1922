@@ -23,7 +23,7 @@ namespace MuseumModerna
         private CanvasGroup group;
         private Image background, ring;
         private RectTransform reticle;
-        private Text heading, title, body, pageLabel;
+        private Text heading, title, body, pageLabel, hint;
         private Button previous, next;
         private readonly Button[] actions = new Button[6];
         private RectTransform actionGrid, toolbar;
@@ -69,7 +69,7 @@ namespace MuseumModerna
             pageLabel = MakeText(Board, "", 22, 30);
             var pagesRow = Row(Board, "Paginas");
             previous = MakeButton(pagesRow, "Anterior", () => ChangePage(-1));
-            next = MakeButton(pagesRow, "Próxima", () => ChangePage(1));
+            next = MakeButton(pagesRow, "Próxima página", () => ChangePage(1));
             var grid=new GameObject("Acoes",typeof(RectTransform),typeof(GridLayoutGroup),typeof(LayoutElement));
             grid.transform.SetParent(Board,false);actionGrid=(RectTransform)grid.transform;
             var gridLayout=grid.GetComponent<GridLayoutGroup>();gridLayout.constraint=GridLayoutGroup.Constraint.FixedColumnCount;gridLayout.constraintCount=2;
@@ -80,7 +80,7 @@ namespace MuseumModerna
                 int index = i;
                 actions[i] = MakeButton(actionGrid, "", () => InvokeAction(index));
             }
-            MakeText(Board, "Olhe para um botão por 1 segundo para acionar.", 22, 32);
+            hint = MakeText(Board, "Olhe para um botão por 1 segundo para acionar.", 22, 32);
             foreach (var button in GetComponentsInChildren<Button>())
             {
                 var surface = button.GetComponent<Image>();
@@ -151,7 +151,7 @@ namespace MuseumModerna
             current = info; visible = true;
             if (changed)
             {
-                page = 0; PlaceBoard(); RebuildPages();
+                page = 0; SetReadingLayout(true); PlaceBoard(); RebuildPages();
             }
             RenderPage();
         }
@@ -176,7 +176,7 @@ namespace MuseumModerna
             current = gaze.Focus.Current;
             if (current != null && preferences.PanelsEnabled)
             {
-                page = 0; RebuildPages(); PlaceBoard(); RenderPage();
+                page = 0; SetReadingLayout(true); RebuildPages(); PlaceBoard(); RenderPage();
             }
             else visible = false;
         }
@@ -240,26 +240,31 @@ namespace MuseumModerna
             }
             if (output.Count == 0) output.Add("");
         }
-        public void RefreshPin() { if (current != null && !MenuOpen) SetButton(actions[0], gaze.Focus.Pinned ? "Liberar" : "Fixar"); }
+        private void SetReadingLayout(bool reading)
+        {
+            heading.gameObject.SetActive(!reading);
+            hint.gameObject.SetActive(!reading);
+            actionGrid.gameObject.SetActive(!reading);
+            var layout = body.GetComponent<LayoutElement>();
+            // Four visible rows, three gaps and the existing vertical padding.
+            layout.minHeight = layout.preferredHeight = reading ? Board.sizeDelta.y - 44 - 94 - 30 - MuseumGuideTheme.VrButtonHeight - 24 : 330;
+        }
         private void RenderPage()
         {
             if (current == null || MenuOpen) return;
-            heading.text = "ACERVO / MEDIAÇÃO DIGITAL";
             title.text = current.title;
             body.text = pages[page];
             pageLabel.text = "Página " + (page + 1) + " de " + pages.Count;
             previous.interactable = page > 0; next.interactable = page + 1 < pages.Count;
-            SetButton(actions[0], gaze.Focus.Pinned ? "Liberar" : "Fixar");
-            SetButton(actions[1], "Opções"); SetButton(actions[2], "Fechar");
-            SetButton(actions[3],"Reposicionar");SetActionCount(4);
             ApplyContrast();
         }
         private void RenderMenu()
         {
+            SetReadingLayout(false);
             heading.text = "VISITA / CONTROLES PELO OLHAR";
             title.text = "Opções do visor";
             body.fontSize = MuseumGuideTheme.VrBody;
-            body.text = "Olhe à frente para preparar a visita. Abaixe a cabeça para andar e levante para parar.\n\nPara abrir as opções, olhe por 1 segundo para o botão Menu ao lado esquerdo. A caminhada fica pausada durante as opções.";
+            body.text = "Abaixe a cabeça para andar e levante para parar.\n\nAs opções ficam disponíveis no hall e em áreas afastadas das obras. Olhe por 1 segundo para Menu. A caminhada pausa durante os ajustes.";
             pageLabel.text = menuPage==0?"VISITA · 1 de 2":"LEITURA · 2 de 2";
             previous.interactable = menuPage > 0; next.interactable = menuPage < 1;
             SetActionCount(6);
@@ -279,7 +284,7 @@ namespace MuseumModerna
                 SetButton(actions[3], "Contraste: " + (preferences.HighContrast ? "alto" : "padrão"));
                 SetButton(actions[4], "Animação: " + (preferences.ReducedMotion ? "não" : "sim"));
                 SetButton(actions[5], "Leitura: " + (preferences.LongerReading ? "longa" : "breve"));
-                body.text="Aumente o texto, escolha a versão resumida ou ative alto contraste.\n\nA ficha fica ao lado da obra. Você pode fixá-la, reposicioná-la e fechá-la a qualquer momento.";
+                body.text="Aumente o texto, escolha a versão resumida ou ative alto contraste.\n\nA ficha abre à sua frente. Use Anterior e Próxima página para ler. Desvie o olhar para encerrar a leitura.";
             }
             ApplyContrast();
         }
@@ -295,14 +300,7 @@ namespace MuseumModerna
         }
         private void InvokeAction(int index)
         {
-            if (!MenuOpen)
-            {
-                if (index == 0) { gaze.TogglePin(); RenderPage(); }
-                else if (index == 1) OpenMenu();
-                else if(index==2)gaze.Close();
-                else if(index==3)PlaceBoard();
-                return;
-            }
+            if (!MenuOpen) return;
             if (menuPage == 0)
             {
                 if (index == 0) { CloseMenu(); return; }

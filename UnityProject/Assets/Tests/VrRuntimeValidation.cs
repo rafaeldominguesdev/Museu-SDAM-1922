@@ -196,6 +196,10 @@ namespace MuseumModerna
             var bodyText=(Text)typeof(VrWorldGuide).GetField("body",Private).GetValue(guide);
             var titleText=(Text)typeof(VrWorldGuide).GetField("title",Private).GetValue(guide);
             var pageContents=(System.Collections.Generic.List<string>)typeof(VrWorldGuide).GetField("pages",Private).GetValue(guide);
+            Require(guide.GetComponentsInChildren<Button>().Select(b => b.GetComponentInChildren<Text>().text)
+                .OrderBy(label => label).SequenceEqual(new[] { "Anterior", "Próxima página" }),
+                "Ficha oferece somente Anterior e Próxima página");
+            Require(bodyText.rectTransform.rect.height > 650, "Área dos controles removidos recebe texto de leitura");
             for(int textSize=0;textSize<3;textSize++)
             {
                 foreach(var exhibit in FindObjectsByType<PaintingExhibit>(FindObjectsSortMode.None))
@@ -213,20 +217,17 @@ namespace MuseumModerna
                 preferences.CycleTextSize();
             }
             guide.Show(original.PaintingData);
-            PointAt(Button("Próxima").transform);
+            PointAt(Button("Próxima página").transform);
             yield return new WaitForSecondsRealtime(1.3f);
             Require(guide.PageIndex == 1 && gaze.Focus.Current == original.PaintingData, "Ler controles mantém ficha e avança página");
             yield return new WaitForSecondsRealtime(1.5f);
             Require(guide.PageIndex == 1, "Página não repete ao manter olhar");
-            PointAt(Button("Fixar").transform);
-            yield return new WaitForSecondsRealtime(1.3f);
-            Require(gaze.Focus.Pinned, "Fixação pelo olhar");
             var readingPosition = player.transform.position;
             var boardPosition = guide.Board.position;
             float readingDistance = Vector3.Distance(eye.transform.position, boardPosition);
             player.transform.position += guide.Board.forward * .6f;
             yield return null; yield return null;
-            Require(Vector3.Distance(boardPosition, guide.Board.position) < .001f && guide.PageIndex == 1 && gaze.Focus.Pinned &&
+            Require(Vector3.Distance(boardPosition, guide.Board.position) < .001f && guide.PageIndex == 1 &&
                 Vector3.Distance(eye.transform.position, guide.Board.position) < readingDistance - .5f,
                 "Aproximar reduz distância de leitura sem afastar ficha ou perder página");
             boardPosition = guide.Board.position;
@@ -241,12 +242,9 @@ namespace MuseumModerna
             eye.transform.LookAt(original.transform.position);
             yield return new WaitForSecondsRealtime(.2f);
             Capture("museum-vr-guide-editor.png");
-            PointAt(Button("Liberar").transform);
-            yield return new WaitForSecondsRealtime(1.3f);
-            Require(!gaze.Focus.Pinned, "Liberar pelo olhar");
-            PointAt(Button("Fechar").transform);
-            yield return new WaitForSecondsRealtime(1.6f);
-            Require(gaze.Focus.Current == null && guide.GetComponent<CanvasGroup>().alpha == 0, "Fechar pelo olhar");
+            eye.transform.rotation = Quaternion.LookRotation(Vector3.up, Vector3.forward);
+            yield return new WaitForSecondsRealtime(5.5f);
+            Require(gaze.Focus.Current == null && guide.GetComponent<CanvasGroup>().alpha == 0, "Desviar o olhar fecha ficha sem botão adicional");
             eye.transform.rotation = Quaternion.LookRotation(new Vector3(0, 1, .6f));
             yield return new WaitForSecondsRealtime(1.5f);
             Require(!guide.MenuOpen, "Céu permanece livre depois de fechar ficha");
