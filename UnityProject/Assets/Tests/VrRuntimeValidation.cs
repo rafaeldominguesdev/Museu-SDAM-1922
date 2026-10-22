@@ -55,6 +55,10 @@ namespace MuseumModerna
             Invoke(player.GetComponent<HeadGazeMovement>(),"OnApplicationFocus",true);
             Require(mode.IsActive && !guide.MenuOpen && !FindAnyObjectByType<UIManager>().GetComponent<Canvas>().enabled, "VR inicia a visita sem menu central");
             Require(guide.GetComponent<Canvas>().renderMode == RenderMode.WorldSpace, "Ficha em espaço3D para ambos os olhos");
+            var nearRay = new Ray(original.transform.position + original.transform.forward * 2.5f, -original.transform.forward);
+            var farRay = new Ray(original.transform.position + original.transform.forward * 5f, -original.transform.forward);
+            Require(gaze.RaycastExhibit(farRay) == null, "Obra distante não abre ficha VR");
+            Require(gaze.RaycastExhibit(nearRay) == original, "Obra próxima continua acessível pelo olhar");
             eye.transform.rotation = Quaternion.LookRotation(new Vector3(0, 1, .6f));
             yield return new WaitForSecondsRealtime(1.5f);
             Require(!guide.MenuOpen, "Observar a lua e o céu não abre opções");
@@ -177,6 +181,20 @@ namespace MuseumModerna
             PointAt(Button("Fixar").transform);
             yield return new WaitForSecondsRealtime(1.3f);
             Require(gaze.Focus.Pinned, "Fixação pelo olhar");
+            var readingPosition = player.transform.position;
+            var boardPosition = guide.Board.position;
+            player.transform.position -= original.transform.forward * .6f;
+            yield return null; yield return null;
+            Require(Vector3.Distance(boardPosition, guide.Board.position) > .4f && guide.PageIndex == 1 && gaze.Focus.Pinned,
+                "Aproximar da mesma obra reposiciona a ficha sem perder página ou fixação");
+            boardPosition = guide.Board.position;
+            var boardRotation = guide.Board.rotation;
+            eye.transform.rotation *= Quaternion.Euler(0, 25, 0);
+            yield return null; yield return null;
+            Require(Vector3.Distance(boardPosition, guide.Board.position) < .001f && Quaternion.Angle(boardRotation, guide.Board.rotation) < .01f,
+                "Girar a cabeça mantém os botões da ficha estáveis");
+            player.transform.position = readingPosition;
+            yield return null; yield return null;
             Button("Anterior").onClick.Invoke();
             eye.transform.LookAt(original.transform.position);
             yield return new WaitForSecondsRealtime(.2f);

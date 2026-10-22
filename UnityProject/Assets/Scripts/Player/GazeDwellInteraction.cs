@@ -41,7 +41,9 @@ namespace MuseumModerna
         public PaintingExhibit RaycastExhibit(Ray ray)
         {
             // Primeiro sólido atingido: paredes, vitrines e pedestais também bloqueiam o olhar.
-            if (Physics.Raycast(ray, out var hit, maxRayDistance, rayMask, QueryTriggerInteraction.Ignore))
+            bool inVr = MobileVrMode.Instance != null && MobileVrMode.Instance.IsActive;
+            float distance = inVr ? Mathf.Min(maxRayDistance, 3f) : maxRayDistance;
+            if (Physics.Raycast(ray, out var hit, distance, rayMask, QueryTriggerInteraction.Ignore))
             {
                 var original = hit.collider.GetComponentInParent<PaintingExhibit>();
                 if (original != null) return original;
