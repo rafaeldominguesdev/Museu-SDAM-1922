@@ -33,9 +33,6 @@ namespace MuseumModerna
         private readonly List<string> pages = new List<string>();
         private readonly GazeActivation activation = new GazeActivation();
         private PaintingInfo current;
-        private PaintingExhibit currentExhibit;
-        private Vector3 placementEyePosition;
-        private bool centeredPlacement;
         private GazeDwellInteraction gaze;
         private Material overlayMaterial;
         private Texture2D ringTexture;
@@ -154,9 +151,7 @@ namespace MuseumModerna
             current = info; visible = true;
             if (changed)
             {
-                currentExhibit = gaze.RaycastExhibit(new Ray(eye.transform.position, eye.transform.forward));
-                if (currentExhibit != null && currentExhibit.PaintingData != info) currentExhibit = null;
-                page = 0; PlaceBoard(false); RebuildPages();
+                page = 0; PlaceBoard(); RebuildPages();
             }
             RenderPage();
         }
@@ -170,7 +165,7 @@ namespace MuseumModerna
             if (!IsEnabled || MenuOpen || gaze.IsPaused || !AwayFromExhibits()) return;
             MenuOpen = true; visible = true; menuPage = 0;
             mode.ResetWalkingGesture();
-            PlaceBoard(true); RenderMenu();
+            PlaceBoard(); RenderMenu();
         }
         private bool AwayFromExhibits() => !Physics.CheckSphere(eye.transform.position, 4f,
             LayerMask.GetMask("Painting"), QueryTriggerInteraction.Ignore);
@@ -181,7 +176,7 @@ namespace MuseumModerna
             current = gaze.Focus.Current;
             if (current != null && preferences.PanelsEnabled)
             {
-                page = 0; RebuildPages(); PlaceBoard(false); RenderPage();
+                page = 0; RebuildPages(); PlaceBoard(); RenderPage();
             }
             else visible = false;
         }
@@ -192,38 +187,11 @@ namespace MuseumModerna
             if (highlighted != null) highlighted.GetComponent<Image>().color = MuseumGuideTheme.Control;
             highlighted = null;
         }
-        private void PlaceBoard(bool centered, bool keepHeading = false)
+        private void PlaceBoard()
         {
-            var direction = keepHeading ? Board.forward : eye.transform.forward;
-            if (!centered && currentExhibit != null)
-                direction = currentExhibit.transform.position - eye.transform.position;
-            var forward = Vector3.ProjectOnPlane(direction, Vector3.up).normalized;
-            if (forward.sqrMagnitude < .1f) forward = Vector3.forward;
-            var rotation = Quaternion.LookRotation(forward);
-            float lateral=0;
-            if(!centered)
-            {
-                lateral=1.5f;
-                var exhibit=currentExhibit;
-                var renderer=exhibit!=null?exhibit.ArtworkRenderer:null;
-                var bounds=renderer!=null?renderer.bounds:exhibit!=null?exhibit.GetComponent<Collider>().bounds:new Bounds();
-                if(exhibit!=null)
-                {
-                    float left=0,right=0;
-                    for(int x=-1;x<=1;x+=2)for(int y=-1;y<=1;y+=2)for(int z=-1;z<=1;z+=2)
-                    {
-                        var corner=bounds.center+Vector3.Scale(bounds.extents,new Vector3(x,y,z));
-                        var p=Quaternion.Inverse(rotation)*(corner-eye.transform.position);
-                        if(p.z>.1f){left=Mathf.Min(left,p.x/p.z);right=Mathf.Max(right,p.x/p.z);}
-                    }
-                    float half=Board.sizeDelta.x*Scale*.5f;
-                    float rightSpace=right*Distance+half+.18f,leftSpace=-left*Distance+half+.18f;
-                    lateral=rightSpace<=leftSpace+.15f?rightSpace:-leftSpace;
-                }
-            }
-            Board.SetPositionAndRotation(eye.transform.position + rotation * new Vector3(lateral, -.10f, Distance), rotation);
-            placementEyePosition = eye.transform.position;
-            centeredPlacement = centered;
+            // Anchor once along the opening gaze: approaching must actually reduce reading distance.
+            var rotation = Quaternion.LookRotation(eye.transform.forward, Vector3.up);
+            Board.SetPositionAndRotation(eye.transform.position + eye.transform.forward * Distance, rotation);
             activation.Reset();
         }
         private void RebuildPages()
@@ -332,7 +300,7 @@ namespace MuseumModerna
                 if (index == 0) { gaze.TogglePin(); RenderPage(); }
                 else if (index == 1) OpenMenu();
                 else if(index==2)gaze.Close();
-                else if(index==3)PlaceBoard(true);
+                else if(index==3)PlaceBoard();
                 return;
             }
             if (menuPage == 0)
@@ -360,9 +328,6 @@ namespace MuseumModerna
             bool paused = FindPlayerPaused();
             UpdateToolbar();
             if (paused) { ResetInteraction(); return; }
-            // Follow translation, not head rotation: gaze buttons stay reachable while reading.
-            if (visible && (eye.transform.position - placementEyePosition).sqrMagnitude > .0225f)
-                PlaceBoard(centeredPlacement, true);
             // Voltar do Android ou um frame travado não completa dwell/gestos sozinho.
             float elapsed = Mathf.Clamp(Time.unscaledDeltaTime, 0f, .1f);
             group.alpha = preferences.ReducedMotion ? (visible ? 1 : 0) :

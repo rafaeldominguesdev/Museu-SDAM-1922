@@ -181,6 +181,17 @@ namespace MuseumModerna
             yield return new WaitForSecondsRealtime(.6f);
             Require(gaze.Focus.Current == original.PaintingData && guide.GetComponent<CanvasGroup>().alpha > .9f, "Obra abre ficha VR");
             Require(guide.PageCount > 1, "Ficha longa paginada sem toque");
+            var openingRay = new Ray(eye.transform.position, eye.transform.forward);
+            Require(Vector3.Angle(openingRay.direction, guide.Board.position - openingRay.origin) < .1f &&
+                Vector3.Angle(guide.Board.forward, openingRay.direction) < .1f,
+                "Ficha abre centralizada e voltada ao olhar, incluindo inclinação");
+            var corners = new Vector3[4];
+            guide.Board.GetWorldCorners(corners);
+            Require(corners.All(c => {
+                var local = Quaternion.Inverse(eye.transform.rotation) * (c - eye.transform.position);
+                return local.z > 0 && Mathf.Abs(Mathf.Atan2(local.x, local.z) * Mathf.Rad2Deg) < 20 &&
+                    Mathf.Abs(Mathf.Atan2(local.y, local.z) * Mathf.Rad2Deg) < 20;
+            }), "Ficha inteira cabe nos 40 graus centrais ao abrir");
             var preferences=FindAnyObjectByType<UIManager>().Guide;
             var bodyText=(Text)typeof(VrWorldGuide).GetField("body",Private).GetValue(guide);
             var titleText=(Text)typeof(VrWorldGuide).GetField("title",Private).GetValue(guide);
@@ -212,10 +223,12 @@ namespace MuseumModerna
             Require(gaze.Focus.Pinned, "Fixação pelo olhar");
             var readingPosition = player.transform.position;
             var boardPosition = guide.Board.position;
-            player.transform.position -= original.transform.forward * .6f;
+            float readingDistance = Vector3.Distance(eye.transform.position, boardPosition);
+            player.transform.position += guide.Board.forward * .6f;
             yield return null; yield return null;
-            Require(Vector3.Distance(boardPosition, guide.Board.position) > .4f && guide.PageIndex == 1 && gaze.Focus.Pinned,
-                "Aproximar da mesma obra reposiciona a ficha sem perder página ou fixação");
+            Require(Vector3.Distance(boardPosition, guide.Board.position) < .001f && guide.PageIndex == 1 && gaze.Focus.Pinned &&
+                Vector3.Distance(eye.transform.position, guide.Board.position) < readingDistance - .5f,
+                "Aproximar reduz distância de leitura sem afastar ficha ou perder página");
             boardPosition = guide.Board.position;
             var boardRotation = guide.Board.rotation;
             eye.transform.rotation *= Quaternion.Euler(0, 25, 0);
