@@ -122,8 +122,6 @@ namespace MuseumModerna
         public void SetGuidePinned(bool pinned)
         {
             guide?.SetPinned(pinned);
-            if (MobileVrMode.Instance != null && MobileVrMode.Instance.IsActive)
-                MobileVrMode.Instance.WorldGuide.RefreshPin();
         }
 
         // ─── Ciclo de Vida Unity ──────────────────────────────────────────────

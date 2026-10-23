@@ -59,11 +59,27 @@ namespace MuseumModerna
             var farRay = new Ray(original.transform.position + original.transform.forward * 5f, -original.transform.forward);
             Require(gaze.RaycastExhibit(farRay) == null, "Obra distante não abre ficha VR");
             Require(gaze.RaycastExhibit(nearRay) == original, "Obra próxima continua acessível pelo olhar");
+            var toolbar=(RectTransform)typeof(VrWorldGuide).GetField("toolbar",Private).GetValue(guide);
+            foreach (var exhibit in FindObjectsByType<PaintingExhibit>(FindObjectsSortMode.None))
+            {
+                player.transform.position += exhibit.transform.position + exhibit.transform.forward * 2.5f - eye.transform.position;
+                eye.transform.rotation = Quaternion.LookRotation(exhibit.transform.forward);
+                Physics.SyncTransforms();
+                yield return null;
+                Require(!toolbar.gameObject.activeSelf, "Menu oculto perto da obra mesmo olhando para longe: " + exhibit.PaintingData.uniqueId);
+                guide.OpenMenu();
+                Require(!guide.MenuOpen, "Atalho de opções respeita distância da obra: " + exhibit.PaintingData.uniqueId);
+            }
+            player.transform.position += new Vector3(0, 1.65f, 16) - eye.transform.position;
+            eye.transform.rotation = Quaternion.identity;
+            Physics.SyncTransforms(); yield return null;
+            Require(toolbar.gameObject.activeSelf, "Menu disponível no ponto livre central da sala ao fundo");
+            player.transform.position += new Vector3(0, 1.65f, 0) - eye.transform.position;
+            Physics.SyncTransforms();
             eye.transform.rotation = Quaternion.LookRotation(new Vector3(0, 1, .6f));
             yield return new WaitForSecondsRealtime(1.5f);
             Require(!guide.MenuOpen, "Observar a lua e o céu não abre opções");
             eye.transform.rotation=Quaternion.identity;yield return null;
-            var toolbar=(RectTransform)typeof(VrWorldGuide).GetField("toolbar",Private).GetValue(guide);
             Require(toolbar.gameObject.activeSelf && !VrWorldGuide.HitRect(toolbar, new Ray(eye.transform.position, eye.transform.forward)),
                 "Menu fica lateral e deixa livre o centro da visita");
             Require(!toolbar.GetComponentsInChildren<Button>(true).Any(b=>b.GetComponentInChildren<Text>().text=="Caminhar"),
@@ -152,6 +168,8 @@ namespace MuseumModerna
             Require(Vector3.Distance(initialPosition, guide.Board.position) < .001f, "Painel não foge ao girar cabeça");
             yield return new WaitForSecondsRealtime(.7f);
             Require(!guide.MenuOpen, "Voltar acionado apenas pelo olhar");
+            player.transform.position += original.transform.position + original.transform.forward * 3f - eye.transform.position;
+            Physics.SyncTransforms();
             eye.transform.LookAt(original.transform.position);
             yield return new WaitForSecondsRealtime(.2f);
             Require(gaze.Focus.Current==null,"Passar rapidamente pela obra não abre ficha");
@@ -163,10 +181,25 @@ namespace MuseumModerna
             yield return new WaitForSecondsRealtime(.6f);
             Require(gaze.Focus.Current == original.PaintingData && guide.GetComponent<CanvasGroup>().alpha > .9f, "Obra abre ficha VR");
             Require(guide.PageCount > 1, "Ficha longa paginada sem toque");
+            var openingRay = new Ray(eye.transform.position, eye.transform.forward);
+            Require(Vector3.Angle(openingRay.direction, guide.Board.position - openingRay.origin) < .1f &&
+                Vector3.Angle(guide.Board.forward, openingRay.direction) < .1f,
+                "Ficha abre centralizada e voltada ao olhar, incluindo inclinação");
+            var corners = new Vector3[4];
+            guide.Board.GetWorldCorners(corners);
+            Require(corners.All(c => {
+                var local = Quaternion.Inverse(eye.transform.rotation) * (c - eye.transform.position);
+                return local.z > 0 && Mathf.Abs(Mathf.Atan2(local.x, local.z) * Mathf.Rad2Deg) < 20 &&
+                    Mathf.Abs(Mathf.Atan2(local.y, local.z) * Mathf.Rad2Deg) < 20;
+            }), "Ficha inteira cabe nos 40 graus centrais ao abrir");
             var preferences=FindAnyObjectByType<UIManager>().Guide;
             var bodyText=(Text)typeof(VrWorldGuide).GetField("body",Private).GetValue(guide);
             var titleText=(Text)typeof(VrWorldGuide).GetField("title",Private).GetValue(guide);
             var pageContents=(System.Collections.Generic.List<string>)typeof(VrWorldGuide).GetField("pages",Private).GetValue(guide);
+            Require(guide.GetComponentsInChildren<Button>().Select(b => b.GetComponentInChildren<Text>().text)
+                .OrderBy(label => label).SequenceEqual(new[] { "Anterior", "Próxima página" }),
+                "Ficha oferece somente Anterior e Próxima página");
+            Require(bodyText.rectTransform.rect.height > 650, "Área dos controles removidos recebe texto de leitura");
             for(int textSize=0;textSize<3;textSize++)
             {
                 foreach(var exhibit in FindObjectsByType<PaintingExhibit>(FindObjectsSortMode.None))
@@ -180,24 +213,32 @@ namespace MuseumModerna
                         fits &= bodyText.preferredHeight<=bodyText.rectTransform.rect.height+2;
                     }
                     Require(fits,"Páginas sem corte no tamanho "+preferences.TextStep+": "+exhibit.PaintingData.uniqueId);
+                    var completeText = string.Concat(pageContents.Select(WithoutWhitespace));
+                    var data = exhibit.PaintingData;
+                    var fields = new[] { data.artist, data.Periodo, data.tecnica,
+                        preferences.Summary ? data.resumo : data.description,
+                        data.relacao_com_a_semana_de_1922, data.obra_historica_ou_reinterpretacao,
+                        preferences.Summary ? "" : data.fontes };
+                    Require(fields.All(field => completeText.Contains(WithoutWhitespace(field ?? ""))),
+                        "Paginação preserva conteúdo e fontes: " + data.uniqueId);
                 }
                 preferences.CycleTextSize();
             }
             guide.Show(original.PaintingData);
-            PointAt(Button("Próxima").transform);
+            Require(pageContents[0].Contains("RELAÇÃO COM 1922"), "Primeira página aproveita espaço com a seção seguinte");
+            PointAt(Button("Próxima página").transform);
             yield return new WaitForSecondsRealtime(1.3f);
             Require(guide.PageIndex == 1 && gaze.Focus.Current == original.PaintingData, "Ler controles mantém ficha e avança página");
             yield return new WaitForSecondsRealtime(1.5f);
             Require(guide.PageIndex == 1, "Página não repete ao manter olhar");
-            PointAt(Button("Fixar").transform);
-            yield return new WaitForSecondsRealtime(1.3f);
-            Require(gaze.Focus.Pinned, "Fixação pelo olhar");
             var readingPosition = player.transform.position;
             var boardPosition = guide.Board.position;
-            player.transform.position -= original.transform.forward * .6f;
+            float readingDistance = Vector3.Distance(eye.transform.position, boardPosition);
+            player.transform.position += guide.Board.forward * .6f;
             yield return null; yield return null;
-            Require(Vector3.Distance(boardPosition, guide.Board.position) > .4f && guide.PageIndex == 1 && gaze.Focus.Pinned,
-                "Aproximar da mesma obra reposiciona a ficha sem perder página ou fixação");
+            Require(Vector3.Distance(boardPosition, guide.Board.position) < .001f && guide.PageIndex == 1 &&
+                Vector3.Distance(eye.transform.position, guide.Board.position) < readingDistance - .5f,
+                "Aproximar reduz distância de leitura sem afastar ficha ou perder página");
             boardPosition = guide.Board.position;
             var boardRotation = guide.Board.rotation;
             eye.transform.rotation *= Quaternion.Euler(0, 25, 0);
@@ -210,15 +251,14 @@ namespace MuseumModerna
             eye.transform.LookAt(original.transform.position);
             yield return new WaitForSecondsRealtime(.2f);
             Capture("museum-vr-guide-editor.png");
-            PointAt(Button("Liberar").transform);
-            yield return new WaitForSecondsRealtime(1.3f);
-            Require(!gaze.Focus.Pinned, "Liberar pelo olhar");
-            PointAt(Button("Fechar").transform);
-            yield return new WaitForSecondsRealtime(1.6f);
-            Require(gaze.Focus.Current == null && guide.GetComponent<CanvasGroup>().alpha == 0, "Fechar pelo olhar");
+            eye.transform.rotation = Quaternion.LookRotation(Vector3.up, Vector3.forward);
+            yield return new WaitForSecondsRealtime(5.5f);
+            Require(gaze.Focus.Current == null && guide.GetComponent<CanvasGroup>().alpha == 0, "Desviar o olhar fecha ficha sem botão adicional");
             eye.transform.rotation = Quaternion.LookRotation(new Vector3(0, 1, .6f));
             yield return new WaitForSecondsRealtime(1.5f);
             Require(!guide.MenuOpen, "Céu permanece livre depois de fechar ficha");
+            player.transform.position += new Vector3(0, 1.65f, 0) - eye.transform.position;
+            Physics.SyncTransforms();
             eye.transform.rotation=Quaternion.identity;yield return null;
             PointAt(Button("Menu").transform);yield return new WaitForSecondsRealtime(1.3f);
             Require(guide.MenuOpen,"Menu continua disponível após fechar ficha");
@@ -311,6 +351,7 @@ namespace MuseumModerna
             Canvas.ForceUpdateCanvases();
             eye.transform.LookAt(target.position);
         }
+        private static string WithoutWhitespace(string value) => new string(value.Where(c => !char.IsWhiteSpace(c)).ToArray());
         private void Capture(string filename)
         {
             var target = new RenderTexture(1440, 900, 24);

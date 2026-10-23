@@ -23,7 +23,7 @@ namespace MuseumModerna
         private CanvasGroup group;
         private Image background, ring;
         private RectTransform reticle;
-        private Text heading, title, body, pageLabel;
+        private Text heading, title, body, pageLabel, hint;
         private Button previous, next;
         private readonly Button[] actions = new Button[6];
         private RectTransform actionGrid, toolbar;
@@ -33,9 +33,6 @@ namespace MuseumModerna
         private readonly List<string> pages = new List<string>();
         private readonly GazeActivation activation = new GazeActivation();
         private PaintingInfo current;
-        private PaintingExhibit currentExhibit;
-        private Vector3 placementEyePosition;
-        private bool centeredPlacement;
         private GazeDwellInteraction gaze;
         private Material overlayMaterial;
         private Texture2D ringTexture;
@@ -72,7 +69,7 @@ namespace MuseumModerna
             pageLabel = MakeText(Board, "", 22, 30);
             var pagesRow = Row(Board, "Paginas");
             previous = MakeButton(pagesRow, "Anterior", () => ChangePage(-1));
-            next = MakeButton(pagesRow, "Próxima", () => ChangePage(1));
+            next = MakeButton(pagesRow, "Próxima página", () => ChangePage(1));
             var grid=new GameObject("Acoes",typeof(RectTransform),typeof(GridLayoutGroup),typeof(LayoutElement));
             grid.transform.SetParent(Board,false);actionGrid=(RectTransform)grid.transform;
             var gridLayout=grid.GetComponent<GridLayoutGroup>();gridLayout.constraint=GridLayoutGroup.Constraint.FixedColumnCount;gridLayout.constraintCount=2;
@@ -83,7 +80,7 @@ namespace MuseumModerna
                 int index = i;
                 actions[i] = MakeButton(actionGrid, "", () => InvokeAction(index));
             }
-            MakeText(Board, "Olhe para um botão por 1 segundo para acionar.", 22, 32);
+            hint = MakeText(Board, "Olhe para um botão por 1 segundo para acionar.", 22, 32);
             foreach (var button in GetComponentsInChildren<Button>())
             {
                 var surface = button.GetComponent<Image>();
@@ -122,7 +119,7 @@ namespace MuseumModerna
         private void UpdateToolbar()
         {
             bool lookingDown=eye.transform.forward.y<-.26f;
-            bool available=IsEnabled&&!MenuOpen&&!visible&&!gaze.IsPaused&&!lookingDown;
+            bool available=IsEnabled&&!MenuOpen&&!visible&&!gaze.IsPaused&&!lookingDown&&AwayFromExhibits();
             // Refresh heading while walking; keep the lateral target still when looking up to select it.
             if(lookingDown)
             {
@@ -154,9 +151,7 @@ namespace MuseumModerna
             current = info; visible = true;
             if (changed)
             {
-                currentExhibit = gaze.RaycastExhibit(new Ray(eye.transform.position, eye.transform.forward));
-                if (currentExhibit != null && currentExhibit.PaintingData != info) currentExhibit = null;
-                page = 0; PlaceBoard(false); RebuildPages();
+                page = 0; SetReadingLayout(true); PlaceBoard(); RebuildPages();
             }
             RenderPage();
         }
@@ -167,11 +162,13 @@ namespace MuseumModerna
         }
         public void OpenMenu()
         {
-            if (!IsEnabled || MenuOpen || gaze.IsPaused) return;
+            if (!IsEnabled || MenuOpen || gaze.IsPaused || !AwayFromExhibits()) return;
             MenuOpen = true; visible = true; menuPage = 0;
             mode.ResetWalkingGesture();
-            PlaceBoard(true); RenderMenu();
+            PlaceBoard(); RenderMenu();
         }
+        private bool AwayFromExhibits() => !Physics.CheckSphere(eye.transform.position, 4f,
+            LayerMask.GetMask("Painting"), QueryTriggerInteraction.Ignore);
         public void CloseMenu()
         {
             MenuOpen = false; ConsumesGaze = false;
@@ -179,7 +176,7 @@ namespace MuseumModerna
             current = gaze.Focus.Current;
             if (current != null && preferences.PanelsEnabled)
             {
-                page = 0; RebuildPages(); PlaceBoard(false); RenderPage();
+                page = 0; SetReadingLayout(true); RebuildPages(); PlaceBoard(); RenderPage();
             }
             else visible = false;
         }
@@ -190,38 +187,11 @@ namespace MuseumModerna
             if (highlighted != null) highlighted.GetComponent<Image>().color = MuseumGuideTheme.Control;
             highlighted = null;
         }
-        private void PlaceBoard(bool centered, bool keepHeading = false)
+        private void PlaceBoard()
         {
-            var direction = keepHeading ? Board.forward : eye.transform.forward;
-            if (!centered && currentExhibit != null)
-                direction = currentExhibit.transform.position - eye.transform.position;
-            var forward = Vector3.ProjectOnPlane(direction, Vector3.up).normalized;
-            if (forward.sqrMagnitude < .1f) forward = Vector3.forward;
-            var rotation = Quaternion.LookRotation(forward);
-            float lateral=0;
-            if(!centered)
-            {
-                lateral=1.5f;
-                var exhibit=currentExhibit;
-                var renderer=exhibit!=null?exhibit.ArtworkRenderer:null;
-                var bounds=renderer!=null?renderer.bounds:exhibit!=null?exhibit.GetComponent<Collider>().bounds:new Bounds();
-                if(exhibit!=null)
-                {
-                    float left=0,right=0;
-                    for(int x=-1;x<=1;x+=2)for(int y=-1;y<=1;y+=2)for(int z=-1;z<=1;z+=2)
-                    {
-                        var corner=bounds.center+Vector3.Scale(bounds.extents,new Vector3(x,y,z));
-                        var p=Quaternion.Inverse(rotation)*(corner-eye.transform.position);
-                        if(p.z>.1f){left=Mathf.Min(left,p.x/p.z);right=Mathf.Max(right,p.x/p.z);}
-                    }
-                    float half=Board.sizeDelta.x*Scale*.5f;
-                    float rightSpace=right*Distance+half+.18f,leftSpace=-left*Distance+half+.18f;
-                    lateral=rightSpace<=leftSpace+.15f?rightSpace:-leftSpace;
-                }
-            }
-            Board.SetPositionAndRotation(eye.transform.position + rotation * new Vector3(lateral, -.10f, Distance), rotation);
-            placementEyePosition = eye.transform.position;
-            centeredPlacement = centered;
+            // Anchor once along the opening gaze: approaching must actually reduce reading distance.
+            var rotation = Quaternion.LookRotation(eye.transform.forward, Vector3.up);
+            Board.SetPositionAndRotation(eye.transform.position + eye.transform.forward * Distance, rotation);
             activation.Reset();
         }
         private void RebuildPages()
@@ -230,11 +200,11 @@ namespace MuseumModerna
             body.fontSize = MuseumGuideTheme.VrBody + preferences.TextStep * 4;
             var description = preferences.Summary ? current.resumo : current.description;
             Canvas.ForceUpdateCanvases();
-            var sections=new List<string>{"SOBRE A OBRA\n"+current.artist+" — "+current.Periodo+"\n"+current.tecnica+"\n\n"+description,
+            var sections=new List<string>{current.artist+" — "+current.Periodo+"\n"+current.tecnica+"\n\n"+description,
                 "RELAÇÃO COM 1922\n"+current.relacao_com_a_semana_de_1922,
                 "SOBRE ESTA REPRODUÇÃO\n"+current.obra_historica_ou_reinterpretacao};
             if(!preferences.Summary)sections.Add("FONTES\n"+current.fontes);
-            foreach(var section in sections){var split=new List<string>();Paginate(section,body,split);pages.AddRange(split);}
+            Paginate(string.Join("\n\n", sections), body, pages);
             page = Mathf.Clamp(page, 0, pages.Count - 1);
         }
         public static void Paginate(string text, Text target, List<string> output)
@@ -270,26 +240,31 @@ namespace MuseumModerna
             }
             if (output.Count == 0) output.Add("");
         }
-        public void RefreshPin() { if (current != null && !MenuOpen) SetButton(actions[0], gaze.Focus.Pinned ? "Liberar" : "Fixar"); }
+        private void SetReadingLayout(bool reading)
+        {
+            heading.gameObject.SetActive(!reading);
+            hint.gameObject.SetActive(!reading);
+            actionGrid.gameObject.SetActive(!reading);
+            var layout = body.GetComponent<LayoutElement>();
+            // Four visible rows, three gaps and the existing vertical padding.
+            layout.minHeight = layout.preferredHeight = reading ? Board.sizeDelta.y - 44 - 94 - 30 - MuseumGuideTheme.VrButtonHeight - 24 : 330;
+        }
         private void RenderPage()
         {
             if (current == null || MenuOpen) return;
-            heading.text = "ACERVO / MEDIAÇÃO DIGITAL";
             title.text = current.title;
             body.text = pages[page];
             pageLabel.text = "Página " + (page + 1) + " de " + pages.Count;
             previous.interactable = page > 0; next.interactable = page + 1 < pages.Count;
-            SetButton(actions[0], gaze.Focus.Pinned ? "Liberar" : "Fixar");
-            SetButton(actions[1], "Opções"); SetButton(actions[2], "Fechar");
-            SetButton(actions[3],"Reposicionar");SetActionCount(4);
             ApplyContrast();
         }
         private void RenderMenu()
         {
+            SetReadingLayout(false);
             heading.text = "VISITA / CONTROLES PELO OLHAR";
             title.text = "Opções do visor";
             body.fontSize = MuseumGuideTheme.VrBody;
-            body.text = "Olhe à frente para preparar a visita. Abaixe a cabeça para andar e levante para parar.\n\nPara abrir as opções, olhe por 1 segundo para o botão Menu ao lado esquerdo. A caminhada fica pausada durante as opções.";
+            body.text = "Abaixe a cabeça para andar e levante para parar.\n\nAs opções ficam disponíveis no hall e em áreas afastadas das obras. Olhe por 1 segundo para Menu. A caminhada pausa durante os ajustes.";
             pageLabel.text = menuPage==0?"VISITA · 1 de 2":"LEITURA · 2 de 2";
             previous.interactable = menuPage > 0; next.interactable = menuPage < 1;
             SetActionCount(6);
@@ -309,7 +284,7 @@ namespace MuseumModerna
                 SetButton(actions[3], "Contraste: " + (preferences.HighContrast ? "alto" : "padrão"));
                 SetButton(actions[4], "Animação: " + (preferences.ReducedMotion ? "não" : "sim"));
                 SetButton(actions[5], "Leitura: " + (preferences.LongerReading ? "longa" : "breve"));
-                body.text="Aumente o texto, escolha a versão resumida ou ative alto contraste.\n\nA ficha fica ao lado da obra. Você pode fixá-la, reposicioná-la e fechá-la a qualquer momento.";
+                body.text="Aumente o texto, escolha a versão resumida ou ative alto contraste.\n\nA ficha abre à sua frente. Use Anterior e Próxima página para ler. Desvie o olhar para encerrar a leitura.";
             }
             ApplyContrast();
         }
@@ -325,14 +300,7 @@ namespace MuseumModerna
         }
         private void InvokeAction(int index)
         {
-            if (!MenuOpen)
-            {
-                if (index == 0) { gaze.TogglePin(); RenderPage(); }
-                else if (index == 1) OpenMenu();
-                else if(index==2)gaze.Close();
-                else if(index==3)PlaceBoard(true);
-                return;
-            }
+            if (!MenuOpen) return;
             if (menuPage == 0)
             {
                 if (index == 0) { CloseMenu(); return; }
@@ -358,9 +326,6 @@ namespace MuseumModerna
             bool paused = FindPlayerPaused();
             UpdateToolbar();
             if (paused) { ResetInteraction(); return; }
-            // Follow translation, not head rotation: gaze buttons stay reachable while reading.
-            if (visible && (eye.transform.position - placementEyePosition).sqrMagnitude > .0225f)
-                PlaceBoard(centeredPlacement, true);
             // Voltar do Android ou um frame travado não completa dwell/gestos sozinho.
             float elapsed = Mathf.Clamp(Time.unscaledDeltaTime, 0f, .1f);
             group.alpha = preferences.ReducedMotion ? (visible ? 1 : 0) :
