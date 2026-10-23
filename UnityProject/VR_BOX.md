@@ -22,12 +22,14 @@ para entrar. **Modo normal** permite visitar em 2D. Nas opções desse modo,
   se completa e aciona o botão. O controle acompanha a cabeça, não os olhos.
   Manter o olhar não repete a ação. Desvie e volte para acioná-lo novamente.
 - **Anterior** e **Próxima** percorrem as páginas; não é necessário arrastar texto.
-- **Fixar**, **Liberar** e **Fechar** também funcionam pelo olhar.
+- A ficha tem apenas **Anterior** e **Próxima página**. Desvie o olhar para
+  encerrar a leitura após a tolerância configurada.
 - Olhe à frente para preparar o gesto; baixe a cabeça para caminhar e levante
   para parar imediatamente. Não é necessário solicitar a caminhada por botão.
-- Sem ficha aberta, **Menu** fica ao lado esquerdo. Ele permanece estável ao
-  mirar nos controles e desaparece ao olhar para baixo para caminhar.
-- **Menu** (ou **Opções** na ficha) abre os ajustes. Olhar o céu não abre opções.
+- Sem ficha aberta e a mais de 4 metros dos expositores, **Menu** fica ao lado
+  esquerdo. Está disponível no centro do hall e em pontos livres das salas.
+  Ele permanece estável ao mirar nos controles e desaparece ao olhar para baixo.
+- **Menu** abre os ajustes. Olhar o céu não abre opções.
   **Voltar** fecha as opções sem sair da visita.
 - A caminhada por inclinação é sempre usada no VR, inclusive com preferências
   antigas salvas. Velocidades: lenta 0,8 m/s, normal 1,25 m/s e rápida 1,6 m/s.
@@ -36,9 +38,9 @@ para entrar. **Modo normal** permite visitar em 2D. Nas opções desse modo,
 - O menu permite ampliar texto, resumir, mudar contraste, desativar fichas,
   reduzir animações, prolongar leitura, centralizar a visão e sair do VR.
 
-A ficha acompanha o deslocamento do visitante e fica no lugar ao girar apenas a
-cabeça: seus controles podem ser alcançados pela mira. Aproximar-se da mesma obra
-preserva página e fixação. Há 1,5 segundo de tolerância ao desviar para alcançar a ficha
+A ficha abre à frente do visitante, centralizada na direção do olhar, mesmo que
+sobreponha a obra. Permanece fixa no espaço ao andar ou girar a cabeça: aproximar-se
+reduz a distância de leitura e preserva a página. Há 1,5 segundo de tolerância ao desviar
 (ou 5 segundos com leitura longa). A interface funciona como sobreposição em 3D;
 as paredes continuam bloqueando a detecção das obras.
 
@@ -88,7 +90,7 @@ Teste de interação no Editor, a partir da raiz do repositório:
 ```
 
 O teste encerra o Unity automaticamente; não use `-quit`. Verifica dwell,
-paginação, leitura, fixação, menu e saída sem simular toques ou invocar cliques.
+paginação, leitura, proximidade, menu e saída pelo olhar.
 
 Fontes técnicas: [Cardboard v1.30.1](https://github.com/googlevr/cardboard-xr-plugin/releases/tag/v1.30.1),
 [alteração de compatibilidade em v1.31.0](https://github.com/googlevr/cardboard-xr-plugin/releases/tag/v1.31.0),
