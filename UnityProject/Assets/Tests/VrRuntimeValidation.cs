@@ -1,6 +1,7 @@
 #if UNITY_EDITOR
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -16,10 +17,13 @@ namespace MuseumModerna
         private VrWorldGuide guide;
         private Camera eye;
         private int checks;
+        private readonly Dictionary<string, int?> savedPreferences = new Dictionary<string, int?>();
         private const BindingFlags Private = BindingFlags.Instance | BindingFlags.NonPublic;
         private IEnumerator Start()
         {
-            bool savedTilt=HeadGazeMovement.TiltWalking;
+            foreach(var key in new[]{"MuseumTiltWalking", "MuseumWalkSpeed", "MuseumGuide_size", "MuseumGuide_summary",
+                "MuseumGuide_enabled", "MuseumGuide_contrast", "MuseumGuide_linger", "MuseumGuide_motion"})
+                savedPreferences[key]=PlayerPrefs.HasKey(key)?PlayerPrefs.GetInt(key):(int?)null;
             HeadGazeMovement.SetTiltWalking(false);
             yield return null; yield return null;
             var routine = Tests();
@@ -27,12 +31,19 @@ namespace MuseumModerna
             {
                 object value;
                 try { if (!routine.MoveNext()) break; value = routine.Current; }
-                catch (Exception e) { HeadGazeMovement.SetTiltWalking(savedTilt); Debug.LogException(e); UnityEditor.EditorApplication.Exit(1); yield break; }
+                catch (Exception e) { RestorePreferences(); Debug.LogException(e); UnityEditor.EditorApplication.Exit(1); yield break; }
                 yield return value;
             }
-            HeadGazeMovement.SetTiltWalking(savedTilt);
+            RestorePreferences();
             Debug.Log($"[VrValidation] PASS: {checks} verificações de interação e recuperação VR (simulação no Editor; sem lentes físicas)");
             UnityEditor.EditorApplication.Exit(0);
+        }
+        private void RestorePreferences()
+        {
+            foreach(var preference in savedPreferences)
+                if(preference.Value.HasValue)PlayerPrefs.SetInt(preference.Key,preference.Value.Value);
+                else PlayerPrefs.DeleteKey(preference.Key);
+            PlayerPrefs.Save();
         }
         private IEnumerator Tests()
         {
@@ -46,6 +57,10 @@ namespace MuseumModerna
             foreach (var locked in FindObjectsByType<LockPosition>(FindObjectsSortMode.None)) locked.enabled = false;
             var player = FindAnyObjectByType<PlayerController>();
             var gaze = eye.GetComponent<GazeDwellInteraction>();
+            var preferences=FindAnyObjectByType<UIManager>().Guide;
+            while(preferences.TextStep!=0)preferences.CycleTextSize();
+            if(!preferences.PanelsEnabled)preferences.TogglePanels();
+            if(preferences.Summary)preferences.ToggleSummary();
             var original = FindObjectsByType<PaintingExhibit>(FindObjectsSortMode.None).First(e =>
                 e.PaintingData.uniqueId == "homem_amarelo" || e.PaintingData.uniqueId == "anita_homem");
             player.transform.position += original.transform.position + original.transform.forward * 3 - eye.transform.position;
@@ -161,6 +176,29 @@ namespace MuseumModerna
                 PointAt(Button("Centralizar").transform);yield return null;
             }
             Capture("vr-velocidade.png");
+            Require(Button("Não exibir mais nesta sessão").interactable,"Ocultar ajustes é uma ação separada das fichas");
+            PointAt(guide.Board);Capture("vr-menu-sessao.png");
+            Require(guide.GetComponentsInChildren<Text>().All(t=>t.preferredHeight<=t.rectTransform.rect.height+2),
+                "Explicação e botões do menu da sessão cabem sem corte");
+            Button("Ajustar leitura").onClick.Invoke();
+            Canvas.ForceUpdateCanvases();
+            for(int size=0;size<MuseumGuidePanel.TextSizeCount;size++)
+            {
+                var sizeButton=Button("Texto: "+preferences.TextSizeLabel);
+                PointAt(sizeButton.transform);yield return new WaitForSecondsRealtime(1.3f);
+                Require(preferences.TextStep==(size+1)%MuseumGuidePanel.TextSizeCount&&
+                    PlayerPrefs.GetInt("MuseumGuide_size")==preferences.TextStep,
+                    "Tamanho pelo olhar é aplicado e salvo: "+preferences.TextSizeLabel);
+                if(preferences.TextStep==3)
+                {
+                    Require(preferences.TextSizeLabel=="Extra Grande"&&
+                        FindAnyObjectByType<UIManager>().GetComponentsInChildren<Text>(true).Any(t=>t.text=="Texto: Extra Grande"),
+                        "Extra Grande tem o mesmo nome nos ajustes VR e normais");
+                    PointAt(guide.Board);Capture("vr-menu-extra-grande.png");
+                }
+                PointAt(guide.Board);yield return null;
+            }
+            Button("Anterior").onClick.Invoke();
             var initialPosition = guide.Board.position;
             PointAt(Button("Voltar à visita").transform);
             yield return new WaitForSecondsRealtime(.5f);
@@ -192,7 +230,6 @@ namespace MuseumModerna
                 return local.z > 0 && Mathf.Abs(Mathf.Atan2(local.x, local.z) * Mathf.Rad2Deg) < 20 &&
                     Mathf.Abs(Mathf.Atan2(local.y, local.z) * Mathf.Rad2Deg) < 20;
             }), "Ficha inteira cabe nos 40 graus centrais ao abrir");
-            var preferences=FindAnyObjectByType<UIManager>().Guide;
             var bodyText=(Text)typeof(VrWorldGuide).GetField("body",Private).GetValue(guide);
             var titleText=(Text)typeof(VrWorldGuide).GetField("title",Private).GetValue(guide);
             var pageContents=(System.Collections.Generic.List<string>)typeof(VrWorldGuide).GetField("pages",Private).GetValue(guide);
@@ -200,11 +237,12 @@ namespace MuseumModerna
                 .OrderBy(label => label).SequenceEqual(new[] { "Anterior", "Próxima página" }),
                 "Ficha oferece somente Anterior e Próxima página");
             Require(bodyText.rectTransform.rect.height > 650, "Área dos controles removidos recebe texto de leitura");
-            for(int textSize=0;textSize<3;textSize++)
+            for(int textSize=0;textSize<MuseumGuidePanel.TextSizeCount;textSize++)
             {
                 foreach(var exhibit in FindObjectsByType<PaintingExhibit>(FindObjectsSortMode.None))
                 {
                     guide.Show(exhibit.PaintingData);Canvas.ForceUpdateCanvases();
+                    Require(bodyText.fontSize==MuseumGuideTheme.VrBody+textSize*4,"Tamanho aplicado à ficha: "+textSize);
                     Require(titleText.preferredHeight<=titleText.rectTransform.rect.height+2,"Título completo: "+exhibit.PaintingData.uniqueId);
                     bool fits=true;
                     foreach(var content in pageContents)
@@ -222,8 +260,13 @@ namespace MuseumModerna
                     Require(fields.All(field => completeText.Contains(WithoutWhitespace(field ?? ""))),
                         "Paginação preserva conteúdo e fontes: " + data.uniqueId);
                 }
+                if(textSize==3)
+                {
+                    guide.Show(original.PaintingData);PointAt(guide.Board);Capture("vr-ficha-extra-grande.png");
+                }
                 preferences.CycleTextSize();
             }
+            guide.Hide();
             guide.Show(original.PaintingData);
             Require(pageContents[0].Contains("RELAÇÃO COM 1922"), "Primeira página aproveita espaço com a seção seguinte");
             PointAt(Button("Próxima página").transform);
@@ -378,6 +421,77 @@ namespace MuseumModerna
                 Require(HeadGazeMovement.SpeedSetting==(initialSpeed+i+1)%3,"Velocidade normal alterada e compartilhada com VR");
             }
             Require(!ui.GetComponentsInChildren<Text>(true).Any(t=>t.text.Contains("QR")),"Interface sem opção ou solicitação de QR");
+
+            // O cenário anterior injeta um sensor sem pose; a prévia seguinte volta ao visor simulado.
+            typeof(MobileVrMode).GetField("driver",Private).SetValue(mode,null);
+            Destroy(driver);
+            mode.EnterEditorPreview();
+            player.transform.position += new Vector3(0,1.65f,0)-eye.transform.position;
+            eye.transform.rotation=Quaternion.identity;Physics.SyncTransforms();yield return null;
+            guide.OpenMenu();
+            Require(guide.MenuOpen,"Ajustes começam habilitados na sessão do aplicativo");
+            Button("Ajustar leitura").onClick.Invoke();
+            while(preferences.TextStep!=3)Button("Texto: "+preferences.TextSizeLabel).onClick.Invoke();
+            var preservedSpeed=HeadGazeMovement.SpeedSetting;
+            var preservedOptions=new[]{preferences.Summary,preferences.HighContrast,preferences.PanelsEnabled,
+                preferences.LongerReading,preferences.ReducedMotion};
+            Button("Anterior").onClick.Invoke();
+            PointAt(Button("Não exibir mais nesta sessão").transform);
+            yield return new WaitForSecondsRealtime(1.3f);
+            Require(!guide.MenuOpen&&!toolbar.gameObject.activeSelf&&!guide.BlocksWalking,
+                "Ocultar ajustes pelo olhar fecha menu e libera caminhada");
+            guide.OpenMenu();Require(!guide.MenuOpen,"Atalho de ajustes também respeita ocultação");
+            Invoke(mode,"OnApplicationPause",true);Invoke(mode,"OnApplicationFocus",false);
+            Invoke(mode,"OnApplicationPause",false);Invoke(mode,"OnApplicationFocus",true);
+            for(int i=0;i<4;i++)yield return null;
+            guide.OpenMenu();
+            Require(player.State!=PlayerState.Paused&&!guide.MenuOpen&&!toolbar.gameObject.activeSelf,
+                "Pausa e recuperação retomam visita sem reabilitar ajustes ocultos");
+            mode.HandleBack();
+            Require(guide.MainMenuOpen,"Menu inicial continua acessível com ajustes ocultos");
+            PointAt(Button("Continuar em VR").transform);yield return new WaitForSecondsRealtime(1.3f);
+            Require(!guide.MenuOpen&&mode.IsActive,"Menu inicial continua operável pelo olhar");
+            mode.EnterNormalMode();mode.EnterEditorPreview();yield return null;
+            guide.OpenMenu();
+            Require(!guide.MenuOpen&&!toolbar.gameObject.activeSelf,"Trocar de modo não reabilita ajustes ocultos");
+            Require(preferences.TextStep==3&&HeadGazeMovement.SpeedSetting==preservedSpeed&&
+                preservedOptions.SequenceEqual(new[]{preferences.Summary,preferences.HighContrast,preferences.PanelsEnabled,
+                    preferences.LongerReading,preferences.ReducedMotion}),"Ocultação e transições preservam todas as configurações");
+            foreach(var exhibit in FindObjectsByType<PaintingExhibit>(FindObjectsSortMode.None))
+            {
+                guide.Show(exhibit.PaintingData);Canvas.ForceUpdateCanvases();
+                Require(!guide.MenuOpen&&titleText.text==exhibit.PaintingData.title&&bodyText.fontSize==44&&
+                    guide.GetComponentsInChildren<Button>().Length==2&&
+                    guide.GetComponentsInChildren<Button>().All(b=>b.GetComponentInChildren<Text>().text=="Anterior"||
+                        b.GetComponentInChildren<Text>().text=="Próxima página"),
+                    "Ficha independente dos ajustes ocultos: "+exhibit.PaintingData.uniqueId);
+            }
+            gaze.Close();guide.Hide();
+            player.transform.position += original.transform.position+original.transform.forward*3-eye.transform.position;
+            Physics.SyncTransforms();eye.transform.LookAt(original.transform.position);
+            yield return new WaitForSecondsRealtime(1.2f);
+            Require(gaze.Focus.Current==original.PaintingData&&guide.GetComponent<CanvasGroup>().alpha>.9f,
+                "Obra abre pelo olhar mesmo com ajustes ocultos");
+            PointAt(Button("Próxima página").transform);yield return new WaitForSecondsRealtime(1.3f);
+            Require(guide.PageIndex==1,"Próxima página funciona com ajustes ocultos");
+            PointAt(Button("Anterior").transform);yield return new WaitForSecondsRealtime(1.3f);
+            Require(guide.PageIndex==0,"Página anterior funciona com ajustes ocultos");
+            PointAt(guide.Board);Capture("vr-ficha-menu-oculto.png");
+            eye.transform.rotation=Quaternion.LookRotation(Vector3.up,Vector3.forward);
+            yield return new WaitForSecondsRealtime(5.5f);
+            Require(gaze.Focus.Current==null&&guide.GetComponent<CanvasGroup>().alpha==0,
+                "Desviar o olhar fecha ficha sem reabrir ajustes ocultos");
+            player.transform.position += new Vector3(0,1.65f,0)-eye.transform.position;
+            eye.transform.rotation=Quaternion.identity;Physics.SyncTransforms();yield return null;
+            Capture("vr-hall-menu-oculto.png");
+            Require(!toolbar.gameObject.activeSelf,"Hall permanece livre após leitura com ajustes ocultos");
+            var reset=typeof(VrWorldGuide).GetMethod("ResetSession",BindingFlags.Static|BindingFlags.NonPublic);
+            Require(reset.GetCustomAttributes(typeof(RuntimeInitializeOnLoadMethodAttribute),false).Length==1,
+                "Reinicialização da sessão registrada no ciclo de abertura do aplicativo");
+            reset.Invoke(null,null);yield return null;
+            guide.OpenMenu();
+            Require(guide.MenuOpen&&preferences.TextStep==3&&PlayerPrefs.GetInt("MuseumGuide_size")==3&&
+                HeadGazeMovement.SpeedSetting==preservedSpeed,"Nova sessão reabilita ajustes sem apagar configurações");
         }
         private Button Button(string label) => FindObjectsByType<Button>(FindObjectsSortMode.None).First(b =>
             (b.transform.IsChildOf(guide.transform) || b.transform.root.name=="Controles_da_visita_VR" ||

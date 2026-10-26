@@ -39,9 +39,13 @@ namespace MuseumModerna
         private Texture2D ringTexture;
         private Sprite ringSprite;
         private bool visible;
+        private static bool menuHiddenForSession;
         private int page, menuPage;
         private const float DwellSeconds = MuseumGuideTheme.VrDwell;
         private const float Distance = MuseumGuideTheme.VrDistance, Scale = MuseumGuideTheme.VrScale;
+
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+        private static void ResetSession() => menuHiddenForSession = false;
 
         public void Build(Camera camera, MuseumGuidePanel settings, MobileVrMode owner)
         {
@@ -120,7 +124,7 @@ namespace MuseumModerna
         private void UpdateToolbar()
         {
             bool lookingDown=eye.transform.forward.y<-.26f;
-            bool available=IsEnabled&&!MenuOpen&&!visible&&!gaze.IsPaused&&!lookingDown&&AwayFromExhibits();
+            bool available=IsEnabled&&!menuHiddenForSession&&!MenuOpen&&!visible&&!gaze.IsPaused&&!lookingDown&&AwayFromExhibits();
             // Refresh heading while walking; keep the lateral target still when looking up to select it.
             if(lookingDown)
             {
@@ -163,7 +167,7 @@ namespace MuseumModerna
         }
         public void OpenMenu()
         {
-            if (!IsEnabled || MenuOpen || gaze.IsPaused || !AwayFromExhibits()) return;
+            if (!IsEnabled || menuHiddenForSession || MenuOpen || gaze.IsPaused || !AwayFromExhibits()) return;
             MenuOpen = true; visible = true; menuPage = 0;
             mode.ResetWalkingGesture();
             PlaceBoard(); RenderMenu();
@@ -285,7 +289,7 @@ namespace MuseumModerna
             heading.text = "VISITA / CONTROLES PELO OLHAR";
             title.text = "Opções do visor";
             body.fontSize = MuseumGuideTheme.VrBody;
-            body.text = "Abaixe a cabeça para andar e levante para parar.\n\nAs opções ficam disponíveis no hall e em áreas afastadas das obras. Olhe por 1 segundo para Menu. A caminhada pausa durante os ajustes.";
+            body.text = "Abaixe a cabeça para andar e levante para parar.\n\nAjustes disponíveis no hall e longe das obras.\n\nNão exibir mais nesta sessão: oculta este menu até reiniciar o aplicativo e mantém suas configurações.";
             pageLabel.text = menuPage==0?"VISITA · 1 de 2":"LEITURA · 2 de 2";
             previous.interactable = menuPage > 0; next.interactable = menuPage < 1;
             SetActionCount(6);
@@ -295,11 +299,11 @@ namespace MuseumModerna
                 SetButton(actions[1], "Centralizar");
                 SetButton(actions[2], "Velocidade: "+HeadGazeMovement.SpeedLabel);
                 SetButton(actions[3], "Ajustar leitura");SetButton(actions[4], "Menu inicial");
-                SetActionCount(5);
+                SetButton(actions[5], "Não exibir mais nesta sessão");
             }
             else if (menuPage == 1)
             {
-                SetButton(actions[0], "Texto: " + new[] { "padrão", "grande", "maior" }[preferences.TextStep]);
+                SetButton(actions[0], "Texto: " + preferences.TextSizeLabel);
                 SetButton(actions[1], "Resumo: " + (preferences.Summary ? "sim" : "não"));
                 SetButton(actions[2], "Fichas: " + (preferences.PanelsEnabled ? "sim" : "não"));
                 SetButton(actions[3], "Contraste: " + (preferences.HighContrast ? "alto" : "padrão"));
@@ -335,6 +339,12 @@ namespace MuseumModerna
                 else if(index==2){HeadGazeMovement.CycleSpeed();RenderMenu();}
                 else if(index==3){menuPage=1;RenderMenu();}
                 else if(index==4)mode.ShowMainMenu();
+                else if(index==5)
+                {
+                    menuHiddenForSession=true;
+                    CloseMenu();
+                    UpdateToolbar();
+                }
                 return;
             }
             else if (menuPage == 1)
