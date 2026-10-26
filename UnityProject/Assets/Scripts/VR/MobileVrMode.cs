@@ -184,9 +184,9 @@ namespace MuseumModerna
             missingPoseTime = 0f;
             ResetWalkingGesture();
             player.SetPaused(false);
-            // Entrar no visor deve começar a visita, não cobrir a imagem com o
-            // menu central. O menu lateral deixa livre o gesto de caminhada.
-            WorldGuide.CloseMenu();
+            // Recuperar o tracking deve preservar a tela inicial aberta no visor.
+            if (WorldGuide.MainMenuOpen) WorldGuide.OpenMainMenu();
+            else WorldGuide.CloseMenu();
         }
         public void ResetWalkingGesture()
         {
@@ -214,14 +214,17 @@ namespace MuseumModerna
             ui.Guide.CloseSettings();
             player.SetPaused(false);
         }
-        public void ExitVR() => ShowMainMenu();
-        public void ShowMainMenu()
+        public void ExitVR()
         {
             RestoreNormalRendering();
             if (preparation != null) preparation.SetActive(false);
             ui.Guide.CloseSettings();
-            player.SetPaused(true);
             ui.GetComponent<WelcomeScreen>()?.Show();
+        }
+        public void ShowMainMenu()
+        {
+            if (IsActive) WorldGuide.OpenMainMenu();
+            else ExitVR();
         }
         private void RestoreNormalRendering()
         {

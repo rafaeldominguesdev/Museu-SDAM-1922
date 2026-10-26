@@ -31,6 +31,10 @@ para entrar. **Modo normal** permite visitar em 2D. Nas opções desse modo,
   Ele permanece estável ao mirar nos controles e desaparece ao olhar para baixo.
 - **Menu** abre os ajustes. Olhar o céu não abre opções.
   **Voltar** fecha as opções sem sair da visita.
+- **Menu inicial**, nos ajustes, ou **Voltar** do Android durante a visita abre
+  a escolha de modo dentro do visor, com os créditos de autoria e controles pelo
+  olhar. **Continuar em VR** retoma a visita; **Modo normal** encerra o visor e
+  continua em 2D. Na tela inicial VR, **Voltar** também retoma a visita.
 - A caminhada por inclinação é sempre usada no VR, inclusive com preferências
   antigas salvas. Velocidades: lenta 0,8 m/s, normal 1,25 m/s e rápida 1,6 m/s.
   Menu aberto ou olhar sobre a ficha suspendem o caminhar. Após pausa ou opções,

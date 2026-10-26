@@ -13,6 +13,7 @@ namespace MuseumModerna
         public bool ConsumesGaze { get; private set; }
         public bool BlocksWalking => MenuOpen || (visible && HitRect(Board, new Ray(eye.transform.position, eye.transform.forward)));
         public bool MenuOpen { get; private set; }
+        public bool MainMenuOpen { get; private set; }
         public RectTransform Board { get; private set; }
         public int PageIndex => page;
         public int PageCount => pages.Count;
@@ -132,7 +133,7 @@ namespace MuseumModerna
         }
         public void SetVrEnabled(bool enabled)
         {
-            IsEnabled = enabled; visible = false; MenuOpen = false; ConsumesGaze = false;
+            IsEnabled = enabled; visible = false; MenuOpen = false; MainMenuOpen = false; ConsumesGaze = false;
             current = null; group.alpha = 0; ResetInteraction();
             reticle.gameObject.SetActive(enabled);
             if (enabled)
@@ -169,9 +170,27 @@ namespace MuseumModerna
         }
         private bool AwayFromExhibits() => !Physics.CheckSphere(eye.transform.position, 4f,
             LayerMask.GetMask("Painting"), QueryTriggerInteraction.Ignore);
+        public void OpenMainMenu()
+        {
+            if (!IsEnabled || gaze.IsPaused) return;
+            ResetInteraction();
+            MenuOpen = MainMenuOpen = visible = true;
+            mode.ResetWalkingGesture();
+            SetReadingLayout(false);
+            heading.text = "MUSEU / 1922";
+            title.text = "Semana de Arte Moderna";
+            body.fontSize = MuseumGuideTheme.VrBody;
+            body.text = "Escolha como continuar a visita.\n\n" + WelcomeScreen.Authorship.Replace(" | ", "\n");
+            pageLabel.gameObject.SetActive(false);
+            previous.transform.parent.gameObject.SetActive(false);
+            SetActionCount(2);
+            SetButton(actions[0], "Continuar em VR");
+            SetButton(actions[1], "Modo normal");
+            PlaceBoard(); ApplyContrast();
+        }
         public void CloseMenu()
         {
-            MenuOpen = false; ConsumesGaze = false;
+            MenuOpen = MainMenuOpen = false; ConsumesGaze = false;
             ResetInteraction();
             current = gaze.Focus.Current;
             if (current != null && preferences.PanelsEnabled)
@@ -242,6 +261,8 @@ namespace MuseumModerna
         }
         private void SetReadingLayout(bool reading)
         {
+            pageLabel.gameObject.SetActive(true);
+            previous.transform.parent.gameObject.SetActive(true);
             heading.gameObject.SetActive(!reading);
             hint.gameObject.SetActive(!reading);
             actionGrid.gameObject.SetActive(!reading);
@@ -273,7 +294,7 @@ namespace MuseumModerna
                 SetButton(actions[0], "Voltar à visita");
                 SetButton(actions[1], "Centralizar");
                 SetButton(actions[2], "Velocidade: "+HeadGazeMovement.SpeedLabel);
-                SetButton(actions[3], "Ajustar leitura");SetButton(actions[4], "Sair do VR");
+                SetButton(actions[3], "Ajustar leitura");SetButton(actions[4], "Menu inicial");
                 SetActionCount(5);
             }
             else if (menuPage == 1)
@@ -301,13 +322,19 @@ namespace MuseumModerna
         private void InvokeAction(int index)
         {
             if (!MenuOpen) return;
+            if (MainMenuOpen)
+            {
+                if (index == 0) { CloseMenu(); mode.ResetWalkingGesture(); }
+                else if (index == 1) mode.EnterNormalMode();
+                return;
+            }
             if (menuPage == 0)
             {
                 if (index == 0) { CloseMenu(); return; }
                 if (index == 1) mode.Recenter();
                 else if(index==2){HeadGazeMovement.CycleSpeed();RenderMenu();}
                 else if(index==3){menuPage=1;RenderMenu();}
-                else if(index==4)mode.ExitVR();
+                else if(index==4)mode.ShowMainMenu();
                 return;
             }
             else if (menuPage == 1)

@@ -53,6 +53,9 @@ namespace MuseumModerna
                 Require(welcome.IsVisible && player.State == PlayerState.Paused && !mode.IsPreparationVisible,
                     "Abertura única, jogador parado, preparação VR não iniciada");
                 Require(welcome.Root.GetComponentsInChildren<Button>().Length == 2, "Exatamente dois modos principais");
+                var authors = welcome.Root.GetComponentsInChildren<Text>().Single(t => t.name == "CreditosDeAutoria");
+                Require(authors.text == "Feito por: Bruno Proença Silva | Rafael Fernandes Domingues" && !authors.raycastTarget,
+                    "Autoria completa na abertura sem interceptar toques");
                 foreach (var size in new[] { new Vector2Int(844,390), new Vector2Int(1280,720), new Vector2Int(2400,1080), new Vector2Int(390,844), new Vector2Int(568,320), new Vector2Int(640,360), new Vector2Int(320,568) })
                     Capture(size.x, size.y);
                 EventSystem.current.enabled = false;
@@ -175,6 +178,13 @@ namespace MuseumModerna
                 float preferred = label.preferredHeight;
                 Require(preferred <= label.rectTransform.rect.height + 2, $"Texto {label.name} sem corte em {width}x{height}");
             }
+            var authors = root.GetComponentsInChildren<Text>().Single(t => t.name == "CreditosDeAutoria").rectTransform;
+            var authorCorners = new Vector3[4]; authors.GetWorldCorners(authorCorners);
+            Require(authorCorners.All(p => safe.rect.Contains((Vector2)safe.InverseTransformPoint(p))),
+                $"Autoria dentro da área segura em {width}x{height}");
+            var buttonCorners = new Vector3[4]; ((RectTransform)welcome.VrButton.transform).GetWorldCorners(buttonCorners);
+            Require(authorCorners[1].y < buttonCorners[0].y,
+                $"Autoria abaixo dos botões sem sobreposição em {width}x{height}");
             // A abertura real usa overlay: a geometria não deve interceptar o Canvas da captura.
             var renderers = FindObjectsByType<Renderer>(FindObjectsSortMode.None).Where(r => r.enabled).ToArray();
             foreach (var renderer in renderers) renderer.enabled = false;

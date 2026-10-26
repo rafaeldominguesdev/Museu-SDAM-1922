@@ -150,7 +150,7 @@ namespace MuseumModerna
             guide.OpenMenu();
             Require(Vector3.Distance(menuPosition,guide.Board.position)<.001f,
                 "Solicitação repetida de menu não reposiciona opções sobre o olhar");
-            Require(Button("Sair do VR").interactable, "Sair do VR fica na primeira página de opções");
+            Require(Button("Menu inicial").interactable, "Menu inicial fica na primeira página de opções");
             int initialSpeed=HeadGazeMovement.SpeedSetting;
             for(int i=0;i<3;i++)
             {
@@ -262,11 +262,47 @@ namespace MuseumModerna
             eye.transform.rotation=Quaternion.identity;yield return null;
             PointAt(Button("Menu").transform);yield return new WaitForSecondsRealtime(1.3f);
             Require(guide.MenuOpen,"Menu continua disponível após fechar ficha");
-            PointAt(Button("Sair do VR").transform); yield return new WaitForSecondsRealtime(1.3f);
+            var stereoBeforeMenu = eye.stereoTargetEye;
+            PointAt(Button("Menu inicial").transform); yield return new WaitForSecondsRealtime(1.3f);
             var ui = FindAnyObjectByType<UIManager>();
+            Require(mode.IsActive && guide.MainMenuOpen && guide.MenuOpen && guide.BlocksWalking &&
+                !ui.GetComponent<Canvas>().enabled && !ui.GetComponent<WelcomeScreen>().IsVisible &&
+                eye.stereoTargetEye == stereoBeforeMenu,
+                "Retorno à home preserva VR e renderização do visor sem sobreposição 2D");
+            Require(guide.GetComponentsInChildren<Button>().Length == 2 &&
+                guide.GetComponentsInChildren<Text>().Any(t => t.text.Contains("Bruno Proença Silva") && t.text.Contains("Rafael Fernandes Domingues")),
+                "Home VR tem dois controles pelo olhar e autoria completa");
+            Require(guide.GetComponent<Canvas>().renderMode == RenderMode.WorldSpace &&
+                guide.GetComponentsInChildren<Text>().All(t => t.preferredHeight <= t.rectTransform.rect.height + 2),
+                "Home VR no mundo, com textos sem corte");
+            yield return null;
+            var menuTitle = guide.GetComponentsInChildren<Text>().Single(t => t.text == "Semana de Arte Moderna");
+            Require(menuTitle.cachedTextGenerator.characterCountVisible >= menuTitle.text.Length,
+                "Título completo da home VR gera todos os caracteres visíveis");
+            Capture("menu-inicial-vr.png");
+            Invoke(mode, "OnApplicationPause", true);
+            Invoke(mode, "OnApplicationFocus", false);
+            Invoke(mode, "OnApplicationPause", false);
+            Invoke(mode, "OnApplicationFocus", true);
+            for (int i = 0; i < 4; i++) yield return null;
+            Require(mode.IsActive && guide.MainMenuOpen && guide.BlocksWalking,
+                "Recuperação de foco preserva home VR e bloqueio de caminhada");
+            PointAt(Button("Continuar em VR").transform); yield return new WaitForSecondsRealtime(1.3f);
+            Require(mode.IsActive && !guide.MenuOpen && !guide.MainMenuOpen,
+                "Continuar pelo olhar fecha a home e mantém o visor ativo");
+            mode.HandleBack();
+            Require(mode.IsActive && guide.MainMenuOpen, "Voltar do Android abre a home dentro do visor");
+            mode.HandleBack();
+            Require(mode.IsActive && !guide.MenuOpen, "Voltar na home retoma a visita VR");
+            mode.ShowMainMenu();
+            PointAt(Button("Modo normal").transform); yield return new WaitForSecondsRealtime(1.3f);
+            Require(!mode.IsActive && !guide.IsEnabled && !ui.GetComponent<WelcomeScreen>().IsVisible &&
+                player.State != PlayerState.Paused && ui.GetComponent<Canvas>().enabled,
+                "Modo normal pelo olhar encerra VR e retoma visita 2D");
+            mode.ShowMainMenu();
             Require(!mode.IsActive && ui.GetComponent<Canvas>().enabled &&
                 ui.GetComponent<WelcomeScreen>().IsVisible && player.State == PlayerState.Paused,
-                "Sair pelo olhar restaura a home e interrompe caminhada");
+                "Retorno no modo normal abre a home 2D e interrompe caminhada");
 
             // Recuperação conjunta: Android pode notificar foco e pausa em ordens diferentes.
             eye.transform.localRotation = Quaternion.Euler(35, 125, 0);
