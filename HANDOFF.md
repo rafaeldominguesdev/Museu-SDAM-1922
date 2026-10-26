@@ -1,6 +1,6 @@
 # Handoff — Museu da Semana de Arte Moderna
 
-Atualizado: 25/10/2026 — créditos incluídos também no carregamento nativo anterior ao menu.
+Atualizado: 25/10/2026 — texto Extra Grande, ocultação dos ajustes VR por sessão e números das salas brancos.
 
 ## Estado vigente — 25/10/2026
 
@@ -8,11 +8,13 @@ Atualizado: 25/10/2026 — créditos incluídos também no carregamento nativo a
 - Sala lateral de Oswald convertida em Sala dos Manifestos; os quatro livros e a biografia de Oswald estão na sala ao fundo.
 - Tarsila reúne A Negra, A Cuca, Abaporu e Operários. Pescadores corresponde à pintura de 1951 do MAC-USP, com reprodução da Revista USP.
 - VR caminha ao olhar para baixo e para ao levantar a cabeça. Velocidades: 0,8 / 1,25 / 1,6 m/s. O botão Menu é lateral, disponível somente a mais de 4 m dos expositores e oculto durante o gesto de caminhada.
+- Opções VR: “Não exibir mais nesta sessão” fecha os ajustes, oculta o botão lateral e bloqueia o atalho até reiniciar o aplicativo. Configurações mantidas durante pausa, recuperação e troca de modo; as fichas das obras e o menu inicial seguem operáveis. O bloqueio fica em memória e é limpo na inicialização do Unity.
+- Texto: padrão, grande, maior e Extra Grande, compartilhados com os ajustes normais e salvos. As 31 fichas foram verificadas sem cortes nos quatro tamanhos. Os números 01 a 06 das salas estão brancos, na cena e no gerador.
 - Fichas VR abrem até 3 m, após permanência do olhar, centralizadas e voltadas ao visitante. Ficam fixas no espaço para permitir aproximação. Apenas Anterior e Próxima página; texto ocupa a área liberada pelos controles, com seções compartilhando páginas.
 - Abertura com créditos de autoria abaixo dos botões. No VR, retornar ao menu inicial mantém o visor ativo, com controles pelo olhar para continuar em VR ou passar ao modo normal. Recuperação de foco preserva essa tela e bloqueia a caminhada enquanto estiver aberta.
 - Carregamento nativo: sprite de autoria centralizado por 4 segundos, com a marca Unity abaixo. `SplashValidation` aprovado; imagem conferida e presença no APK confirmada. Aparência e tempo efetivo no aparelho ainda pendentes.
-- Editor: 422 verificações de VR, seis cenários de dwell e 170 verificações de menu normal aprovados em 25/10, com capturas conferidas. A etapa anterior registrou 360 verificações de acervo/circulação e 43 de movimento.
-- APK atual: `artifacts/splash-creditos-2026-10-25/Museu-Creditos-Carregamento.apk`, 149,41 MiB; build, CRC ZIP, alinhamento e assinatura v2 aprovados. SHA-256 e evidências no [relatório do carregamento](artifacts/splash-creditos-2026-10-25/README.md). A validação do menu está no [relatório de autoria e menu VR](artifacts/creditos-2026-10-25/README.md). APKs anteriores preservados.
+- Editor: 692 verificações de VR, seis cenários de dwell, 183 verificações de menu normal e 361 de acervo/circulação aprovados em 25/10, com capturas conferidas. Incluem leitura/paginação com ajustes ocultos e reinicialização simulada da sessão. A etapa anterior registrou 43 verificações de movimento.
+- APK atual: `artifacts/menu-sessao-2026-10-25/Museu-Menu-Sessao.apk`, 149,41 MiB; build, CRC ZIP, alinhamento e assinatura v2 aprovados. SHA-256, limites e evidências no [relatório do menu por sessão](artifacts/menu-sessao-2026-10-25/README.md). Créditos da abertura preservados, documentados no [relatório do carregamento](artifacts/splash-creditos-2026-10-25/README.md). APKs anteriores preservados.
 - Fontes, análise das obras e capturas: [curadoria de 21/10](artifacts/curadoria-2026-10-21/FONTES.md). Resultado da entrega: [relatório](artifacts/curadoria-2026-10-21/README.md).
 - Aparelho físico: lentes, sensores, conforto, FPS e aquecimento continuam pendentes de validação.
 - Correções posteriores ao acervo aprovado: [leitura e opções VR](artifacts/vr-leitura-2026-10-22/README.md).

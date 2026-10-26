@@ -1,0 +1,10 @@
+{
+  "apk": "Museu-Menu-Sessao.apk",
+  "bytes": 156664602,
+  "sha256": "1f9c5d978d62c6e086cb9dd05f53daba503ff6fb1f6f3a41a0723af8bfbaa7b9",
+  "zip_entries": 1231,
+  "crc": "PASS",
+  "new_text_and_session_code": "PASS",
+  "signature_v2": "PASS",
+  "zipalign_4": "PASS"
+}
