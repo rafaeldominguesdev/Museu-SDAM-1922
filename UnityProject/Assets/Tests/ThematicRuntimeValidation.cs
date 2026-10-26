@@ -174,6 +174,8 @@ namespace MuseumModerna
             var roomSigns=FindObjectsByType<Transform>(FindObjectsSortMode.None).Where(t=>t.name.StartsWith("Sinal_sala_")).ToArray();
             Require(roomSigns.Length==6&&roomSigns.All(s=>s.Find("Placa_sala")!=null&&s.GetComponentsInChildren<TextMesh>().Length==3),
                 "Seis cabeçalhos de sala redesenhados e sem sobreposição");
+            Require(roomSigns.All(s=>s.GetComponentsInChildren<TextMesh>().Single(t=>t.text==s.name.Substring("Sinal_sala_".Length)).color==Color.white),
+                "Seis números das salas brancos para contrastar com o medalhão");
             Require(RenderSettings.ambientLight.r<.4f&&RenderSettings.fog,"Ambiente não é sobrescrito pelo ciclo legado");
             Require(arch.Find("Focos_das_obras")==null,"Focos legados removidos sem duplicação");
             var ropes=arch.Find("Ambientacao_Museologica");
@@ -183,6 +185,7 @@ namespace MuseumModerna
                 Path.Combine(Application.dataPath,"../../artifacts/cinco-salas-2026-09-30"));
             Directory.CreateDirectory(folder);
             Shot("hall",new Vector3(0,1.65f,-8),new Vector3(0,2.7f,10));
+            Shot("placa-sala-numero",new Vector3(-4,4.5f,-5),new Vector3(-9.25f,5.05f,-5));
             Shot("mario",new Vector3(-11,1.65f,-5),new Vector3(-20,2.3f,-6));
             Shot("manifestos",new Vector3(-11,1.65f,5),new Vector3(-20,2.3f,3));
             Shot("anita",new Vector3(11,1.65f,5),new Vector3(20,2.3f,6));
