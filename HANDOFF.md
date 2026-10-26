@@ -1,6 +1,6 @@
 # Handoff — Museu da Semana de Arte Moderna
 
-Atualizado: 25/10/2026 — autoria na abertura e retorno ao menu inicial dentro do visor.
+Atualizado: 25/10/2026 — créditos incluídos também no carregamento nativo anterior ao menu.
 
 ## Estado vigente — 25/10/2026
 
@@ -10,8 +10,9 @@ Atualizado: 25/10/2026 — autoria na abertura e retorno ao menu inicial dentro 
 - VR caminha ao olhar para baixo e para ao levantar a cabeça. Velocidades: 0,8 / 1,25 / 1,6 m/s. O botão Menu é lateral, disponível somente a mais de 4 m dos expositores e oculto durante o gesto de caminhada.
 - Fichas VR abrem até 3 m, após permanência do olhar, centralizadas e voltadas ao visitante. Ficam fixas no espaço para permitir aproximação. Apenas Anterior e Próxima página; texto ocupa a área liberada pelos controles, com seções compartilhando páginas.
 - Abertura com créditos de autoria abaixo dos botões. No VR, retornar ao menu inicial mantém o visor ativo, com controles pelo olhar para continuar em VR ou passar ao modo normal. Recuperação de foco preserva essa tela e bloqueia a caminhada enquanto estiver aberta.
+- Carregamento nativo: sprite de autoria centralizado por 4 segundos, com a marca Unity abaixo. `SplashValidation` aprovado; imagem conferida e presença no APK confirmada. Aparência e tempo efetivo no aparelho ainda pendentes.
 - Editor: 422 verificações de VR, seis cenários de dwell e 170 verificações de menu normal aprovados em 25/10, com capturas conferidas. A etapa anterior registrou 360 verificações de acervo/circulação e 43 de movimento.
-- APK atual: `artifacts/creditos-2026-10-25/Museu-Creditos-VR.apk`, gerado em 25/10, 149,37 MiB; build, CRC ZIP, alinhamento e assinatura v2 aprovados. SHA-256 e evidências no [relatório de autoria e menu VR](artifacts/creditos-2026-10-25/README.md). APKs anteriores preservados.
+- APK atual: `artifacts/splash-creditos-2026-10-25/Museu-Creditos-Carregamento.apk`, 149,41 MiB; build, CRC ZIP, alinhamento e assinatura v2 aprovados. SHA-256 e evidências no [relatório do carregamento](artifacts/splash-creditos-2026-10-25/README.md). A validação do menu está no [relatório de autoria e menu VR](artifacts/creditos-2026-10-25/README.md). APKs anteriores preservados.
 - Fontes, análise das obras e capturas: [curadoria de 21/10](artifacts/curadoria-2026-10-21/FONTES.md). Resultado da entrega: [relatório](artifacts/curadoria-2026-10-21/README.md).
 - Aparelho físico: lentes, sensores, conforto, FPS e aquecimento continuam pendentes de validação.
 - Correções posteriores ao acervo aprovado: [leitura e opções VR](artifacts/vr-leitura-2026-10-22/README.md).
