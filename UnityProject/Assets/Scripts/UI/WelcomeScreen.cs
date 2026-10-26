@@ -9,9 +9,10 @@ namespace MuseumModerna
     {
         private const string ImageResource = "UI/homem_amarelo";
         private const string Credit = "O homem amarelo · Anita Malfatti\n1915–1916";
+        public const string Authorship = "Feito por: Bruno Proença Silva | Rafael Fernandes Domingues";
         private GameObject root;
         private RectTransform rootRect, safeArea, composition, artPanel, photo, content;
-        private Text eyebrow, title, hint, credit;
+        private Text eyebrow, title, hint, credit, authors;
         private PlayerController player;
         private UIManager ui;
         private Sprite artworkSprite, roundedSprite;
@@ -72,6 +73,7 @@ namespace MuseumModerna
             hint = Label(content, "Escolha", "Escolha como visitar", MuseumGuideTheme.Body);
             NormalButton = ModeButton("Modo_normal", "Modo normal", "Visite pelo celular, sem óculos", true, EnterNormal);
             VrButton = ModeButton("Modo_VR", "Modo VR", "Prepare o VR Box e entre no museu", false, PrepareVr);
+            authors = Label(content, "CreditosDeAutoria", Authorship, MuseumGuideTheme.WelcomeCaption);
 #if !UNITY_ANDROID && !UNITY_EDITOR
             VrButton.interactable = false;
             VrButton.transform.Find("Descricao").GetComponent<Text>().text = "Disponível no aplicativo Android";
@@ -161,7 +163,7 @@ namespace MuseumModerna
             float headingHeight = compact ? MuseumGuideTheme.WelcomeCompactHeadingHeight : MuseumGuideTheme.WelcomeHeadingHeight;
             float buttonHeight = compact ? MuseumGuideTheme.WelcomeCompactModeHeight : MuseumGuideTheme.WelcomeModeHeight;
             float contentHeight = MuseumGuideTheme.WelcomeEyebrowHeight + headingHeight +
-                MuseumGuideTheme.WelcomeHintHeight + MuseumGuideTheme.Gap * 2 + buttonHeight * 2;
+                MuseumGuideTheme.WelcomeHintHeight + MuseumGuideTheme.Gap * 3 + buttonHeight * 2 + MuseumGuideTheme.WelcomeCreditHeight;
             composition.sizeDelta = new Vector2(width, height);
 
             if (landscape)
@@ -195,6 +197,8 @@ namespace MuseumModerna
             Place((RectTransform)NormalButton.transform, 0, y, content.rect.width, buttonHeight);
             y += buttonHeight + MuseumGuideTheme.Gap;
             Place((RectTransform)VrButton.transform, 0, y, content.rect.width, buttonHeight);
+            y += buttonHeight + MuseumGuideTheme.Gap;
+            Place(authors.rectTransform, 0, y, content.rect.width, MuseumGuideTheme.WelcomeCreditHeight);
 
             if (photo != null)
                 Place(photo, MuseumGuideTheme.Gap, MuseumGuideTheme.Gap,
