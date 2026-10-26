@@ -17,12 +17,13 @@ namespace MuseumModerna
         private UIManager ui;
         private Camera eye;
         private int checks;
-        private int savedTilt, savedTap;
-        private bool hadTilt, hadTap;
+        private int savedTilt, savedTap, savedSize;
+        private bool hadTilt, hadTap, hadSize;
         private IEnumerator Start()
         {
             hadTilt=PlayerPrefs.HasKey("MuseumTiltWalking");hadTap=PlayerPrefs.HasKey("MuseumTapToWalk");
             savedTilt=PlayerPrefs.GetInt("MuseumTiltWalking",0);savedTap=PlayerPrefs.GetInt("MuseumTapToWalk",0);
+            hadSize=PlayerPrefs.HasKey("MuseumGuide_size");savedSize=PlayerPrefs.GetInt("MuseumGuide_size",0);
             HeadGazeMovement.SetTapToWalk(false);
             yield return null; yield return null;
             var routine = Tests();
@@ -41,6 +42,7 @@ namespace MuseumModerna
         {
             if(hadTilt)PlayerPrefs.SetInt("MuseumTiltWalking",savedTilt);else PlayerPrefs.DeleteKey("MuseumTiltWalking");
             if(hadTap)PlayerPrefs.SetInt("MuseumTapToWalk",savedTap);else PlayerPrefs.DeleteKey("MuseumTapToWalk");
+            if(hadSize)PlayerPrefs.SetInt("MuseumGuide_size",savedSize);else PlayerPrefs.DeleteKey("MuseumGuide_size");
             PlayerPrefs.Save();
         }
         private IEnumerator Tests()
@@ -118,6 +120,17 @@ namespace MuseumModerna
                 HeadGazeMovement.SetTiltWalking(savedTilt);
                 ui.Guide.OpenSettings();
                 Require(player.State==PlayerState.Paused,"Opções pausam a visita em qualquer modo de caminhada");
+                yield return null;yield return null;
+                var initialSize=ui.Guide.TextStep;
+                var sizeButton=ui.GetComponentsInChildren<Button>().Single(b=>b.GetComponentInChildren<Text>()?.text=="Texto: "+ui.Guide.TextSizeLabel);
+                for(int size=0;size<MuseumGuidePanel.TextSizeCount;size++)
+                {
+                    Click(sizeButton);
+                    Require(ui.Guide.TextStep==(initialSize+size+1)%MuseumGuidePanel.TextSizeCount&&
+                        sizeButton.GetComponentInChildren<Text>().text=="Texto: "+ui.Guide.TextSizeLabel,
+                        "Controle normal alterna os quatro tamanhos: "+ui.Guide.TextSizeLabel);
+                }
+                Require(ui.Guide.TextStep==initialSize,"Ciclo normal inclui Extra Grande e retorna ao tamanho inicial");
                 mode.HandleBack();
                 Require(!ui.Guide.SettingsOpen&&!welcome.IsVisible&&!mode.IsPreparationVisible,
                     "Voltar fecha somente opções sem sair da visita normal");

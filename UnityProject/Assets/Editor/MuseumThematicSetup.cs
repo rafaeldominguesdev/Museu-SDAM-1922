@@ -252,7 +252,7 @@ namespace MuseumModerna
             Cube(sign,"Placa_sala",Vector3.zero,new Vector3(6.5f,1.38f,.08f),ink);
             Border(sign,6.5f,1.38f,new Vector3(0,0,.055f),.04f);
             Cube(sign,"Medalhao_numero",new Vector3(-2.58f,0,.075f),new Vector3(.94f,.94f,.035f),gold);
-            Text(sign,number,new Vector3(-2.58f,0,.105f),.45f,ink.color,4,.74f,true);
+            Text(sign,number,new Vector3(-2.58f,0,.105f),.45f,Color.white,4,.74f,true);
             Text(sign,title,new Vector3(.38f,.23f,.105f),.35f,paper.color,30,5.02f,true);
             Text(sign,subtitle,new Vector3(.38f,-.29f,.105f),.14f,new Color(1,.84f,.48f),38,5.02f);
         }

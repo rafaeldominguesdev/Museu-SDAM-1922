@@ -8,6 +8,7 @@ namespace MuseumModerna
     public sealed class MuseumGuidePanel : MonoBehaviour
     {
         private const string Pref = "MuseumGuide_";
+        private static readonly string[] TextSizes = { "padrão", "grande", "maior", "Extra Grande" };
         private RectTransform safe, panel, settings, toggle, backdrop;
         private CanvasGroup group;
         private Image background;
@@ -32,8 +33,10 @@ namespace MuseumModerna
         public bool LongerReading => linger;
         public bool ReducedMotion => reducedMotion;
         public int TextStep => textStep;
+        public static int TextSizeCount => TextSizes.Length;
+        public string TextSizeLabel => TextSizes[textStep];
         public Sprite RoundedSurface => rounded;
-        public void CycleTextSize() { textStep = (textStep + 1) % 3; ApplyPreferences(); }
+        public void CycleTextSize() { textStep = (textStep + 1) % TextSizeCount; ApplyPreferences(); }
         public void ToggleSummary() { summary = !summary; ApplyPreferences(); }
         public void ToggleContrast() { contrast = !contrast; ApplyPreferences(); }
         public void TogglePanels() { panelsEnabled = !panelsEnabled; ApplyPreferences(); }
@@ -50,7 +53,7 @@ namespace MuseumModerna
             contrast = PlayerPrefs.GetInt(Pref + "contrast", 0) != 0;
             linger = PlayerPrefs.GetInt(Pref + "linger", 0) != 0;
             reducedMotion = PlayerPrefs.GetInt(Pref + "motion", 0) != 0;
-            textStep = Mathf.Clamp(PlayerPrefs.GetInt(Pref + "size", 0), 0, 2);
+            textStep = Mathf.Clamp(PlayerPrefs.GetInt(Pref + "size", 0), 0, TextSizeCount - 1);
             rounded = CreateRoundedSprite();
             safe = Rect("GuideSafeArea", parent);
             Stretch(safe);
@@ -136,7 +139,7 @@ namespace MuseumModerna
             options.gameObject.AddComponent<ContentSizeFitter>().verticalFit = ContentSizeFitter.FitMode.PreferredSize;
             optionsScroll.content = options;
             enabledLabel = Button(options, "", () => { panelsEnabled = !panelsEnabled; ApplyPreferences(); });
-            sizeLabel = Button(options, "", () => { textStep = (textStep + 1) % 3; ApplyPreferences(); });
+            sizeLabel = Button(options, "", CycleTextSize);
             summaryLabel = Button(options, "", () => { summary = !summary; ApplyPreferences(); });
             contrastLabel = Button(options, "", () => { contrast = !contrast; ApplyPreferences(); });
             lingerLabel = Button(options, "", () => { linger = !linger; ApplyPreferences(); });
@@ -242,7 +245,7 @@ namespace MuseumModerna
         private void ApplyPreferences(bool save = true)
         {
             enabledLabel.text = "Painéis: " + (panelsEnabled ? "ativados" : "desativados");
-            sizeLabel.text = "Texto: " + new[] { "padrão", "grande", "maior" }[textStep];
+            sizeLabel.text = "Texto: " + TextSizeLabel;
             summaryLabel.text = "Versão resumida: " + (summary ? "sim" : "não");
             contrastLabel.text = "Alto contraste: " + (contrast ? "sim" : "não");
             lingerLabel.text = "Tempo após olhar: " + (linger ? "5 segundos" : "breve");
